@@ -4,6 +4,9 @@ using namespace std;
 int funcADD(int a,int b){
     return a+b;
 }
+void greetings(string n){
+    cout<<"helloo "<<n<<endl;
+}
 int main(){
     cout<<"Hii Hestabit"<<endl;
     cout<<"My name is Divyajyoti Biswal"<<endl;
