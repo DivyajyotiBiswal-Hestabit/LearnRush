@@ -1,2 +1,2 @@
 # LearnRush
-Hestabit trainee LearnRush
+This repository contains the day wise deliverables 
