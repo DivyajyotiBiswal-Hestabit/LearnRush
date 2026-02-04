@@ -5,4 +5,5 @@ int main(){
     cout<<"My name is Divyajyoti"<<endl;
     cout<<"Life is beautiful";
     cout<<3+4<<endl;
+    cout<<8*8<<endl;
 }
