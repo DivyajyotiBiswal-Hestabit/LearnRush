@@ -4,5 +4,5 @@ int main(){
     cout<<"Hii Hestabit"<<endl;
     cout<<"My name is Divyajyoti Biswal"<<endl;
     cout<<3+4<<endl;
-    cout<<8*8<<endl;
+    cout<<8*8;<<endl;
 }
