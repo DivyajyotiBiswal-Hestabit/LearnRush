@@ -1,4 +1,5 @@
 #include<iostream>
+#include<string>
 using namespace std;
 int funcADD(int a,int b){
     return a+b;
