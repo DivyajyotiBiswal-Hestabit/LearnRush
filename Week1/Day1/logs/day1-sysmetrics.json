@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-02-04T05:45:57.785Z",
+  "pid": 5717,
+  "cpuUsage": {
+    "user": 133103,
+    "system": 20015
+  },
+  "resourceUsage": {
+    "userCPUTime": 133169,
+    "systemCPUTime": 20025,
+    "maxRSS": 48456,
+    "sharedMemorySize": 0,
+    "unsharedDataSize": 0,
+    "unsharedStackSize": 0,
+    "minorPageFault": 4152,
+    "majorPageFault": 0,
+    "swappedOut": 0,
+    "fsRead": 0,
+    "fsWrite": 0,
+    "ipcSent": 0,
+    "ipcReceived": 0,
+    "signalsCount": 0,
+    "voluntaryContextSwitches": 30,
+    "involuntaryContextSwitches": 5
+  }
+}

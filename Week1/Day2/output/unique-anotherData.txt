@@ -1,0 +1,2 @@
+Nothing is impossible
+Handle missing cases
