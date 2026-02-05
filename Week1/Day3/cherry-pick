@@ -1,0 +1,11 @@
+Cherry Pick report
+
+Source Branch - Main
+Traget Branch - release/v0.1
+Cherry picked commit - commit8
+
+Conflict - A merge conflict occured during cheery pick.
+Solution - The conflict was manually resolved and and continued using "git cherry-pick --continue".
+
+Conclusion - The required changes are applied sucessfully to the release branch without any conflicts
+
