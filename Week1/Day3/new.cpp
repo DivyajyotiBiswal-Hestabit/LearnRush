@@ -1,6 +1,6 @@
 #include<iostream>
 using namespace std;
-int sub(int a, int b){
+int sub(int a, int b){  //sub func
     return a-b;
 }
 int main(){
