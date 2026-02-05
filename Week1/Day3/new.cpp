@@ -8,5 +8,13 @@ int main(){
     cout<<"Hii Hestabit"<<endl;
     cout<"Hiiii"
     cout<<5+6<<endl; 
+<<<<<<< Updated upstream
     cout<<sub(9,8)<<endl;
 }
+=======
+<<<<<<< HEAD
+    cout<<sub(9,8);
+=======
+>>>>>>> 3176e85 (commit8)
+}// temporary debug change
+>>>>>>> Stashed changes

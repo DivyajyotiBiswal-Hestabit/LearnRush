@@ -1,0 +1,5 @@
+Stash report
+
+An uncommited change was made in new.cpp using git stash push
+Branch was successfully switched from release branch to main branch while the working tree was clean
+Then the stash changes were restored using git stash apply
