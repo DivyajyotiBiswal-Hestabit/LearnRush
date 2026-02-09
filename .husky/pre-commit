@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "🔍 Running pre-commit checks..."
+echo "Checking formatting..."
+
+# Ensure .env is NOT tracked
+if git ls-files --error-unmatch .env > /dev/null 2>&1; then
+  echo "❌ .env file is tracked!"
+  exit 1
+fi
+
+# Ensure logs are ignored
+if ! grep -q "^logs/" .gitignore; then
+  echo "❌ logs/ is not ignored in .gitignore"
+  exit 1
+fi
+
+# Ensure JS is formatted
+npx prettier --check "src/**/*.js"
+

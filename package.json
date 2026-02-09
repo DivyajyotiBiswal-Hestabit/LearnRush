@@ -1,0 +1,25 @@
+{
+  "name": "learnrush",
+  "version": "1.0.0",
+  "description": "This repository contains the day wise deliverables",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DivyajyotiBiswal-Hestabit/LearnRush.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DivyajyotiBiswal-Hestabit/LearnRush/issues"
+  },
+  "homepage": "https://github.com/DivyajyotiBiswal-Hestabit/LearnRush#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "prettier": "^3.8.1"
+  }
+}
