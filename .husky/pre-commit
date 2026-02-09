@@ -1,20 +1,29 @@
 #!/bin/sh
 
 echo "🔍 Running pre-commit checks..."
-echo "Checking formatting..."
 
-# Ensure .env is NOT tracked
+# 1️⃣ Ensure .env is not tracked
 if git ls-files --error-unmatch .env > /dev/null 2>&1; then
   echo "❌ .env file is tracked!"
   exit 1
 fi
 
-# Ensure logs are ignored
+# 2️⃣ Ensure logs are ignored
 if ! grep -q "^logs/" .gitignore; then
   echo "❌ logs/ is not ignored in .gitignore"
   exit 1
 fi
 
-# Ensure JS is formatted
-npx prettier --check "src/**/*.js"
+# 3️⃣ Ensure JS is formatted (ONLY if JS files exist)
+FILES=$(git ls-files "src/**/*.js")
+
+if [ -n "$FILES" ]; then
+  echo "Checking formatting..."
+  npx prettier --check $FILES
+else
+  echo "No JS files found, skipping Prettier check"
+fi
+
+echo "✅ Pre-commit checks passed"
+
 
