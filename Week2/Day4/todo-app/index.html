@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="head"><h1>PLAN YOUR DAY HERE</h1></header>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="searchbar">
+                <input type="text" placeholder="Search tasks...">
+            </div>
+            <div class="Choose">
+                <h3>LISTS</h3>
+                <ul>
+                    <li id="newListBtn">➕ New List</li>
+                    <li>📌 Important</li>
+                    <li>📅 Planned</li>
+                </ul>
+            </div>
+            <div class="recent-work">
+                <h3>Recent</h3>
+                <ul>
+                    
+                </ul>
+            </div>
+        </aside>
+        <main class="main-content">
+            <section class="today-todo">
+                <h2>Today's To-Do</h2>
+                <div class="todo-input">
+                    <textarea type="text" placeholder="Add a task..." ></textarea>
+                    <button>Add</button>
+                    <button id="saveListBtn">Save List</button>
+
+                </div>
+                <ul class="todo-list">
+                    <!-- Tasks will appear here -->
+                </ul>
+            </section>
+            <section class="sticky-walls">
+                <h2>Sticky Wall</h2>
+                <div class="sticky-input">
+                    <input type="text" placeholder="Add a sticky note..." />
+                    <button>Add</button>
+                </div>
+
+                <div class="sticky-container">
+                    <div class="sticky-note">💡 Random Idea</div>
+                    <div class="sticky-note">📌 Reminder</div>
+                    <div class="sticky-note">🔥 Motivation</div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
