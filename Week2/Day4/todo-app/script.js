@@ -1,4 +1,4 @@
-// ================= SELECTORS =================
+// SELECTORS 
 const taskInput = document.querySelector(".todo-input textarea");
 const addBtn = document.querySelector(".todo-input button");
 const saveListBtn = document.getElementById("saveListBtn");
@@ -10,12 +10,12 @@ const stickyInput = document.querySelector(".sticky-input input");
 const stickyAddBtn = document.querySelector(".sticky-input button");
 const stickyContainer = document.querySelector(".sticky-container");
 
-// ================= DATA =================
+// DATA 
 let currentTasks = [];
 let allLists = JSON.parse(localStorage.getItem("allLists")) || [];
 let stickyNotes = JSON.parse(localStorage.getItem("stickyNotes")) || [];
 
-// ================= ADD TASK =================
+// ADD TASK 
 addBtn.addEventListener("click", addTask);
 
 function addTask() {
@@ -27,7 +27,7 @@ function addTask() {
   taskInput.value = "";
 }
 
-// ================= RENDER TASKS =================
+// RENDER TASKS
 function renderTasks() {
   todoList.innerHTML = "";
 
@@ -50,7 +50,7 @@ function renderTasks() {
   });
 }
 
-// ================= SAVE LIST =================
+// SAVE LIST 
 saveListBtn.addEventListener("click", () => {
   if (currentTasks.length === 0) {
     alert("Add some tasks first!");
@@ -74,7 +74,7 @@ saveListBtn.addEventListener("click", () => {
   renderTasks();
 });
 
-// ================= RENDER RECENT LISTS =================
+// RECENT LISTS
 function renderRecentLists() {
   recentList.innerHTML = "";
 
@@ -91,7 +91,7 @@ function renderRecentLists() {
   });
 }
 
-// ================= SEARCH =================
+//SEARCH
 searchInput.addEventListener("input", () => {
   const value = searchInput.value.toLowerCase();
   const items = todoList.querySelectorAll("li");
@@ -102,7 +102,7 @@ searchInput.addEventListener("input", () => {
   });
 });
 
-// ================= STICKY WALL =================
+//STICKY WALL
 stickyAddBtn.addEventListener("click", addStickyNote);
 
 function addStickyNote() {
@@ -134,8 +134,6 @@ function renderStickyNotes() {
     stickyContainer.appendChild(div);
   });
 }
-
-// ================= INIT =================
 renderRecentLists();
 renderStickyNotes();
 
