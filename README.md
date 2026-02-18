@@ -3,38 +3,41 @@ This repository contains the day wise deliverables
 
 📌 Week 1 — Engineering Mindset Bootcamp
 
-🟦 DAY 1 — SYSTEM REVERSE ENGINEERING + NODE & TERMINAL
+🟦 DAY1 — SYSTEM REVERSE ENGINEERING + NODE & TERMINAL
 
-📖 Overview
+~ Sysinfo.js is a script that prints the hostname, available disk space, top 5 open ports, default gateway and count of logged-in users
 
-This task focuses on understanding system-level concepts using Node.js and the Linux terminal.
-The objective was to inspect system information, work with shell configuration, and log runtime metrics using Node.js.
-The exercise builds foundational knowledge in:
+~ Created 3 shell aliases named gst,files and ports for git status, ls -lha and lsof -i -P -n | grep LISTEN  respectively  (Screenshot attached in the folder)
+[ To verify this, run(in terminal):  alias
+                                     type alias_name]
+Reminder - Before creating aliases, check your current shell by "echo $SHELL"   
 
-System introspection
-Terminal commands
-Shell configuration
-Node.js process metrics
-Logging structured JSON output
+~ Ran a node program named runtimeMetrics.js and logged its runtime metrices using process.cpuUsage() and process.resourceUsage()
 
-🛠 Tech Stack
-Node.js
-Linux Terminal
-Bash
-Built-in Node modules (os, child_process, fs)
+🟩 DAY2 — NODE CLI & CONCURRENCY
 
-🟩 DAY 2 — Node CLI & Concurrency
+CLI Tool-Stats.js
+Features: -Counts lines, characters, and words
+          -Processes 3 files in parallel
+          -Outputs performance metrics
+          -Optional duplicate removal
 
-📖 Overview
+🟨 DAY3 — GIT MASTERY (RESET + REVERT + CHERRY-PICK + STASH)
+🟥 DAY4 — HTTP / API FORENSICS (cURL + POSTMAN)
+🟪 DAY5 — AUTOMATION & MINI-CI PIPELINE
 
-Built a production-style CLI tool using Node.js that performs file statistics analysis with concurrent processing and performance monitoring.
-Bonus feature - Remove duplicates
+📌 Week 2 — Frontend (HTML, CSS, JS)
 
-🛠 Concepts Practiced
-CLI argument parsing
-File system operations
-Async concurrency with: Promise.all
-                        async/await
-Performance measurement:process.hrtime()
-                        process.memoryUsage()
-Writing structured logs
+🟦 DAY1 – HTML5 + Semantic Layout
+🟩 DAY2 – CSS Layout Mastery (Flexbox + Grid)
+🟨 DAY3 – JavaScript ES6 + DOM Manipulation
+🟥 DAY4 – JS Utilities + LocalStorage Mini-Project
+🟪 DAY5 – Capstone UI + JS Project
+
+📌 Week 3 – Frontend Advanced
+
+🟦 DAY1 — TailwindCSS + UI System Basics
+🟩 DAY2 — Tailwind Advanced + Component Library
+🟨 DAY3 — Next.js Routing + Layout System
+🟥 DAY4 — Dynamic UI + Image Optimization
+🟪 DAY5 — Capstone Mini Project (No backend)
