@@ -1,70 +1,79 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
-import Modal from "@/components/ui/Modal";
-import Input from "@/components/ui/Input";
-
-export default function Page() {
-  const [open, setOpen] = useState(false);
-
+export default function Home() {
   return (
-    <div className="p-10 space-y-10 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
 
-      {/* Page Title */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <Button onClick={() => setOpen(true)}>Open Modal</Button>
-      </div>
+      {/* Hero */}
+      <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Users</h2>
-          <p className="text-3xl font-bold mt-1">1,245</p>
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900">
+          StoreFlow Dashboard
+        </h1>
 
-          <Badge>+12%</Badge>
-        </Card>
+        <p className="mt-4 text-gray-600 max-w-2xl">
+          Manage orders, track revenue, monitor customers, and analyze store
+          performance — all in one powerful and modern dashboard built for
+          growing e-commerce businesses.
+        </p>
 
-        <Card>
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Revenue</h2>
-          <p className="text-3xl font-bold mt-1">$34,200</p>
+        {/* CTAs */}
+        <div className="mt-8 flex gap-4 flex-wrap justify-center">
 
-          <Badge>+8%</Badge>
-        </Card>
+          <Link
+            href="/dashboard"
+            className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-medium shadow hover:bg-indigo-700 transition"
+          >
+            Enter Dashboard →
+          </Link>
 
-        <Card>
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Orders</h2>
-          <p className="text-3xl font-bold mt-1">320</p>
+          <Link
+            href="/dashboard/about"
+            className="px-6 py-3 rounded-xl border border-gray-300 hover:bg-gray-100 transition"
+          >
+            Learn More
+          </Link>
 
-          <Badge>+5%</Badge>
-        </Card>
-
-        <Card>
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Performance</h2>
-          <p className="text-3xl font-bold mt-1">98%</p>
-
-          <Badge>Stable</Badge>
-        </Card>
-      </div>
-
-      {/* Form Section */}
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold">Quick Action</h2>
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <Input placeholder="Enter something..." />
-          <Button>Submit</Button>
         </div>
-      </Card>
 
-      {/* Modal */}
-      <Modal isOpen={open} onClose={() => setOpen(false)}>
-        <h2 className="text-lg font-semibold mb-2">Example Modal</h2>
-        <p>This is a reusable modal component.</p>
-      </Modal>
+      </div>
+
+      {/* Features */}
+      <section className="px-6 pb-16 max-w-6xl mx-auto w-full">
+        <div className="grid gap-6 md:grid-cols-3">
+
+          <div className="bg-white p-6 rounded-xl shadow border">
+            <h3 className="font-semibold text-lg">📦 Order Management</h3>
+            <p className="text-sm text-gray-500 mt-2">
+              Track orders, monitor fulfillment, and manage returns efficiently.
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow border">
+            <h3 className="font-semibold text-lg">📊 Real-time Analytics</h3>
+            <p className="text-sm text-gray-500 mt-2">
+              Visualize revenue, conversion rates, and customer insights.
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow border">
+            <h3 className="font-semibold text-lg">👥 Customer Insights</h3>
+            <p className="text-sm text-gray-500 mt-2">
+              Understand customer behavior and improve retention strategies.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="text-center pb-6 text-sm text-gray-400">
+        © 2026 StoreFlow — Built with Next.js
+      </footer>
 
     </div>
   );
 }
+
+
+
