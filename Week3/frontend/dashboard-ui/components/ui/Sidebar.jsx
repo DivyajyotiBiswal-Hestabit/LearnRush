@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { name: "Dashboard", href: "/" },
-  { name: "Analytics", href: "/analytics" },
-  { name: "Users", href: "/users" },
-  { name: "Settings", href: "/settings" },
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "About", href: "/dashboard/about" }, 
+  { name: "Analytics", href: "/dashboard/analytics" },
+  { name: "Customers", href: "/dashboard/customers" },
+  { name: "Settings", href: "/dashboard/settings" },
 ];
 
 export default function Sidebar() {
@@ -18,14 +19,14 @@ export default function Sidebar() {
 
       {/* Logo */}
       <div className="px-6 py-5 text-xl font-bold text-white">
-        MyApp
+        StoreFlow
       </div>
 
       {/* Navigation */}
       <nav className="flex flex-col gap-2 px-3">
 
         {links.map((link) => {
-          const active = pathname === link.href;
+          const active = pathname.startsWith(link.href);
 
           return (
             <Link
@@ -52,3 +53,4 @@ export default function Sidebar() {
     </aside>
   );
 }
+
