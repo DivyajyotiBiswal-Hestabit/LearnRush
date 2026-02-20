@@ -15,7 +15,7 @@ This repository contains the day wise deliverables
 
 Reminder - Before creating aliases, check your current shell by "echo $SHELL"   
 
-~ Ran a node program named runtimeMetrics.js and logged its runtime metrices using process.cpuUsage() and process.resourceUsage()
+~ Ran a node program named runtimeMetrics.js and captured its runtime metrices using process.cpuUsage() and process.resourceUsage()
 
 🟩 DAY2 — NODE CLI & CONCURRENCY
 
