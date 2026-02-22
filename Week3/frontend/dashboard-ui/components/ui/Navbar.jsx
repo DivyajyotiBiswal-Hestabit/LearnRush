@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
@@ -6,7 +7,7 @@ export default function Navbar() {
 
       {/* Title */}
       <h1 className="text-lg font-semibold text-gray-800">
-        Dashboard
+        StoreFlow
       </h1>
 
       {/* Right side */}
@@ -20,9 +21,11 @@ export default function Navbar() {
         />
 
         {/* Avatar */}
-        <div className="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
-          D
-        </div>
+        <Link href="/dashboard/profile">
+            <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
+                D
+            </div>
+        </Link>
 
       </div>
 

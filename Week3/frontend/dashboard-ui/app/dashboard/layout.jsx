@@ -15,7 +15,7 @@ export default function DashboardLayout({ children }) {
         <Navbar />
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="p-7 ml-64">
           {children}
         </main>
 
