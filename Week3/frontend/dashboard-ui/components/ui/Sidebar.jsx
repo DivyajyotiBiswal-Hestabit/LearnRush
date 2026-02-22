@@ -8,6 +8,7 @@ const links = [
   { name: "About", href: "/dashboard/about" }, 
   { name: "Analytics", href: "/dashboard/analytics" },
   { name: "Customers", href: "/dashboard/customers" },
+  { name: "Billing", href: "/dashboard/billing" },
   { name: "Settings", href: "/dashboard/settings" },
 ];
 
@@ -15,7 +16,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 h-screen bg-slate-900 text-gray-300 flex flex-col border-r border-slate-800">
+    <aside className="fixed inset-y-0 left-0 w-64 overflow-y-auto bg-slate-900 text-gray-300 flex flex-col border-r border-slate-800">
 
       {/* Logo */}
       <div className="px-6 py-5 text-xl font-bold text-white">

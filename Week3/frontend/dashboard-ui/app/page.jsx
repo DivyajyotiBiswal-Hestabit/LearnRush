@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import LandingNavbar from "@/components/ui/LandingPageNavbar";
 
 export const metadata = {
   title: "StoreFlow — E-commerce Dashboard",
@@ -11,14 +12,16 @@ export const metadata = {
 export default function Home() {
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
-
+        {/* Navbar */}
+        <LandingNavbar />
+        
         {/* Dark gradient background */}
-        <div className="absolute inset-0 -z-20 bg-[linear-gradient(400deg,#020617_0%,#020617_30%,#030712_60%,#020617_100%)]" />
+        <div className="absolute inset-0 -z-20 bg-[linear-gradient(100deg,#020500_0%,#020500_40%,#020600_60%,#010617_100%)]" />
 
         {/* Soft shade blobs */}
         <div className="absolute inset-0 -z-10">
-            <div className="absolute top-[-200px] left-[-150px] w-[500px] h-[500px] bg-indigo-600/20 blur-3xl rounded-full" />
-            <div className="absolute bottom-[-200px] right-[-150px] w-[500px] h-[500px] bg-purple-600/20 blur-3xl rounded-full" />
+            <div className="absolute top-[-200px] left-[-250px] w-[600px] h-[500px] bg-indigo-600/40 blur-3xl rounded-full" />
+            <div className="absolute bottom-[-200px] right-[-250px] w-[600px] h-[500px] bg-indigo-600/40 blur-3xl rounded-full" />
         </div>
 
 
@@ -52,14 +55,15 @@ export default function Home() {
           </div>
 
           {/* Hero Image */}
-          <div className="relative mt-12 w-full max-w-5xl rounded-3xl border border-white/10 bg-white/5 backdrop-blur shadow-2xl overflow-hidden">
+          <div className="relative flex justify-center mt-15">
+              <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full"></div>
 
               <Image
-                  src="/background.png"
+                  src="/e_commerce.jpg"
                   alt="Dashboard preview"
-                  fill
-                  className="object-contain rounded-2xl shadow-lg border"
-                  priority
+                  width={400}
+                  height={200}
+                  className="relative rounded-2xl shadow-2xl border border-slate-700"
               />
           </div>
 
