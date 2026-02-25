@@ -2,7 +2,7 @@
 
 This repository contains the day wise deliverables 
 
-**📌 Week 1 — Engineering Mindset Bootcamp**
+***📌 Week 1 — Engineering Mindset Bootcamp***
 
 **🟦 DAY1 — SYSTEM REVERSE ENGINEERING + NODE & TERMINAL**
 
@@ -114,26 +114,141 @@ Commands to run build bundle : TIMESTAMP = $(date +%Y%m%d%H%M%S)
   <img src="Screenshots/Week1/scheduledCronJob.png" width="600"/>
 </p>
 
-📌 Week 2 — Frontend (HTML, CSS, JS)
+***📌 Week 2 — Frontend (HTML, CSS, JS)***
 
-🟦 DAY1 – HTML5 + Semantic Layout
+**🟦 DAY1 – HTML5 + Semantic Layout**
 
-🟩 DAY2 – CSS Layout Mastery (Flexbox + Grid)
+### Exercise
 
-🟨 DAY3 – JavaScript ES6 + DOM Manipulation
+Built a Blog Page using only semantic HTML (no CSS).
 
-🟥 DAY4 – JS Utilities + LocalStorage Mini-Project
+### Key Learnings
 
-🟪 DAY5 – Capstone UI + JS Project
+- Importance of semantic tags like `header`, `nav`, `main`, `section`, `article`, `aside`, and `footer`
+- How semantic HTML improves accessibility and SEO
+- Structuring content without relying on generic containers
+- Basics of building accessible forms
+- Understanding document flow before applying styles
 
-📌 Week 3 – Frontend Advanced
+### Notes
 
-🟦 DAY1 — TailwindCSS + UI System Basics
+- No CSS was used — focus was on structure and semantics.
+- Accessibility considerations were included where applicable.
 
-🟩 DAY2 — Tailwind Advanced + Component Library
+**🟩 DAY2 – CSS Layout Mastery (Flexbox + Grid)**
 
-🟨 DAY3 — Next.js Routing + Layout System
+### Exercise
 
-🟥 DAY4 — Dynamic UI + Image Optimization
+Replicated a UI screenshot provided by mentor using Flexbox and CSS Grid.
 
-🟪 DAY5 — Capstone Mini Project (No backend)
+### Key Learnings
+
+- Difference between Flexbox (1D layout) and Grid (2D layout)
+- Building responsive layouts without frameworks
+- Handling spacing, alignment, and layout flow
+- Importance of mobile-first design strategy
+- Practical understanding of CSS responsiveness
+
+### Notes
+- Focus was on layout techniques using Flexbox and Grid.
+- Responsiveness tested across different screen sizes.
+
+<p align="center">
+  <img src="Screenshots/Week2/Comparison.png" width="600"/>
+</p>
+
+**🟨 DAY3 – JavaScript ES6 + DOM Manipulation**
+
+### Exercise
+
+Built an interactive FAQ accordion using JavaScript (click to expand).
+
+### Key Learnings
+
+- Writing cleaner code using ES6 features
+- Understanding event-driven programming
+- Selecting and updating DOM elements dynamically
+- Managing UI state using JavaScript
+- Improving interactivity without external libraries
+
+### Notes
+
+- Focus was on core JavaScript fundamentals and DOM APIs.
+- No frameworks were used — pure JavaScript implementation.
+
+<p align="center">
+  <img src="Screenshots/Week2/Accordion.png" width="600"/>
+</p>
+
+**🟥 DAY4 – JS Utilities + LocalStorage Mini-Project**
+
+### 🧪 Exercise
+Built a Todo App with LocalStorage persistence.
+
+Features:
+- Add tasks
+- Edit tasks
+- Delete tasks
+- Add sticky notes
+- Persist data after refresh
+
+### Key Learnings
+
+- Structuring reusable utility functions
+- Persisting application state in the browser
+- Debugging JavaScript effectively using DevTools
+- Handling runtime errors gracefully
+- Building small stateful applications without frameworks
+
+### Notes
+
+- Focus was on building a functional mini-project with persistence.
+- Emphasis on clean utility functions and debugging workflow.
+
+<p align="center">
+  <img src="Screenshots/Week2/Todo.png" width="600"/>
+</p>
+
+**🟪 DAY5 – Capstone UI + JS Project**
+
+### Exercise
+
+Built a mini “E-commerce product listing page”.
+
+### Key Learnings
+
+- Fetching and rendering API data dynamically
+- Managing UI state with search and sorting
+- Structuring a multi-page frontend project
+- Building responsive layouts
+- Integrating all frontend fundamentals into a single project
+
+### Notes
+
+- Focus was on combining layout, interactivity, and data fetching.
+- Emphasis on clean UI and responsiveness.
+
+<p align="center">
+  <img src="Screenshots/Week2/Ecommerce1.png" width="600"/>
+</p>
+
+<p align="center">
+  <img src="Screenshots/Week2/ECommerce2.png" width="600"/>
+</p>
+
+<p align="center">
+  <img src="Screenshots/Week2/ECommerce3.png" width="600"/>
+</p>
+
+
+***📌 Week 3 – Frontend Advanced***
+
+**🟦 DAY1 — TailwindCSS + UI System Basics**
+
+**🟩 DAY2 — Tailwind Advanced + Component Library**
+
+**🟨 DAY3 — Next.js Routing + Layout System**
+
+**🟥 DAY4 — Dynamic UI + Image Optimization**
+
+**🟪 DAY5 — Capstone Mini Project (No backend)**
