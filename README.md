@@ -95,12 +95,10 @@ For private ip address of sever: curl ifconfig.me
 
 <p align="center">
   <img src="Screenshots/Week1/failed_pre-commit.png" width="600"/>
-  <p>Failed pre-commit hook"</p>
 </p>
 
 <p align="center">
-  <img src="Screenshots/Weeek1/passed_pre-commit.png" width="600"/>
-  <p>Passed pre-commit hook"</p>
+  <img src="Screenshots/Week1/passed_pre-commit.png" width="600"/>
 </p>
 
 ~ Generated archive: bundle-<timestamp>.zip which includes source code, logs, docs and SHA1 checksums  (To create checksum file: sha1sum src/* > checksums.sha1)
@@ -112,7 +110,7 @@ zip -r bundle -$TIMESTAMP.zip src logs docs checksum.sha1
 ~ Scheduling to run healthcheck.sh to run every 5 min using cron. To edit crontab run : crontab -e but first make the healthcheck.sh executable using chmod +x healthcheck.sh
 
 <p align="center">
-  <img src="Screenshots/Weeek1/scheduledCronJob.png" width="600"/>
+  <img src="Screenshots/Week1/scheduledCronJob.png" width="600"/>
 </p>
 
 📌 Week 2 — Frontend (HTML, CSS, JS)
