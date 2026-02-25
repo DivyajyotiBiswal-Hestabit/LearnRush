@@ -2,7 +2,7 @@
 
 This repository contains the day wise deliverables 
 
-***📌 Week 1 — Engineering Mindset Bootcamp***
+## 📌 Week 1 — Engineering Mindset Bootcamp
 
 **🟦 DAY1 — SYSTEM REVERSE ENGINEERING + NODE & TERMINAL**
 
@@ -114,7 +114,7 @@ Commands to run build bundle : TIMESTAMP = $(date +%Y%m%d%H%M%S)
   <img src="Screenshots/Week1/scheduledCronJob.png" width="600"/>
 </p>
 
-***📌 Week 2 — Frontend (HTML, CSS, JS)***
+## 📌 Week 2 — Frontend (HTML, CSS, JS)
 
 **🟦 DAY1 – HTML5 + Semantic Layout**
 
@@ -182,7 +182,7 @@ Built an interactive FAQ accordion using JavaScript (click to expand).
 
 **🟥 DAY4 – JS Utilities + LocalStorage Mini-Project**
 
-### 🧪 Exercise
+### Exercise
 Built a Todo App with LocalStorage persistence.
 
 Features:
@@ -232,23 +232,170 @@ Built a mini “E-commerce product listing page”.
   <img src="Screenshots/Week2/Ecommerce1.png" width="600"/>
 </p>
 
+
 <p align="center">
   <img src="Screenshots/Week2/ECommerce2.png" width="600"/>
 </p>
+
 
 <p align="center">
   <img src="Screenshots/Week2/ECommerce3.png" width="600"/>
 </p>
 
-
-***📌 Week 3 – Frontend Advanced***
+## 📌 Week 3 – Frontend Advanced
 
 **🟦 DAY1 — TailwindCSS + UI System Basics**
 
+### Exercise
+
+Built a Dashboard Layout skeleton including header and sidebar.
+
+### Key Learnings
+
+- Setting up Tailwind in a Next.js environment
+- Using utility-first styling effectively
+- Structuring reusable UI components
+- Understanding layout composition with header and sidebar
+- Working with custom design tokens via theme configuration
+
 **🟩 DAY2 — Tailwind Advanced + Component Library**
+
+### Exercise
+
+Built a component library using reusable UI components and reused the Day 1 sidebar and header.
+
+Components created in:
+/components/ui/
+
+- Button.jsx
+- Input.jsx
+- Card.jsx
+- Badge.jsx
+- Modal.jsx
+
+### Key Learnings
+
+- Designing reusable UI components
+- Applying atomic design concepts
+- Managing layout with Tailwind utilities
+- Passing props for flexible component behavior
+- Structuring a scalable component library
 
 **🟨 DAY3 — Next.js Routing + Layout System**
 
+### Exercise
+
+Built a multi-page application structure using routing and layouts.
+
+Pages created:
+- `/` (landing page)
+- `/about`
+- `/dashboard`
+- `/dashboard/profile`
+
+Used the Day 2 complete UI to create static pages and implement routing and layout system.
+
+### Key Learnings
+
+- Understanding file-based routing in Next.js
+- Creating nested layout hierarchies
+- Sharing navigation across pages
+- When to use Client vs Server components
+- Structuring scalable multi-page applications
+
 **🟥 DAY4 — Dynamic UI + Image Optimization**
 
+### Exercise
+
+Built a responsive landing page similar to a SaaS product page using the codebase completed up to Day 3.
+
+Sections included:
+- Hero section
+- Features grid
+- Testimonials (cards)
+- Footer
+
+Applied Tailwind classes for responsiveness and implemented on-page SEO tags.
+
+### Key Learnings
+
+- Optimizing images for performance using Next.js
+- Building responsive UI with Tailwind utilities
+- Improving SEO through proper metadata and structure
+- Structuring landing pages for clarity and conversion
+- Enhancing UI with subtle animations
+
 **🟪 DAY5 — Capstone Mini Project (No backend)**
+
+### Exercise
+
+Built a full multi-page UI using Next.js and Tailwind CSS without a backend.
+
+
+<p align="center">
+  <img src="Screenshots/Week3/LandingPage1.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/LandingPage2.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/Dashboard.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/SignIn.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/SignUp.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/About.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/Profile.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/Billing.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/Customers.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/Analytics.png" width="600"/>
+</p>
+
+
+<p align="center">
+  <img src="Screenshots/Week3/Settings.png" width="600"/>
+</p>
+
+
+
+## 📌 WEEK 4 — BACKEND SYSTEMS & PRODUCTION ENGINEERING
+
+**🟦 DAY 1 — BACKEND SYSTEM BOOTSTRAPPING & LIFECYCLE**
+
+**🟩 DAY 2 — DATA DESIGN & QUERY PERFORMANCE (NON-CRUD)**
+
+**🟨 DAY 3 — QUERY PIPELINES & FAILURE-SAFE APIs**
+
+**🟥 DAY 4 — API DEFENSE & INPUT CONTROL**
+
+**🟪 DAY 5 — ASYNC WORKERS, OBSERVABILITY & RELEASE READINESS**
