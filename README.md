@@ -17,6 +17,10 @@ type alias_name
 
 Reminder - Before creating aliases, check your current shell by "echo $SHELL"   
 
+<p align="center">
+  <img src="Screenshots/Week1/bashrc_screenshot.png" width="600"/>
+</p>
+
 ~ Ran a node program named runtimeMetrics.js and captured its runtime metrices using process.cpuUsage() and process.resourceUsage()
 
 🟩 DAY2 — NODE CLI & CONCURRENCY
@@ -57,6 +61,10 @@ Command used: git cherry-pick 1commitHash 2commitHash....
 
 ~ Created commit graph using: git log --graph --all show
 
+<p align="center">
+  <img src="Screenshots/Week1/commit-graph.png" width="600"/>
+</p>
+
 🟥 DAY4 — HTTP / API FORENSICS (cURL + POSTMAN)
 
 ~ Logged the response headers into curl-headers.txt using:  curl -I https://api.github.com/users/octat > curl-headers.txt
@@ -85,6 +93,16 @@ For private ip address of sever: curl ifconfig.me
 
 ~ Created pre-commit hook using Husky which checks that .env file does not exist in git, Js is formatted and ensure log files are ignored.
 
+<p align="center">
+  <img src="Screenshots/Week1/failed_pre-commit.png" width="600"/>
+  <p>Failed pre-commit hook"</p>
+</p>
+
+<p align="center">
+  <img src="Screenshots/Weeek1/passed_pre-commit.png" width="600"/>
+  <p>Passed pre-commit hook"</p>
+</p>
+
 ~ Generated archive: bundle-<timestamp>.zip which includes source code, logs, docs and SHA1 checksums  (To create checksum file: sha1sum src/* > checksums.sha1)
 
 Commands to run build bundle : TIMESTAMP = $(date +%Y%m%d%H%M%S)      #to generate timestamp
@@ -92,6 +110,10 @@ Commands to run build bundle : TIMESTAMP = $(date +%Y%m%d%H%M%S)      #to genera
 zip -r bundle -$TIMESTAMP.zip src logs docs checksum.sha1
 
 ~ Scheduling to run healthcheck.sh to run every 5 min using cron. To edit crontab run : crontab -e but first make the healthcheck.sh executable using chmod +x healthcheck.sh
+
+<p align="center">
+  <img src="Screenshots/Weeek1/scheduledCronJob.png" width="600"/>
+</p>
 
 📌 Week 2 — Frontend (HTML, CSS, JS)
 
