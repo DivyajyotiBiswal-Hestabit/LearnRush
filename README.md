@@ -1,9 +1,10 @@
 # LearnRush
+
 This repository contains the day wise deliverables 
 
-📌 Week 1 — Engineering Mindset Bootcamp
+**📌 Week 1 — Engineering Mindset Bootcamp**
 
-🟦 DAY1 — SYSTEM REVERSE ENGINEERING + NODE & TERMINAL
+**🟦 DAY1 — SYSTEM REVERSE ENGINEERING + NODE & TERMINAL**
 
 ~ Sysinfo.js is a script that prints the hostname, available disk space, top 5 open ports, default gateway and count of logged-in users
 
@@ -23,7 +24,7 @@ Reminder - Before creating aliases, check your current shell by "echo $SHELL"
 
 ~ Ran a node program named runtimeMetrics.js and captured its runtime metrices using process.cpuUsage() and process.resourceUsage()
 
-🟩 DAY2 — NODE CLI & CONCURRENCY
+**🟩 DAY2 — NODE CLI & CONCURRENCY**
 
 CLI Tool-Stats.js
 
@@ -41,7 +42,7 @@ Command to run : node stats.js --file filename.txt  (this will process the file 
 
 To process files and remove their duplicate lines : node stats.js --file filename.txt --unique true   (After this the modified files will be added to the output folder)       
 
-🟨 DAY3 — GIT MASTERY (RESET + REVERT + CHERRY-PICK + STASH)
+**🟨 DAY3 — GIT MASTERY (RESET + REVERT + CHERRY-PICK + STASH)**
 
 ~ Syntax error was inserted in the program as a bad commit out of 10 commits and used git bisect to detect the first bad commit  
 
@@ -65,7 +66,7 @@ Command used: git cherry-pick 1commitHash 2commitHash....
   <img src="Screenshots/Week1/commit-graph.png" width="600"/>
 </p>
 
-🟥 DAY4 — HTTP / API FORENSICS (cURL + POSTMAN)
+**🟥 DAY4 — HTTP / API FORENSICS (cURL + POSTMAN)**
 
 ~ Logged the response headers into curl-headers.txt using:  curl -I https://api.github.com/users/octat > curl-headers.txt
 
@@ -83,7 +84,7 @@ http://localhost:3000/headers
 
 http://localhost:3000/count
 
-🟪 DAY5 — AUTOMATION & MINI-CI PIPELINE
+**🟪 DAY5 — AUTOMATION & MINI-CI PIPELINE**
 
 ~ healthcheck.sh pings your sever every 10sec and also log the timestamps during the failure into the logs folder  
 
@@ -103,9 +104,9 @@ For private ip address of sever: curl ifconfig.me
 
 ~ Generated archive: bundle-<timestamp>.zip which includes source code, logs, docs and SHA1 checksums  (To create checksum file: sha1sum src/* > checksums.sha1)
 
-Commands to run build bundle : TIMESTAMP = $(date +%Y%m%d%H%M%S)      #to generate timestamp
+Commands to run build bundle : TIMESTAMP = $(date +%Y%m%d%H%M%S)      
 
-zip -r bundle -$TIMESTAMP.zip src logs docs checksum.sha1
+#to generate timestamp:  zip -r bundle -$TIMESTAMP.zip src logs docs checksum.sha1
 
 ~ Scheduling to run healthcheck.sh to run every 5 min using cron. To edit crontab run : crontab -e but first make the healthcheck.sh executable using chmod +x healthcheck.sh
 
