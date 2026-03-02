@@ -1,14 +1,17 @@
 const mongoose = require("mongoose");
 const config = require("../config");
-const logger = require("../utils/logger");
 
-module.exports = async function loadDB() {
+const connectDB = async () => {
   try {
-    await mongoose.connect(config.dbUri);
+    console.log("Trying to connect to:", config.mongoUri); // 👈 ADD THIS
 
-    logger.info("Database connected");
-  } catch (err) {
-    logger.error("Database connection failed");
+    await mongoose.connect(config.mongoUri);
+
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.error("Full error:", error.message); // 👈 CHANGE THIS
     process.exit(1);
   }
 };
+
+module.exports = connectDB;

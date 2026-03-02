@@ -16,7 +16,6 @@ dotenv.config({
 });
 
 module.exports = {
-  env,
   port: process.env.PORT || 3000,
-  dbUri: process.env.DB_URI
+  mongoUri: process.env.DB_URI,
 };

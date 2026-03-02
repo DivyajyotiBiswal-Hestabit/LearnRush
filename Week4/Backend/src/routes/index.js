@@ -1,14 +1,14 @@
-const express = require("express");
 const logger = require("../utils/logger");
 
+const healthRoutes = require("./health.routes");
+const productRoutes = require("./product.routes");
+const emailRoutes = require("./email.routes");
+
+router.use("/email", emailRoutes);
+
 module.exports = function loadRoutes(app) {
-  const router = express.Router();
-
-  router.get("/health", (req, res) => {
-    res.json({ status: "OK" });
-  });
-
-  app.use("/api", router);
-
-  logger.info("Routes mounted: 1 endpoint");
+  app.use("/api", healthRoutes);
+  app.use("/api/products", productRoutes);
+  app.use("/api/email", emailRoutes);
+  logger.info("Routes mounted: health + products");
 };
