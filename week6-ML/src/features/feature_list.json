@@ -1,0 +1,17 @@
+[
+    "type_log",
+    "duration",
+    "listed_in",
+    "listed_in_log",
+    "director",
+    "director_log",
+    "rating",
+    "country",
+    "country_log",
+    "cast_log",
+    "cast",
+    "rating_len",
+    "release_year",
+    "year_added",
+    "month_added"
+]
