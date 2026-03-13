@@ -1,7 +1,10 @@
+
 const express = require("express");
 const connectDB = require("./db");
 const productRoutes = require("../routes/product.routes");
+const healthRoutes = require("../routes/health.routes");
 const emailRoutes = require("../routes/email.routes");
+const userRoutes = require("../routes/user.routes");
 const applySecurity = require("../middlewares/security");
 const requestIdMiddleware = require("../middlewares/requestId");
 const swaggerUi = require("swagger-ui-express");
@@ -12,9 +15,8 @@ async function createApp() {
 
   await connectDB();
 
-  app.use(express.json());
-
   applySecurity(app);
+
 
   // 🔥 Attach requestId middleware EARLY
   app.use(requestIdMiddleware);
@@ -31,6 +33,8 @@ async function createApp() {
   // Routes
   app.use("/api/products", productRoutes);
   app.use("/api/email", emailRoutes);
+  app.use("/api", healthRoutes);
+  app.use("/api/users", userRoutes);
 
   // 404 handler
   app.use((req, res) => {

@@ -10,6 +10,10 @@ class AccountRepository {
     return await Account.findById(id);
   }
 
+  static async findAll() {
+  return await Account.find({ deletedAt: null }); // fetch only non-deleted users
+}
+
   static async findPaginated({ limit = 10, cursor }) {
     const query = cursor ? { _id: { $gt: cursor } } : {};
 

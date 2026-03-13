@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const router = express.Router();
 const { addEmailJob } = require("../jobs/email.job");
@@ -26,7 +28,15 @@ router.post("/send-email", async (req, res) => {
   try {
     const { email } = req.body;
 
-    await addEmailJob({ email });
+    await addEmailJob({
+      email,
+      requestId: req.requestId, // Pass requestId to worker
+    });
+
+    fs.appendFileSync(
+      path.join(__dirname, "../../logs/app.log"),
+      `[${req.requestId}] Email job added via /send-email\n`
+    );
 
     res.status(200).json({
       success: true,
@@ -36,6 +46,7 @@ router.post("/send-email", async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message,
+      requestId: req.requestId,
     });
   }
 });

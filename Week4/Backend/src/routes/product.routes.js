@@ -1,7 +1,7 @@
 const express = require("express");
 const productController = require("../controllers/product.controller");
 const validate = require("../middlewares/validate");
-const { productSchema } = require("../validations/product.schema");
+const { createProductSchema } = require("../validations/product.schema");
 
 /**
  * @swagger
@@ -20,7 +20,7 @@ router.get("/", productController.getProducts);
 
 router.post(
   "/",
-  validate(productSchema),          // Validation layer added
+  validate(createProductSchema),          // Validation layer added
   productController.createProduct
 );
 

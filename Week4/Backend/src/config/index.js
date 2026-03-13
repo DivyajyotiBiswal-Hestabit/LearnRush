@@ -12,10 +12,14 @@ const envFileMap = {
 const envFile = envFileMap[env] || ".env.local";
 
 dotenv.config({
-  path: path.resolve(process.cwd(), envFile)
+  path: path.resolve(process.cwd(), envFile),
+  debug: true, 
 });
+
+console.log("Loaded env file:", envFile);
+console.log("MONGO_URI =", process.env.MONGO_URI);
 
 module.exports = {
   port: process.env.PORT || 3000,
-  mongoUri: process.env.DB_URI,
+  mongoUri: process.env.MONGO_URI
 };

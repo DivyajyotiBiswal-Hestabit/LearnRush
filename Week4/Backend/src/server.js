@@ -1,12 +1,12 @@
 require("./config");
 
 const http = require("http");
-const createApp = require("./loaders/app");
+const createApp = require("./loaders/app"); // returns configured Express app
 const config = require("./config");
 const logger = require("./utils/logger");
 
 async function startServer() {
-  const app = await createApp();
+  const app = await createApp(); // app already has express.json(), helmet, cors, routes, etc.
 
   const server = http.createServer(app);
 
@@ -26,4 +26,5 @@ async function startServer() {
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
 }
+
 startServer();
