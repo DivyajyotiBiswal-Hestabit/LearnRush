@@ -1,90 +1,245 @@
-# Netflix Dataset EDA Report
+# DATA REPORT — DAY 1
 
-**Dataset:** `netflix_titles.csv`  
-**Number of rows:** 7787  
-**Number of columns:** 12  
+## Data Pipeline, Cleaning & Preprocessing
 
 ---
 
-## 1️⃣ Column Overview
+## 1. Objective
 
-| Column Name     | Data Type | Missing Values | Notes |
-|-----------------|-----------|----------------|-------|
-| show_id         | object    | 0              | Unique identifier, dropped in processing |
-| type            | object    | 0              | Categorical (Movie / TV Show) |
-| title           | object    | 0              | Dropped in processing |
-| director        | object    | 2173           | Missing values filled with mode |
-| cast            | object    | 1673           | Missing values filled with mode |
-| country         | object    | 299            | Missing values filled with mode |
-| date_added      | datetime  | 0 (after cleaning) | Converted to year_added, month_added |
-| release_year    | int64     | 0              | Numeric |
-| rating          | object    | 0              | Categorical, encoded later |
-| duration        | object    | 0              | Cleaned to numeric (`duration_clean`) |
-| listed_in       | object    | 0              | Multi-category, encoded later |
-| description     | object    | 0              | Dropped in processing |
+The objective of Day 1 was to build a **robust and reproducible data pipeline** that:
+
+* Loads raw data
+* Cleans and preprocesses it
+* Handles missing values and duplicates
+* Detects and removes outliers
+* Prepares a structured dataset for downstream ML tasks
 
 ---
 
-## 2️⃣ Missing Values Heatmap
+## 2. Dataset Overview
 
-- `director`, `cast`, and `country` had missing values.
-- All missing values were imputed using **mode** for categorical and **median** for numeric features.
+* Dataset: **Netflix Titles Dataset**
+* Source: CSV file (`netflix_titles.csv`)
+* Target (updated later in Day 3): `rating`
+* Initial Features:
 
-![Missing Values Heatmap](figures/missing_values_heatmap.png)
-
----
-
-## 3️⃣ Feature Distributions
-
-### Numeric Features
-
-- `release_year`:
-
-![Release Year Distribution](figures/release_year_dist.png)
-
-- `duration_clean`:
-
-![Duration Distribution](figures/duration_dist.png)
-
-### Categorical Features
-
-- `type`:
-
-![Type Distribution](figures/type_dist.png)
-
-- `rating`:
-
-![Rating Distribution](figures/rating_dist.png)
+  * show_id
+  * title
+  * director
+  * cast
+  * country
+  * date_added
+  * release_year
+  * rating
+  * duration
+  * listed_in
+  * description
 
 ---
 
-## 4️⃣ Target Distribution
+## 3. Pipeline Architecture
 
-- If we consider `type` as target:
+The data pipeline is implemented in:
 
-![Target Distribution](figures/target_dist.png)
+```
+src/pipelines/data_pipeline.py
+```
 
-- Classes are **imbalanced** (more Movies than TV Shows), so SMOTE was applied during training.
+It follows a structured flow:
 
----
-
-## 5️⃣ Correlation Matrix
-
-- Only numeric features (`release_year`, `duration_clean`, `year_added`, `month_added`) were included.
-- `duration_clean` and `release_year` have low correlation with each other.
-
-![Correlation Matrix](figures/correlation_matrix.png)
+```
+Load → Clean → Transform → Encode → Remove Outliers → Save
+```
 
 ---
 
-## 6️⃣ Observations
+## 4. Data Loading
 
-1. `director` and `cast` have many missing values — might require careful handling in modeling.  
-2. `duration` is only meaningful for Movies; for TV Shows, it may represent number of seasons.  
-3. Dataset has **class imbalance** (`type`), handled via SMOTE.  
-4. Many categorical features need encoding (`rating`, `listed_in`, `country`).  
-5. No extreme numeric outliers after Z-score/IQR filtering.  
+The dataset is loaded using Pandas:
+
+```python
+df = pd.read_csv(path)
+```
+
+This allows efficient handling of structured tabular data.
 
 ---
 
-**EDA Complete:** Dataset is clean, scaled, and ready for **train/validation/test split** and further modeling.
+## 5. Data Cleaning
+
+### 5.1 Dropping Irrelevant Columns
+
+The following columns were removed:
+
+* `show_id` (unique identifier)
+* `title` (non-informative for modeling)
+* `description` (high-cardinality text)
+
+Reason:
+
+* These features do not contribute effectively to structured ML models.
+
+---
+
+### 5.2 Removing Duplicates
+
+Duplicate rows were removed using:
+
+```python
+df.drop_duplicates()
+```
+
+This prevents bias and data leakage during training.
+
+---
+
+## 6. Handling Missing Values
+
+Missing values were handled column-wise:
+
+* **Numerical columns** → filled with median
+* **Categorical columns** → filled with mode
+
+Example:
+
+```python
+if numeric:
+    fill with median
+else:
+    fill with mode
+```
+
+Reason:
+
+* Median is robust to outliers
+* Mode preserves category distribution
+
+---
+
+## 7. Feature Transformations
+
+### 7.1 Date Processing
+
+The `date_added` column was:
+
+* Stripped of extra spaces
+* Converted to datetime
+* Extracted into:
+
+  * `year_added`
+  * `month_added`
+
+Then the original column was dropped.
+
+Reason:
+
+* Date components are more useful than raw strings.
+
+---
+
+### 7.2 Duration Cleaning
+
+The `duration` column originally contained strings such as:
+
+```
+"90 min", "2 Seasons"
+```
+
+It was cleaned using regex to extract numeric values:
+
+```python
+df["duration"] = df["duration"].str.extract(r"(\d+)")
+```
+
+Converted to numeric format for modeling.
+
+---
+
+## 8. Categorical Encoding
+
+Categorical features were encoded using **Label Encoding**:
+
+```python
+LabelEncoder()
+```
+
+Reason:
+
+* Converts categories into numeric form
+* Suitable for tree-based models and pipelines
+
+---
+
+## 9. Outlier Detection & Removal
+
+Outliers were removed using **Z-score method**:
+
+```python
+z = np.abs(stats.zscore(numeric_cols))
+df = df[(z < threshold).all(axis=1)]
+```
+
+Threshold used:
+
+* **3 standard deviations**
+
+Reason:
+
+* Removes extreme values that can distort model training
+
+---
+
+## 10. Data Scaling
+
+Features were scaled using:
+
+* **StandardScaler** (default)
+
+```python
+X_scaled = scaler.fit_transform(X)
+```
+
+Reason:
+
+* Normalizes feature distribution
+* Important for models like Logistic Regression and Neural Networks
+
+---
+
+## 11. Data Splitting
+
+The dataset was split into:
+
+* Training set: 70%
+* Validation set: 15%
+* Test set: 15%
+
+Using stratified sampling:
+
+```python
+train_test_split(..., stratify=y)
+```
+
+Reason:
+
+* Preserves class distribution across splits
+
+---
+
+## 12. Class Imbalance Handling
+
+SMOTE was used for balancing classes.
+
+
+---
+
+## 13. Output
+
+The processed dataset is saved to:
+
+```
+src/data/processed/final.csv
+```
+
+
+

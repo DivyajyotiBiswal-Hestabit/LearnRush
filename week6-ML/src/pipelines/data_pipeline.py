@@ -1,19 +1,12 @@
-# src/pipelines/data_pipeline.py
-
 from utils.helpers import (
     load_dataset,
     drop_columns,
     handle_missing_values,
     clean_duration,
     process_date,
-    encode_categorical,
     remove_duplicates,
-    remove_outliers_zscore,
-    scale_features,
-    split_dataset,
-    handle_class_imbalance
+    remove_outliers_zscore
 )
-
 from utils.logger import get_logger
 from features.build_features import build_features
 from features.feature_selector import (
@@ -22,11 +15,12 @@ from features.feature_selector import (
     save_feature_list
 )
 import os
+from sklearn.preprocessing import LabelEncoder
+
 
 def run_pipeline(config):
     logger = get_logger(config["logs"]["log_file"])
 
-    # ---------------- LOAD DATA ---------------- #
     df = load_dataset(config["data"]["raw_path"])
     logger.info(f"Raw dataset shape: {df.shape}")
 
@@ -34,44 +28,40 @@ def run_pipeline(config):
     df = handle_missing_values(df)
     df = clean_duration(df)
     df = process_date(df)
-    df = encode_categorical(df)
     df = remove_duplicates(df)
-    df = remove_outliers_zscore(df, config["outliers"]["threshold"])
 
-    # ---------------- FEATURE ENGINEERING ---------------- #
+    numeric_outlier_cols = [c for c in ["duration", "release_year", "year_added"] if c in df.columns]
+    if numeric_outlier_cols:
+        df = remove_outliers_zscore(
+            df,
+            config["outliers"]["threshold"],
+            exclude_cols=[]
+        )
+
     df = build_features(df, config)
     logger.info(f"Dataset shape after feature engineering: {df.shape}")
 
-    # ---------------- FEATURE SELECTION ---------------- #
-    X = df.drop(config["target_column"], axis=1)
-    y = df[config["target_column"]].fillna("unknown")  # safeguard for NaNs
+    target_col = config["target_column"]
+    y_raw = df[target_col].copy()
+    X = df.drop(columns=[target_col])
 
-    # Correlation-based filtering
-    X, dropped_corr = correlation_threshold(X, threshold=0.9)
+    # Temporary encoding only for feature selection
+    label_encoder = LabelEncoder()
+    y_encoded = label_encoder.fit_transform(y_raw.astype(str))
 
-    # Mutual information selection
-    X, selected_features = mutual_information_selection(X, y, top_k=20)
+    X, dropped_corr = correlation_threshold(X, threshold=0.95)
+    logger.info(f"Dropped highly correlated features: {dropped_corr}")
 
-    # Save selected features
-    os.makedirs("src/features", exist_ok=True)
-    save_feature_list(selected_features, path="src/features/feature_list.json")
+    X, selected_features = mutual_information_selection(X, y_encoded, top_k=30)
     logger.info(f"Selected top features: {selected_features}")
 
-    # ---------------- SCALE & SPLIT ---------------- #
-    df_selected = X.copy()
-    df_selected[config["target_column"]] = y
+    os.makedirs("src/features", exist_ok=True)
+    save_feature_list(selected_features, path="src/features/feature_list.json")
 
-    df_scaled = scale_features(df_selected, config["target_column"], config["scaling"]["method"])
+    # Save original target labels, not encoded integers
+    final_df = X.copy()
+    final_df[target_col] = y_raw
+    final_df.to_csv(config["data"]["processed_path"], index=False)
 
-    X_final = df_scaled.drop(config["target_column"], axis=1)
-    y_final = df_scaled[config["target_column"]]
-
-    X_train, X_val, X_test, y_train, y_val, y_test = split_dataset(X_final, y_final, config)
-    logger.info("Dataset split into train, validation, and test sets")
-
-    # ---------------- HANDLE CLASS IMBALANCE ---------------- #
-    if config["class_imbalance"]["use_smote"]:
-        X_train, y_train = handle_class_imbalance(X_train, y_train)
-        logger.info("Class imbalance handled using SMOTE")
-
+    logger.info(f"Final processed dataset saved to {config['data']['processed_path']}")
     logger.info("Pipeline completed successfully")

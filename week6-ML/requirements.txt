@@ -7,3 +7,11 @@ imbalanced-learn
 missingno
 pyyaml
 scipy
+fastapi
+uvicorn
+python-dotenv
+joblib
+optuna
+shap
+xgboost
+lightgbm

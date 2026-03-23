@@ -1,0 +1,9 @@
+{
+    "num_errors": 510,
+    "n_clusters": 3,
+    "cluster_counts": {
+        "0": 204,
+        "1": 88,
+        "2": 218
+    }
+}

@@ -1,105 +1,166 @@
-# src/features/build_features.py
-
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
-from sklearn.feature_extraction.text import TfidfVectorizer
 
-# ---------------- FEATURE ENGINEERING ---------------- #
 
-def extract_datetime_features(df, date_column="date_added"):
-    """
-    Safely extract year, month, day features from a datetime column.
-    If column doesn't exist or is already numeric, skip .dt.
-    """
-    if date_column in df.columns:
-        if not np.issubdtype(df[date_column].dtype, np.number):
-            df[date_column] = pd.to_datetime(df[date_column], errors="coerce")
-            df["year_added"] = df[date_column].dt.year
-            df["month_added"] = df[date_column].dt.month
-            df["day_added"] = df[date_column].dt.day
-            df = df.drop(columns=[date_column])
+GENRE_KEYWORDS = [
+    "Drama", "Comedy", "Action", "Romantic", "Horror",
+    "Documentaries", "Kids", "Family", "International", "Crime"
+]
+
+MATURE_WORDS = ["murder", "violence", "crime", "dark", "war", "killer"]
+KIDS_WORDS = ["family", "kids", "school", "adventure", "animated", "friendship"]
+
+
+def map_rating_group(value):
+    val = str(value).strip().upper()
+
+    kids = {"TV-Y", "TV-Y7", "TV-G", "G"}
+    teen = {"PG", "TV-PG", "PG-13", "TV-14"}
+    adult = {"R", "NC-17", "TV-MA"}
+    other = {"NR", "UR"}
+
+    if val in kids:
+        return "kids"
+    if val in teen:
+        return "teen"
+    if val in adult:
+        return "adult"
+    return "other"
+
+
+def add_target_group(df, target_col):
+    if target_col in df.columns:
+        df[target_col] = df[target_col].apply(map_rating_group)
     return df
 
-def numerical_transformations(df, numeric_cols):
-    """
-    Apply log, sqrt, and square transformations to numeric columns.
-    """
-    for col in numeric_cols:
-        df[f"{col}_log"] = np.log1p(df[col].fillna(0))
-        df[f"{col}_sqrt"] = np.sqrt(df[col].fillna(0))
-        df[f"{col}_square"] = np.power(df[col].fillna(0), 2)
+
+def add_type_feature(df):
+    if "type" in df.columns:
+        df["is_movie"] = (df["type"].astype(str).str.lower() == "movie").astype(int)
+        df["is_tv_show"] = (df["type"].astype(str).str.lower() == "tv show").astype(int)
     return df
 
-def encode_categorical_features(df, categorical_cols, method="label"):
-    """
-    Encode categorical features. Supports label encoding and one-hot encoding.
-    """
-    df_copy = df.copy()
-    
-    if method == "label":
-        encoder = LabelEncoder()
-        for col in categorical_cols:
-            df_copy[col] = df_copy[col].fillna("unknown")
-            df_copy[col] = encoder.fit_transform(df_copy[col].astype(str))
-    elif method == "onehot" and categorical_cols:
-        ohe = OneHotEncoder(sparse=False, drop="first")
-        encoded = ohe.fit_transform(df_copy[categorical_cols].fillna("unknown"))
-        ohe_df = pd.DataFrame(encoded, columns=ohe.get_feature_names_out(categorical_cols))
-        df_copy = pd.concat([df_copy.drop(columns=categorical_cols), ohe_df], axis=1)
-    
-    return df_copy
 
-def text_vectorization(df, text_cols, max_features=50):
-    """
-    Apply TF-IDF vectorization to text columns. Fill NaNs with empty strings.
-    """
-    for col in text_cols:
-        df[col] = df[col].fillna("")
-        tfidf = TfidfVectorizer(max_features=max_features)
-        vec = tfidf.fit_transform(df[col].astype(str))
-        tfidf_df = pd.DataFrame(vec.toarray(), columns=[f"{col}_tfidf_{i}" for i in range(vec.shape[1])])
-        df = pd.concat([df.drop(columns=[col]), tfidf_df], axis=1)
+def add_genre_features(df):
+    if "listed_in" not in df.columns:
+        return df
+
+    listed = df["listed_in"].fillna("").astype(str)
+    df["genre_count"] = listed.apply(lambda x: len([g for g in x.split(",") if g.strip()]))
+
+    for genre in GENRE_KEYWORDS:
+        col = f"genre_{genre.lower().replace(' ', '_')}"
+        df[col] = listed.str.contains(genre, case=False, regex=False).astype(int)
+
     return df
 
-def generate_additional_features(df):
-    """
-    Generate extra features like ratios, text length, numeric sums.
-    """
-    if "duration" in df.columns and "year_added" in df.columns:
-        df["duration_per_year"] = df["duration"].fillna(0) / df["year_added"].replace(0, 1)
 
-    if "rating" in df.columns:
-        df["rating_len"] = df["rating"].fillna("unknown").astype(str).apply(len)
-
-    numeric_cols = df.select_dtypes(include=np.number).columns
-    df["numeric_sum"] = df[numeric_cols].sum(axis=1)
-    
+def add_people_count_features(df):
+    if "cast" in df.columns:
+        df["cast_count"] = df["cast"].fillna("").astype(str).apply(
+            lambda x: len([v for v in x.split(",") if v.strip()])
+        )
+    if "director" in df.columns:
+        df["director_count"] = df["director"].fillna("").astype(str).apply(
+            lambda x: len([v for v in x.split(",") if v.strip()])
+        )
+    if "country" in df.columns:
+        df["country_count"] = df["country"].fillna("").astype(str).apply(
+            lambda x: len([v for v in x.split(",") if v.strip()])
+        )
     return df
+
+
+def add_date_features(df):
+    current_year = 2026
+    if "release_year" in df.columns:
+        df["release_age"] = current_year - df["release_year"]
+        df["release_decade"] = (df["release_year"] // 10) * 10
+
+    if "year_added" in df.columns and "release_year" in df.columns:
+        df["years_to_platform"] = df["year_added"] - df["release_year"]
+
+    return df
+
+
+def add_duration_features(df):
+    if "duration" in df.columns:
+        df["duration"] = pd.to_numeric(df["duration"], errors="coerce")
+        df["duration_log"] = np.log1p(df["duration"].fillna(0))
+        df["is_short_duration"] = (df["duration"] <= 60).astype(int)
+        df["is_medium_duration"] = ((df["duration"] > 60) & (df["duration"] <= 120)).astype(int)
+        df["is_long_duration"] = (df["duration"] > 120).astype(int)
+    return df
+
+
+def add_text_features(df):
+    for col in ["title", "description"]:
+        if col not in df.columns:
+            df[col] = ""
+
+    title_text = df["title"].fillna("").astype(str)
+    desc_text = df["description"].fillna("").astype(str)
+    combined = (title_text + " " + desc_text).str.lower()
+
+    df["title_len"] = title_text.str.len()
+    df["description_len"] = desc_text.str.len()
+    df["text_len"] = combined.str.len()
+
+    df["has_mature_words"] = combined.apply(
+        lambda x: int(any(word in x for word in MATURE_WORDS))
+    )
+    df["has_kids_words"] = combined.apply(
+        lambda x: int(any(word in x for word in KIDS_WORDS))
+    )
+
+    return df
+
+
+def add_frequency_features(df):
+    for col in ["director", "cast", "country", "listed_in"]:
+        if col in df.columns:
+            freq = df[col].fillna("unknown").astype(str).value_counts()
+            df[f"{col}_freq"] = df[col].fillna("unknown").astype(str).map(freq)
+            df[f"{col}_freq_log"] = np.log1p(df[f"{col}_freq"])
+    return df
+
+
+def finalize_features(df, target_col):
+    # keep only target as raw categorical; convert remaining object cols safely
+    object_cols = [c for c in df.select_dtypes(include="object").columns if c != target_col]
+
+    # one-hot low-cardinality columns only
+    low_card_cols = [c for c in object_cols if df[c].nunique() <= 15]
+    if low_card_cols:
+        df = pd.get_dummies(df, columns=low_card_cols, drop_first=True)
+
+    # drop high-cardinality raw text cols after derived features
+    drop_cols = ["title", "description", "director", "cast", "country", "listed_in", "type", "date_added", "duration_raw"]
+    df = df.drop(columns=drop_cols, errors="ignore")
+
+    # fill remaining missing values
+    for col in df.columns:
+        if col == target_col:
+            continue
+        if pd.api.types.is_numeric_dtype(df[col]):
+            df[col] = df[col].fillna(df[col].median())
+        else:
+            df[col] = df[col].fillna("unknown")
+
+    return df
+
 
 def build_features(df, config):
-    """
-    Main feature engineering pipeline for Day 2.
-    """
-    # datetime features
-    df = extract_datetime_features(df, date_column="date_added")
-    
-    # numerical transformations
-    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
-    df = numerical_transformations(df, numeric_cols)
-    
-    # categorical encoding
-    categorical_cols = df.select_dtypes(include="object").columns.tolist()
-    df = encode_categorical_features(df, categorical_cols, method="label")
-    
-    # text vectorization (optional)
-    text_cols = []  # e.g., add 'cast', 'director' if needed
-    df = text_vectorization(df, text_cols, max_features=50)
-    
-    # additional features
-    df = generate_additional_features(df)
-    
-    # Fill remaining NaNs just in case
-    df = df.fillna(0)
-    
+    target_col = config["target_column"]
+
+    df = add_target_group(df, target_col)
+    df = add_type_feature(df)
+    df = add_genre_features(df)
+    df = add_people_count_features(df)
+    df = add_date_features(df)
+    df = add_duration_features(df)
+    df = add_text_features(df)
+    df = add_frequency_features(df)
+    df = finalize_features(df, target_col)
+
     return df

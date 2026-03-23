@@ -5,12 +5,12 @@ data:
   raw_path: src/data/raw/netflix_titles.csv
   processed_path: src/data/processed/final.csv
 
-target_column: type
+target_column: rating
 
 drop_columns:
   - show_id
   - title
-  - description
+  - description 
 
 outliers:
   threshold: 3
