@@ -1,0 +1,23 @@
+services:
+  backend1:
+    build: ./backend
+    container_name: day3-backend1
+    environment:
+      INSTANCE_NAME: backend-1
+
+  backend2:
+    build: ./backend
+    container_name: day3-backend2
+    environment:
+      INSTANCE_NAME: backend-2
+
+  nginx:
+    image: nginx:latest
+    container_name: day3-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend1
+      - backend2

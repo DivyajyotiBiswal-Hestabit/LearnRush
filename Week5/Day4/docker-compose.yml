@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: ./backend
+    container_name: day4-backend
+
+  nginx:
+    image: nginx:latest
+    container_name: day4-nginx
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro

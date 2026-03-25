@@ -1,0 +1,10 @@
+{
+  "name": "week5-day1-docker-linux",
+  "version": "1.0.0",
+  "description": "Docker fundamentals and Linux internals practice",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "license": "MIT"
+}
