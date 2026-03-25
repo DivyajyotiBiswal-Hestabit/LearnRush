@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+
+src/data/
+src/vectorstore/
+src/logs/
+logs
+
+.DS_Store
+.env
