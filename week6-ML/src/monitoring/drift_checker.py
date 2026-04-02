@@ -1,6 +1,5 @@
 import os
 import json
-import ast
 from typing import Dict, Any
 
 import numpy as np
@@ -11,7 +10,7 @@ load_dotenv()
 
 PROCESSED_DATA_PATH = os.getenv("REFERENCE_DATA_PATH", "src/data/processed/final.csv")
 FEATURE_LIST_PATH = os.getenv("FEATURE_LIST_PATH", "src/features/feature_list.json")
-PREDICTION_LOG_PATH = os.getenv("PREDICTION_LOG_PATH", "src/prediction_logs.csv")
+PREDICTION_LOG_PATH = os.getenv("PREDICTION_LOG_PATH", "src/logs/prediction_logs.csv")
 DRIFT_REPORT_PATH = os.getenv("DRIFT_REPORT_PATH", "src/monitoring/drift_report.json")
 TARGET_COLUMN = os.getenv("TARGET_COLUMN", "rating")
 
@@ -32,7 +31,7 @@ def load_prediction_features(feature_list):
     if not os.path.exists(PREDICTION_LOG_PATH):
         return pd.DataFrame(columns=feature_list), pd.DataFrame()
 
-    logs = pd.read_csv(PREDICTION_LOG_PATH)
+    logs = pd.read_csv(PREDICTION_LOG_PATH, on_bad_lines="skip")
 
     if logs.empty:
         return pd.DataFrame(columns=feature_list), logs
@@ -42,7 +41,12 @@ def load_prediction_features(feature_list):
         feat = row.get("features_json")
         if pd.isna(feat):
             continue
-        feat_dict = json.loads(feat)
+
+        try:
+            feat_dict = json.loads(feat)
+        except Exception:
+            continue
+
         feature_rows.append({f: feat_dict.get(f, np.nan) for f in feature_list})
 
     pred_df = pd.DataFrame(feature_rows)
@@ -78,28 +82,38 @@ def psi(expected, actual, buckets=10):
 
 
 def accuracy_decay(logs: pd.DataFrame):
-    if "actual_label" not in logs.columns or "prediction" not in logs.columns:
+    if "actual_label" not in logs.columns:
         return {"status": "actual labels not available"}
 
-    valid = logs.dropna(subset=["actual_label", "prediction"]).copy()
+    label_col = "predicted_label" if "predicted_label" in logs.columns else "prediction"
+    if label_col not in logs.columns:
+        return {"status": "prediction labels not available"}
+
+    valid = logs.dropna(subset=["actual_label", label_col]).copy()
     if valid.empty:
         return {"status": "actual labels not available"}
 
-    valid["correct"] = (valid["actual_label"].astype(str) == valid["prediction"].astype(str)).astype(int)
-    overall_accuracy = float(valid["correct"].mean())
+    valid["correct"] = (
+        valid["actual_label"].astype(str).str.strip().str.lower()
+        == valid[label_col].astype(str).str.strip().str.lower()
+    ).astype(int)
 
+    overall_accuracy = float(valid["correct"].mean())
     last_20 = valid.tail(20)
     rolling_accuracy = float(last_20["correct"].mean()) if len(last_20) > 0 else None
 
     return {
         "status": "computed",
+        "comparison_column": label_col,
         "overall_logged_accuracy": overall_accuracy,
         "last_20_accuracy": rolling_accuracy
     }
 
 
 def main():
-    os.makedirs(os.path.dirname(DRIFT_REPORT_PATH), exist_ok=True)
+    drift_dir = os.path.dirname(DRIFT_REPORT_PATH)
+    if drift_dir:
+        os.makedirs(drift_dir, exist_ok=True)
 
     feature_list = load_feature_list()
     ref_df = load_reference_data(feature_list)

@@ -1,40 +1,45 @@
 {
     "cross_validation_results": {
         "logistic_regression": {
-            "accuracy_mean": 0.5853544229642649,
-            "precision_mean": 0.6504799416365885,
-            "recall_mean": 0.5853544229642649,
-            "f1_mean": 0.61035451895719,
-            "roc_auc_mean": 0.8183076428183803
+            "accuracy_mean": 0.5866432337434094,
+            "precision_weighted_mean": 0.6502638194776779,
+            "recall_weighted_mean": 0.5866432337434094,
+            "f1_weighted_mean": 0.6109575247703657,
+            "f1_macro_mean": 0.5090442088388271,
+            "roc_auc_ovr_mean": 0.8191908230121964
         },
         "random_forest": {
-            "accuracy_mean": 0.6912712360867018,
-            "precision_mean": 0.6897372678242074,
-            "recall_mean": 0.6912712360867018,
-            "f1_mean": 0.6892607466812507,
-            "roc_auc_mean": 0.8609957765475468
+            "accuracy_mean": 0.6876391329818394,
+            "precision_weighted_mean": 0.6864244341746872,
+            "recall_weighted_mean": 0.6876391329818394,
+            "f1_weighted_mean": 0.6850540493284725,
+            "f1_macro_mean": 0.5777290048455861,
+            "roc_auc_ovr_mean": 0.8603290110473509
         },
         "neural_network": {
-            "accuracy_mean": 0.6224956063268893,
-            "precision_mean": 0.623198768818604,
-            "recall_mean": 0.6224956063268893,
-            "f1_mean": 0.6225031333435245,
-            "roc_auc_mean": 0.7980575441890523
+            "accuracy_mean": 0.621675454012888,
+            "precision_weighted_mean": 0.6238402044174005,
+            "recall_weighted_mean": 0.621675454012888,
+            "f1_weighted_mean": 0.6221626801074259,
+            "f1_macro_mean": 0.5144963615782892,
+            "roc_auc_ovr_mean": 0.8000378427816607
         },
         "xgboost": {
-            "accuracy_mean": 0.6931458699472758,
-            "precision_mean": 0.6918415234381208,
-            "recall_mean": 0.6931458699472758,
-            "f1_mean": 0.6918661711724783,
-            "roc_auc_mean": 0.8620288689251836
+            "accuracy_mean": 0.6919742237844172,
+            "precision_weighted_mean": 0.6905379527137665,
+            "recall_weighted_mean": 0.6919742237844172,
+            "f1_weighted_mean": 0.6905971117120109,
+            "f1_macro_mean": 0.5736394298318349,
+            "roc_auc_ovr_mean": 0.8632334172906775
         }
     },
     "best_model": "xgboost",
     "best_model_test_metrics": {
-        "accuracy": 0.6994727592267135,
-        "precision": 0.6991893801934537,
-        "recall": 0.6994727592267135,
-        "f1_score": 0.6992743138605578,
-        "roc_auc": 0.8565146591014777
+        "accuracy": 0.6918570591681312,
+        "precision_weighted": 0.6906564694790072,
+        "recall_weighted": 0.6918570591681312,
+        "f1_weighted": 0.6909167047163215,
+        "f1_macro": 0.566867781249317,
+        "roc_auc_ovr": 0.8556373076982737
     }
 }

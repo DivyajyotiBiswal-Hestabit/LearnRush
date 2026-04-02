@@ -105,43 +105,51 @@ def health():
         "model_version": MODEL_VERSION,
         "model_file": MODEL_FILE,
         "feature_count": len(FEATURE_LIST),
-        "label_classes_loaded": LABEL_CLASSES is not None
+        "label_classes_loaded": LABEL_CLASSES is not None,
+        "features": FEATURE_LIST
     }
 
 
 @app.post("/predict")
 def predict(payload: PredictionRequest, request: Request):
     request_id = request.state.request_id
-
     incoming_features = payload.features
-    missing = [f for f in FEATURE_LIST if f not in incoming_features]
-    extra = [f for f in incoming_features if f not in FEATURE_LIST]
 
-    if missing:
+    missing_features = [f for f in FEATURE_LIST if f not in incoming_features]
+    extra_features = [f for f in incoming_features if f not in FEATURE_LIST]
+
+    if missing_features:
         raise HTTPException(
             status_code=400,
             detail={
                 "message": "Missing required features",
-                "missing_features": missing
+                "missing_features": missing_features,
+                "expected_features": FEATURE_LIST
             }
         )
 
     try:
-        X = pd.DataFrame(
-            [[incoming_features[f] for f in FEATURE_LIST]],
-            columns=FEATURE_LIST
-        )
+        # Keep only expected features and preserve exact training order
+        aligned_features = {f: float(incoming_features[f]) for f in FEATURE_LIST}
+
+        X = pd.DataFrame([aligned_features], columns=FEATURE_LIST)
 
         raw_prediction = MODEL.predict(X)[0]
         prediction = raw_prediction.item() if hasattr(raw_prediction, "item") else raw_prediction
 
         predicted_label = prediction
         if LABEL_CLASSES is not None:
-            predicted_label = LABEL_CLASSES[int(prediction)]
+            try:
+                predicted_label = LABEL_CLASSES[int(prediction)]
+            except Exception:
+                predicted_label = prediction
 
         confidence = None
+        probabilities = None
+
         if hasattr(MODEL, "predict_proba"):
             probs = MODEL.predict_proba(X)[0]
+            probabilities = [float(p) for p in probs]
             confidence = float(max(probs))
 
         log_row = {
@@ -152,7 +160,8 @@ def predict(payload: PredictionRequest, request: Request):
             "predicted_label": predicted_label,
             "confidence": confidence,
             "actual_label": payload.actual_label,
-            "features_json": json.dumps(incoming_features)
+            "ignored_extra_features": json.dumps(extra_features),
+            "features_json": json.dumps(aligned_features)
         }
 
         log_prediction(log_row)
@@ -163,13 +172,17 @@ def predict(payload: PredictionRequest, request: Request):
             "prediction": int(prediction) if isinstance(prediction, (int, float)) else prediction,
             "predicted_label": predicted_label,
             "confidence": confidence,
-            "ignored_extra_features": extra
+            "probabilities": probabilities,
+            "ignored_extra_features": extra_features
         }
 
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail={"message": "Prediction failed", "error": str(e)}
+            detail={
+                "message": "Prediction failed",
+                "error": str(e)
+            }
         )
 
 

@@ -25,7 +25,7 @@ from sklearn.metrics import (
     roc_auc_score,
     confusion_matrix
 )
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
@@ -41,15 +41,14 @@ def load_config():
 
 
 def load_data(config):
-    df = pd.read_csv(config["data"]["processed_path"])
-    return df
+    return pd.read_csv(config["data"]["processed_path"])
 
 
 def prepare_data(df, target_column):
     df = df.dropna(subset=[target_column]).copy()
 
     X = df.drop(columns=[target_column])
-    y = df[target_column]
+    y = df[target_column].astype(str)
 
     label_encoder = LabelEncoder()
     y = label_encoder.fit_transform(y)
@@ -63,40 +62,14 @@ def make_dirs():
     os.makedirs("src/models", exist_ok=True)
 
 
-def baseline_model():
-    try:
-        from xgboost import XGBClassifier
-        model = Pipeline([
-            ("imputer", SimpleImputer(strategy="median")),
-            ("model", XGBClassifier(
-                n_estimators=200,
-                max_depth=6,
-                learning_rate=0.1,
-                subsample=0.9,
-                colsample_bytree=0.9,
-                eval_metric="mlogloss",
-                random_state=42
-            ))
-        ])
-        return "xgboost", model
-    except Exception:
-        model = Pipeline([
-            ("imputer", SimpleImputer(strategy="median")),
-            ("model", RandomForestClassifier(
-                n_estimators=200,
-                random_state=42
-            ))
-        ])
-        return "random_forest", model
-
-
 def evaluate_cv(model, X, y, cv):
     scoring = {
         "accuracy": "accuracy",
-        "precision": "precision_weighted",
-        "recall": "recall_weighted",
-        "f1": "f1_weighted",
-        "roc_auc": "roc_auc_ovr"
+        "precision_weighted": "precision_weighted",
+        "recall_weighted": "recall_weighted",
+        "f1_weighted": "f1_weighted",
+        "f1_macro": "f1_macro",
+        "roc_auc_ovr": "roc_auc_ovr"
     }
 
     scores = cross_validate(
@@ -112,20 +85,28 @@ def evaluate_cv(model, X, y, cv):
     return {
         "train_accuracy_mean": float(np.mean(scores["train_accuracy"])),
         "val_accuracy_mean": float(np.mean(scores["test_accuracy"])),
-        "train_f1_mean": float(np.mean(scores["train_f1"])),
-        "val_f1_mean": float(np.mean(scores["test_f1"])),
+        "train_f1_weighted_mean": float(np.mean(scores["train_f1_weighted"])),
+        "val_f1_weighted_mean": float(np.mean(scores["test_f1_weighted"])),
+        "train_f1_macro_mean": float(np.mean(scores["train_f1_macro"])),
+        "val_f1_macro_mean": float(np.mean(scores["test_f1_macro"])),
         "accuracy_mean": float(np.mean(scores["test_accuracy"])),
-        "precision_mean": float(np.mean(scores["test_precision"])),
-        "recall_mean": float(np.mean(scores["test_recall"])),
-        "f1_mean": float(np.mean(scores["test_f1"])),
-        "roc_auc_mean": float(np.mean(scores["test_roc_auc"]))
+        "precision_weighted_mean": float(np.mean(scores["test_precision_weighted"])),
+        "recall_weighted_mean": float(np.mean(scores["test_recall_weighted"])),
+        "f1_weighted_mean": float(np.mean(scores["test_f1_weighted"])),
+        "f1_macro_mean": float(np.mean(scores["test_f1_macro"])),
+        "roc_auc_ovr_mean": float(np.mean(scores["test_roc_auc_ovr"]))
     }
 
 
 def tune_logistic_grid(X, y, cv):
     pipe = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
-        ("model", LogisticRegression(max_iter=2000, solver="saga"))
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(
+            max_iter=2000,
+            solver="saga",
+            class_weight="balanced"
+        ))
     ])
 
     param_grid = {
@@ -147,7 +128,10 @@ def tune_logistic_grid(X, y, cv):
 def tune_rf_random(X, y, cv):
     pipe = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
-        ("model", RandomForestClassifier(random_state=42))
+        ("model", RandomForestClassifier(
+            random_state=42,
+            class_weight="balanced"
+        ))
     ])
 
     param_dist = {
@@ -160,7 +144,33 @@ def tune_rf_random(X, y, cv):
     search = RandomizedSearchCV(
         pipe,
         param_distributions=param_dist,
-        n_iter=12,
+        n_iter=15,
+        scoring="f1_weighted",
+        cv=cv,
+        random_state=42,
+        n_jobs=-1
+    )
+    search.fit(X, y)
+    return search.best_estimator_, search.best_params_, float(search.best_score_)
+
+
+def tune_mlp_random(X, y, cv):
+    pipe = Pipeline([
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler()),
+        ("model", MLPClassifier(random_state=42, max_iter=500))
+    ])
+
+    param_dist = {
+        "model__hidden_layer_sizes": [(64,), (128,), (128, 64), (256, 128)],
+        "model__alpha": [0.0001, 0.001, 0.01],
+        "model__learning_rate_init": [0.0005, 0.001, 0.005]
+    }
+
+    search = RandomizedSearchCV(
+        pipe,
+        param_distributions=param_dist,
+        n_iter=10,
         scoring="f1_weighted",
         cv=cv,
         random_state=42,
@@ -181,13 +191,16 @@ def tune_xgb_optuna(X, y, cv):
         model = Pipeline([
             ("imputer", SimpleImputer(strategy="median")),
             ("model", XGBClassifier(
-                n_estimators=trial.suggest_int("n_estimators", 100, 400),
+                n_estimators=trial.suggest_int("n_estimators", 150, 500),
                 max_depth=trial.suggest_int("max_depth", 3, 10),
-                learning_rate=trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
-                subsample=trial.suggest_float("subsample", 0.6, 1.0),
-                colsample_bytree=trial.suggest_float("colsample_bytree", 0.6, 1.0),
-                reg_alpha=trial.suggest_float("reg_alpha", 0.0, 2.0),
-                reg_lambda=trial.suggest_float("reg_lambda", 0.0, 5.0),
+                learning_rate=trial.suggest_float("learning_rate", 0.01, 0.2, log=True),
+                subsample=trial.suggest_float("subsample", 0.7, 1.0),
+                colsample_bytree=trial.suggest_float("colsample_bytree", 0.7, 1.0),
+                reg_alpha=trial.suggest_float("reg_alpha", 0.0, 3.0),
+                reg_lambda=trial.suggest_float("reg_lambda", 0.5, 6.0),
+                min_child_weight=trial.suggest_int("min_child_weight", 1, 8),
+                gamma=trial.suggest_float("gamma", 0.0, 2.0),
+                objective="multi:softprob",
                 eval_metric="mlogloss",
                 random_state=42
             ))
@@ -198,15 +211,17 @@ def tune_xgb_optuna(X, y, cv):
             X,
             y,
             cv=cv,
-            scoring={"f1": "f1_weighted"},
+            scoring={"f1_weighted": "f1_weighted"},
             n_jobs=-1
         )
-        return float(np.mean(scores["test_f1"]))
+        return float(np.mean(scores["test_f1_weighted"]))
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=20, show_progress_bar=False)
+    study.optimize(objective, n_trials=50, show_progress_bar=False)
 
     best_params = study.best_trial.params
+
+    from xgboost import XGBClassifier
 
     best_model = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
@@ -218,6 +233,9 @@ def tune_xgb_optuna(X, y, cv):
             colsample_bytree=best_params["colsample_bytree"],
             reg_alpha=best_params["reg_alpha"],
             reg_lambda=best_params["reg_lambda"],
+            min_child_weight=best_params["min_child_weight"],
+            gamma=best_params["gamma"],
+            objective="multi:softprob",
             eval_metric="mlogloss",
             random_state=42
         ))
@@ -225,31 +243,6 @@ def tune_xgb_optuna(X, y, cv):
 
     best_model.fit(X, y)
     return best_model, best_params, float(study.best_value), None
-
-
-def tune_mlp_random(X, y, cv):
-    pipe = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("model", MLPClassifier(random_state=42, max_iter=400))
-    ])
-
-    param_dist = {
-        "model__hidden_layer_sizes": [(64,), (128,), (128, 64), (256, 128)],
-        "model__alpha": [0.0001, 0.001, 0.01],
-        "model__learning_rate_init": [0.0005, 0.001, 0.005]
-    }
-
-    search = RandomizedSearchCV(
-        pipe,
-        param_distributions=param_dist,
-        n_iter=8,
-        scoring="f1_weighted",
-        cv=cv,
-        random_state=42,
-        n_jobs=-1
-    )
-    search.fit(X, y)
-    return search.best_estimator_, search.best_params_, float(search.best_score_)
 
 
 def feature_importance_plot(model, feature_names, path):
@@ -282,7 +275,7 @@ def feature_importance_plot(model, feature_names, path):
 def error_analysis_heatmap(y_true, y_pred, path):
     cm = confusion_matrix(y_true, y_pred)
     plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=False, cmap="Blues")
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
     plt.title("Error Analysis Heatmap (Confusion Matrix)")
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
@@ -326,19 +319,20 @@ def fit_test_metrics(model, X_train, y_train, X_test, y_test):
 
     if hasattr(model, "predict_proba"):
         y_prob = model.predict_proba(X_test)
-        if y_prob.shape[1] == 2:
-            roc_auc = roc_auc_score(y_test, y_prob[:, 1])
-        else:
+        try:
             roc_auc = roc_auc_score(y_test, y_prob, multi_class="ovr")
+        except Exception:
+            roc_auc = None
     else:
         roc_auc = None
 
     metrics = {
         "accuracy": float(accuracy_score(y_test, y_pred)),
-        "precision": float(precision_score(y_test, y_pred, average="weighted", zero_division=0)),
-        "recall": float(recall_score(y_test, y_pred, average="weighted", zero_division=0)),
-        "f1_score": float(f1_score(y_test, y_pred, average="weighted", zero_division=0)),
-        "roc_auc": float(roc_auc) if roc_auc is not None else None
+        "precision_weighted": float(precision_score(y_test, y_pred, average="weighted", zero_division=0)),
+        "recall_weighted": float(recall_score(y_test, y_pred, average="weighted", zero_division=0)),
+        "f1_weighted": float(f1_score(y_test, y_pred, average="weighted", zero_division=0)),
+        "f1_macro": float(f1_score(y_test, y_pred, average="macro", zero_division=0)),
+        "roc_auc_ovr": float(roc_auc) if roc_auc is not None else None
     }
     return model, y_pred, metrics
 
@@ -350,17 +344,15 @@ def main():
     df = load_data(config)
     X, y, label_encoder = prepare_data(df, config["target_column"])
 
+    label_classes = label_encoder.classes_.tolist()
+    with open("src/models/label_classes.json", "w") as f:
+        json.dump(label_classes, f, indent=4)
+
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    # Baseline
-    baseline_name, baseline = baseline_model()
-    baseline_results = evaluate_cv(baseline, X, y, cv)
-
-    # Tuning
     log_model, log_params, log_score = tune_logistic_grid(X, y, cv)
     rf_model, rf_params, rf_score = tune_rf_random(X, y, cv)
     mlp_model, mlp_params, mlp_score = tune_mlp_random(X, y, cv)
-
     xgb_model, xgb_params, xgb_score, xgb_error = tune_xgb_optuna(X, y, cv)
 
     tuned_candidates = {
@@ -375,7 +367,6 @@ def main():
     best_name = max(tuned_candidates, key=lambda k: tuned_candidates[k][2])
     best_model, best_params, best_cv_score = tuned_candidates[best_name]
 
-    # Final split for holdout evaluation
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
@@ -387,11 +378,9 @@ def main():
         best_model, X_train, y_train, X_test, y_test
     )
 
-    # Save tuned best model
     with open("src/models/best_model.pkl", "wb") as f:
         pickle.dump(best_model, f)
 
-    # Explainability artifacts
     feature_importance_plot(
         best_model,
         X.columns.tolist(),
@@ -411,33 +400,32 @@ def main():
         "src/tuning/error_clusters.json"
     )
 
-    # Bias / variance analysis
     tuned_cv_results = evaluate_cv(best_model, X, y, cv)
 
     results = {
-        "baseline_model": baseline_name,
-        "baseline_metrics": baseline_results,
         "tuned_models": {
             "logistic_regression_tuned": {
                 "best_params": log_params,
-                "best_cv_f1": log_score
+                "best_cv_f1_weighted": log_score
             },
             "random_forest_tuned": {
                 "best_params": rf_params,
-                "best_cv_f1": rf_score
+                "best_cv_f1_weighted": rf_score
             },
             "neural_network_tuned": {
                 "best_params": mlp_params,
-                "best_cv_f1": mlp_score
+                "best_cv_f1_weighted": mlp_score
             }
         },
         "best_model": best_name,
         "best_model_params": best_params,
-        "best_model_cv_f1": best_cv_score,
+        "best_model_cv_f1_weighted": best_cv_score,
         "best_model_test_metrics": test_metrics,
         "bias_variance_analysis": {
-            "train_f1_mean": tuned_cv_results["train_f1_mean"],
-            "val_f1_mean": tuned_cv_results["val_f1_mean"],
+            "train_f1_weighted_mean": tuned_cv_results["train_f1_weighted_mean"],
+            "val_f1_weighted_mean": tuned_cv_results["val_f1_weighted_mean"],
+            "train_f1_macro_mean": tuned_cv_results["train_f1_macro_mean"],
+            "val_f1_macro_mean": tuned_cv_results["val_f1_macro_mean"],
             "train_accuracy_mean": tuned_cv_results["train_accuracy_mean"],
             "val_accuracy_mean": tuned_cv_results["val_accuracy_mean"]
         }
@@ -446,7 +434,7 @@ def main():
     if xgb_model is not None:
         results["tuned_models"]["xgboost_tuned"] = {
             "best_params": xgb_params,
-            "best_cv_f1": xgb_score
+            "best_cv_f1_weighted": xgb_score
         }
     if xgb_error is not None:
         results["xgboost_status"] = xgb_error

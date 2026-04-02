@@ -12,6 +12,12 @@ drop_columns:
   - title
   - description 
 
+drop_correlated_features:
+  - listed_in_freq
+  - country_freq
+  - is_short_duration
+  - release_decade
+
 outliers:
   threshold: 3
 

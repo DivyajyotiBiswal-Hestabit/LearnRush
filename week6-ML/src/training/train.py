@@ -6,8 +6,10 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
+
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import cross_validate, StratifiedKFold, train_test_split
 from sklearn.impute import SimpleImputer
@@ -21,7 +23,7 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay
 )
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 
 warnings.filterwarnings("ignore")
@@ -35,6 +37,13 @@ def load_config():
 
 def load_data(config):
     return pd.read_csv(config["data"]["processed_path"])
+
+
+def save_feature_list(X, path="src/features/feature_list.json"):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(list(X.columns), f, indent=4)
+    print(f"Feature list saved to: {path}")
 
 
 def build_models(use_smote=True):
@@ -84,20 +93,22 @@ def build_models(use_smote=True):
             ("imputer", SimpleImputer(strategy="median")),
             ("smote", sampler),
             ("model", XGBClassifier(
-                n_estimators=400,
-                max_depth=5,
-                learning_rate=0.05,
+                n_estimators=250,
+                max_depth=6,
+                learning_rate=0.08,
                 subsample=0.9,
                 colsample_bytree=0.9,
+                reg_alpha=0.5,
+                reg_lambda=2.0,
+                min_child_weight=2,
+                gamma=0.2,
+                objective="multi:softprob",
                 eval_metric="mlogloss",
                 random_state=42
             ))
         ])
     except Exception:
-        models["gradient_boosting_fallback"] = ImbPipeline([
-            ("imputer", SimpleImputer(strategy="median")),
-            ("model", GradientBoostingClassifier(random_state=42))
-        ])
+        pass
 
     return models
 
@@ -105,10 +116,11 @@ def build_models(use_smote=True):
 def evaluate_models_cv(X, y, models):
     scoring = {
         "accuracy": "accuracy",
-        "precision": "precision_weighted",
-        "recall": "recall_weighted",
-        "f1": "f1_weighted",
-        "roc_auc": "roc_auc_ovr"
+        "precision_weighted": "precision_weighted",
+        "recall_weighted": "recall_weighted",
+        "f1_weighted": "f1_weighted",
+        "f1_macro": "f1_macro",
+        "roc_auc_ovr": "roc_auc_ovr"
     }
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -124,22 +136,24 @@ def evaluate_models_cv(X, y, models):
             return_train_score=False,
             n_jobs=-1
         )
+
         results[name] = {
             "accuracy_mean": float(np.mean(scores["test_accuracy"])),
-            "precision_mean": float(np.mean(scores["test_precision"])),
-            "recall_mean": float(np.mean(scores["test_recall"])),
-            "f1_mean": float(np.mean(scores["test_f1"])),
-            "roc_auc_mean": float(np.mean(scores["test_roc_auc"]))
+            "precision_weighted_mean": float(np.mean(scores["test_precision_weighted"])),
+            "recall_weighted_mean": float(np.mean(scores["test_recall_weighted"])),
+            "f1_weighted_mean": float(np.mean(scores["test_f1_weighted"])),
+            "f1_macro_mean": float(np.mean(scores["test_f1_macro"])),
+            "roc_auc_ovr_mean": float(np.mean(scores["test_roc_auc_ovr"]))
         }
 
     return results
 
 
 def select_best_model(results):
-    return max(results, key=lambda m: results[m]["f1_mean"])
+    return max(results, key=lambda m: results[m]["f1_weighted_mean"])
 
 
-def fit_and_save_best_model(X_train, y_train, X_test, y_test, best_name, models):
+def fit_and_save_best_model(X_train, y_train, X_test, y_test, best_name, models, class_names):
     model = models[best_name]
     model.fit(X_train, y_train)
 
@@ -148,17 +162,18 @@ def fit_and_save_best_model(X_train, y_train, X_test, y_test, best_name, models)
     roc_auc = None
     if hasattr(model, "predict_proba"):
         y_prob = model.predict_proba(X_test)
-        if y_prob.shape[1] == 2:
-            roc_auc = roc_auc_score(y_test, y_prob[:, 1])
-        else:
+        try:
             roc_auc = roc_auc_score(y_test, y_prob, multi_class="ovr")
+        except Exception:
+            roc_auc = None
 
     test_metrics = {
         "accuracy": float(accuracy_score(y_test, y_pred)),
-        "precision": float(precision_score(y_test, y_pred, average="weighted", zero_division=0)),
-        "recall": float(recall_score(y_test, y_pred, average="weighted", zero_division=0)),
-        "f1_score": float(f1_score(y_test, y_pred, average="weighted", zero_division=0)),
-        "roc_auc": float(roc_auc) if roc_auc is not None else None
+        "precision_weighted": float(precision_score(y_test, y_pred, average="weighted", zero_division=0)),
+        "recall_weighted": float(recall_score(y_test, y_pred, average="weighted", zero_division=0)),
+        "f1_weighted": float(f1_score(y_test, y_pred, average="weighted", zero_division=0)),
+        "f1_macro": float(f1_score(y_test, y_pred, average="macro", zero_division=0)),
+        "roc_auc_ovr": float(roc_auc) if roc_auc is not None else None
     }
 
     os.makedirs("src/models", exist_ok=True)
@@ -167,8 +182,8 @@ def fit_and_save_best_model(X_train, y_train, X_test, y_test, best_name, models)
 
     os.makedirs("src/evaluation", exist_ok=True)
     cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot()
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    disp.plot(xticks_rotation=45)
     plt.title(f"Confusion Matrix - {best_name}")
     plt.tight_layout()
     plt.savefig("src/evaluation/confusion_matrix.png")
@@ -184,6 +199,7 @@ def save_metrics(cv_results, best_model_name, test_metrics):
         "best_model_test_metrics": test_metrics
     }
 
+    os.makedirs("src/evaluation", exist_ok=True)
     with open("src/evaluation/metrics.json", "w") as f:
         json.dump(payload, f, indent=4)
 
@@ -198,9 +214,11 @@ def main():
     X = df.drop(columns=[target])
     y_raw = df[target].astype(str)
 
+    save_feature_list(X)
+
     label_encoder = LabelEncoder()
-    y = label_encoder.fit_transform(y_raw)
-    label_classes = list(label_encoder.classes_)
+    y_encoded = label_encoder.fit_transform(y_raw)
+    label_classes = label_encoder.classes_.tolist()
 
     os.makedirs("src/models", exist_ok=True)
     with open("src/models/label_classes.json", "w") as f:
@@ -208,18 +226,19 @@ def main():
 
     models = build_models(use_smote=config["class_imbalance"]["use_smote"])
 
-    cv_results = evaluate_models_cv(X, y, models)
+    cv_results = evaluate_models_cv(X, y_encoded, models)
     best_model_name = select_best_model(cv_results)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y,
+        X,
+        y_encoded,
         test_size=0.2,
-        stratify=y,
+        stratify=y_encoded,
         random_state=42
     )
 
     test_metrics = fit_and_save_best_model(
-        X_train, y_train, X_test, y_test, best_model_name, models
+        X_train, y_train, X_test, y_test, best_model_name, models, label_classes
     )
 
     save_metrics(cv_results, best_model_name, test_metrics)

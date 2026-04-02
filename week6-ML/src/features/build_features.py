@@ -29,8 +29,19 @@ def map_rating_group(value):
 
 
 def add_target_group(df, target_col):
+    """
+    Handles both cases:
+    1. target_col itself is 'rating'
+    2. target_col is a derived column like 'rating_group' and raw source is 'rating'
+    """
     if target_col in df.columns:
         df[target_col] = df[target_col].apply(map_rating_group)
+    elif "rating" in df.columns:
+        df[target_col] = df["rating"].apply(map_rating_group)
+    else:
+        raise KeyError(
+            f"Neither target column '{target_col}' nor raw source column 'rating' found in dataframe."
+        )
     return df
 
 
@@ -73,6 +84,7 @@ def add_people_count_features(df):
 
 def add_date_features(df):
     current_year = 2026
+
     if "release_year" in df.columns:
         df["release_age"] = current_year - df["release_year"]
         df["release_decade"] = (df["release_year"] // 10) * 10
@@ -113,6 +125,23 @@ def add_text_features(df):
         lambda x: int(any(word in x for word in KIDS_WORDS))
     )
 
+    if "genre_kids" in df.columns and "genre_family" in df.columns:
+        df["kids_score"] = (
+            df["has_kids_words"] +
+            df["genre_kids"] +
+            df["genre_family"]
+        )
+    else:
+        df["kids_score"] = df["has_kids_words"]
+
+    df["is_kids_like"] = (df["kids_score"] > 0).astype(int)
+
+    if "duration" in df.columns:
+        duration_num = pd.to_numeric(df["duration"], errors="coerce").fillna(0)
+        df["short_kids_content"] = (
+            (duration_num < 60) & (df["has_kids_words"] == 1)
+        ).astype(int)
+
     return df
 
 
@@ -122,6 +151,28 @@ def add_frequency_features(df):
             freq = df[col].fillna("unknown").astype(str).value_counts()
             df[f"{col}_freq"] = df[col].fillna("unknown").astype(str).map(freq)
             df[f"{col}_freq_log"] = np.log1p(df[f"{col}_freq"])
+    return df
+
+
+def drop_correlated_features(df, config):
+    """
+    Drops correlated / redundant features listed in config.yaml
+    Example:
+    drop_correlated_features:
+      - listed_in_freq
+      - country_freq
+      - is_short_duration
+      - release_decade
+    """
+    cols_to_drop = config.get("drop_correlated_features", [])
+    existing_cols_to_drop = [col for col in cols_to_drop if col in df.columns]
+
+    if existing_cols_to_drop:
+        df = df.drop(columns=existing_cols_to_drop)
+        print(f"Dropped configured correlated features: {existing_cols_to_drop}")
+    else:
+        print("No configured correlated features found to drop.")
+
     return df
 
 
@@ -135,13 +186,22 @@ def finalize_features(df, target_col):
         df = pd.get_dummies(df, columns=low_card_cols, drop_first=True)
 
     # drop high-cardinality raw text cols after derived features
-    drop_cols = ["title", "description", "director", "cast", "country", "listed_in", "type", "date_added", "duration_raw"]
+    drop_cols = [
+        "title", "description", "director", "cast", "country",
+        "listed_in", "type", "date_added", "duration_raw"
+    ]
+
+    # prevent leakage if target is derived from raw rating
+    if target_col != "rating" and "rating" in df.columns:
+        drop_cols.append("rating")
+
     df = df.drop(columns=drop_cols, errors="ignore")
 
     # fill remaining missing values
     for col in df.columns:
         if col == target_col:
             continue
+
         if pd.api.types.is_numeric_dtype(df[col]):
             df[col] = df[col].fillna(df[col].median())
         else:
@@ -161,6 +221,10 @@ def build_features(df, config):
     df = add_duration_features(df)
     df = add_text_features(df)
     df = add_frequency_features(df)
+
+    
+    df = drop_correlated_features(df, config)
+
     df = finalize_features(df, target_col)
 
     return df
