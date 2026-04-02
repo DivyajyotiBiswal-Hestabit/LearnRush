@@ -20,8 +20,17 @@ FORBIDDEN_SQL_PATTERNS = [
 ]
 
 
+def clean_generated_sql(sql: str) -> str:
+    sql = sql.strip()
+    sql = re.sub(r"^```sql\s*", "", sql, flags=re.IGNORECASE)
+    sql = re.sub(r"^```\s*", "", sql)
+    sql = re.sub(r"\s*```$", "", sql)
+    sql = re.sub(r"^sql\s*:\s*", "", sql, flags=re.IGNORECASE)
+    return sql.strip()
+
+
 def validate_sql(sql: str) -> None:
-    sql_clean = sql.strip()
+    sql_clean = clean_generated_sql(sql)
 
     if not sql_clean:
         raise ValueError("Generated SQL is empty.")
@@ -38,6 +47,8 @@ def validate_sql(sql: str) -> None:
 
 
 def execute_sql(db_path: str, sql: str) -> List[Dict[str, Any]]:
+    sql = clean_generated_sql(sql)
+
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -69,25 +80,27 @@ def summarize_results(user_query: str, rows: List[Dict[str, Any]]) -> str:
 
 
 class SQLQAPipeline:
-    def __init__(self, db_path: str = "src/data/sql/company.db", model_name: str = "Qwen/Qwen2-1.5B-Instruct"):
+    def __init__(self, llm, db_path: str):
         self.db_path = db_path
-        self.generator = SQLGenerator(model_name=model_name)
+        self.generator = SQLGenerator(llm=llm)
 
     def run(self, user_query: str):
         schema = load_sqlite_schema(self.db_path)
         schema_text = format_schema_for_prompt(schema)
 
-        sql = self.generator.generate_sql(user_query, schema_text)
-
         try:
+            sql = self.generator.generate_sql(user_query, schema_text)
+            sql = clean_generated_sql(sql)
             validate_sql(sql)
             rows = execute_sql(self.db_path, sql)
-        except Exception as e:
+
+        except Exception as first_error:
             corrected_sql = self.generator.regenerate_sql_with_error(
                 user_query=user_query,
                 schema_text=schema_text,
-                error_message=str(e)
+                error_message=str(first_error)
             )
+            corrected_sql = clean_generated_sql(corrected_sql)
             validate_sql(corrected_sql)
             rows = execute_sql(self.db_path, corrected_sql)
             sql = corrected_sql
@@ -100,38 +113,3 @@ class SQLQAPipeline:
             "results": rows,
             "summary": summary
         }
-
-
-if __name__ == "__main__":
-    pipeline = SQLQAPipeline()
-
-    print("\n🗄 SQL-QA Engine (type 'exit' to quit)\n")
-
-    while True:
-        query = input("Enter question: ").strip()
-
-        if query.lower() in ["exit", "quit"]:
-            print("Exiting...")
-            break
-
-        if not query:
-            print("Please enter a valid question.\n")
-            continue
-
-        try:
-            output = pipeline.run(query)
-
-            print("\n=== GENERATED SQL ===")
-            print(output["sql"])
-
-            print("\n=== SUMMARY ===")
-            print(output["summary"])
-
-            print("\n=== RAW RESULTS (first 5) ===")
-            for row in output["results"][:5]:
-                print(row)
-
-        except Exception as e:
-            print(f"\nError: {e}")
-
-        print("\n" + "-" * 60 + "\n")

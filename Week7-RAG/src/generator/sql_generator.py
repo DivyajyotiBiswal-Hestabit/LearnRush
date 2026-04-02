@@ -1,10 +1,9 @@
 import re
-from src.generator.llm_client import LocalLLMClient
 
 
 class SQLGenerator:
-    def __init__(self, model_name: str = "Qwen/Qwen2-1.5B-Instruct"):
-        self.llm = LocalLLMClient(model_name=model_name)
+    def __init__(self, llm):
+        self.llm = llm
 
     def build_prompt(self, user_query: str, schema_text: str) -> str:
         prompt = f"""
@@ -46,7 +45,7 @@ SQL:
 
     def generate_sql(self, user_query: str, schema_text: str) -> str:
         prompt = self.build_prompt(user_query, schema_text)
-        raw_output = self.llm.generate(prompt, max_new_tokens=200)
+        raw_output = self.llm.generate(prompt, max_new_tokens=180)
         return self.extract_sql(raw_output)
 
     def regenerate_sql_with_error(self, user_query: str, schema_text: str, error_message: str) -> str:
@@ -74,5 +73,5 @@ Database Error:
 
 Corrected SQL:
 """
-        raw_output = self.llm.generate(prompt, max_new_tokens=200)
+        raw_output = self.llm.generate(prompt, max_new_tokens=180)
         return self.extract_sql(raw_output)

@@ -9,3 +9,5 @@ logs
 
 .DS_Store
 .env
+CHAT-LOGS.json
+memory_store.json

@@ -13,7 +13,12 @@ class ContextBuilder:
         total_len = 0
 
         for i, r in enumerate(results, 1):
-            block = f"[{i}] {r['source_file']} (p:{r.get('page_number')})\n{r['text']}\n"
+            source_file = r.get("source_file", "unknown")
+            page_number = r.get("page_number", "NA")
+            chunk_text = r.get("text", "")
+            chunk_id = r.get("chunk_id", f"chunk_{i}")
+
+            block = f"[{i}] {source_file} (p:{page_number})\n{chunk_text}\n"
 
             if total_len + len(block) > max_chars:
                 break
@@ -23,8 +28,8 @@ class ContextBuilder:
 
             sources.append({
                 "rank": i,
-                "source": r["source_file"],
-                "chunk_id": r["chunk_id"]
+                "source": source_file,
+                "chunk_id": chunk_id
             })
 
         return {
@@ -32,29 +37,3 @@ class ContextBuilder:
             "context": "\n".join(context),
             "sources": sources
         }
-if __name__ == "__main__":
-    builder = ContextBuilder()
-
-    print("\n📦 Context Builder (type 'exit' to quit)\n")
-
-    while True:
-        query = input("Enter query: ").strip()
-
-        if query.lower() in ["exit", "quit"]:
-            print("Exiting...")
-            break
-
-        if not query:
-            print("Please enter a valid query.\n")
-            continue
-
-        result = builder.build(query=query, top_k=5)
-
-        print("\n=== FINAL CONTEXT ===\n")
-        print(result["context"][:3000])
-
-        print("\n=== TRACE SOURCES ===")
-        for src in result["sources"]:
-            print(src)
-
-        print("\n" + "-" * 60 + "\n")

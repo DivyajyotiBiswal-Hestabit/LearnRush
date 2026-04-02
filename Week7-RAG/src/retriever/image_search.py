@@ -1,6 +1,8 @@
 import json
 import os
 import re
+from pathlib import Path
+
 import faiss
 
 from src.embeddings.clip_embedder import CLIPEmbedder
@@ -44,11 +46,9 @@ def build_fallback_answer(results):
     score = top.get("score", 0.0)
     ocr_quality = estimate_ocr_quality(ocr)
 
-    answer_parts = []
-
-    answer_parts.append(
-        f"The most relevant retrieved image is `{top['source_file']}` with similarity score {score:.4f}."
-    )
+    answer_parts = [
+        f"The most relevant retrieved image is `{top.get('source_file', 'unknown')}` with similarity score {score:.4f}."
+    ]
 
     if caption:
         answer_parts.append(f"BLIP caption suggests the image shows: {caption}.")
@@ -81,24 +81,25 @@ def build_fallback_answer(results):
 
 
 class ImageSearchEngine:
-    def __init__(self):
+    def __init__(self, llm):
         self.embedder = CLIPEmbedder()
-        self.answer_generator = ImageAnswerGenerator()
+        self.answer_generator = ImageAnswerGenerator(llm=llm)
 
-        index_path = "src/vectorstore/image_index.faiss"
-        meta_path = "src/vectorstore/image_index_meta.json"
+        base_dir = Path(__file__).resolve().parents[1]
+        index_path = base_dir / "vectorstore" / "image_index.faiss"
+        meta_path = base_dir / "vectorstore" / "image_index_meta.json"
 
-        if not os.path.exists(index_path):
+        if not index_path.exists():
             raise FileNotFoundError(
                 f"{index_path} not found. Run `PYTHONPATH=. python -m src.pipelines.image_ingest` first."
             )
 
-        if not os.path.exists(meta_path):
+        if not meta_path.exists():
             raise FileNotFoundError(
                 f"{meta_path} not found. Run `PYTHONPATH=. python -m src.pipelines.image_ingest` first."
             )
 
-        self.index = faiss.read_index(index_path)
+        self.index = faiss.read_index(str(index_path))
 
         with open(meta_path, "r", encoding="utf-8") as f:
             self.metadata = json.load(f)
@@ -118,6 +119,9 @@ class ImageSearchEngine:
         return results
 
     def search_by_image(self, image_path: str, top_k: int = 5):
+        if not os.path.exists(image_path):
+            raise FileNotFoundError(f"Image not found: {image_path}")
+
         qv = self.embedder.embed_images([image_path])
         scores, indices = self.index.search(qv, top_k)
 
@@ -146,84 +150,3 @@ class ImageSearchEngine:
         except Exception:
             answer = build_fallback_answer(results)
         return results, answer
-
-
-if __name__ == "__main__":
-    engine = ImageSearchEngine()
-
-    print("\n🖼 Image Search Engine")
-    print("1. Text -> Image")
-    print("2. Image -> Image")
-    print("3. Image -> Text Answer")
-    print("Type 'exit' to quit\n")
-
-    while True:
-        mode = input("Choose mode (1/2/3): ").strip()
-
-        if mode.lower() == "exit":
-            print("Exiting...")
-            break
-
-        if mode == "1":
-            query = input("Enter text query: ").strip()
-            if query.lower() == "exit":
-                break
-
-            results, answer = engine.answer_from_text_query(query, top_k=5)
-
-            for i, item in enumerate(results, 1):
-                print(f"\nResult {i}")
-                print(f"Score       : {item['score']:.4f}")
-                print(f"Source      : {item['source_file']}")
-                print(f"Image Path  : {item['processed_image_path']}")
-                print(f"OCR Text    : {clean_ocr_text(item['ocr_text'])[:300]}")
-                print(f"Caption     : {item['caption']}")
-
-            print("\n🧠 Generated Text Answer:\n")
-            print(answer)
-            print("\n" + "-" * 60 + "\n")
-
-        elif mode == "2":
-            image_path = input("Enter image path: ").strip()
-            if image_path.lower() == "exit":
-                break
-
-            results, answer = engine.answer_from_image_query(
-                image_path=image_path,
-                user_question="Find similar images and explain what this image seems to show.",
-                top_k=5
-            )
-
-            for i, item in enumerate(results, 1):
-                print(f"\nResult {i}")
-                print(f"Score       : {item['score']:.4f}")
-                print(f"Source      : {item['source_file']}")
-                print(f"Image Path  : {item['processed_image_path']}")
-                print(f"OCR Text    : {clean_ocr_text(item['ocr_text'])[:300]}")
-                print(f"Caption     : {item['caption']}")
-
-            print("\n🧠 Generated Text Answer:\n")
-            print(answer)
-            print("\n" + "-" * 60 + "\n")
-
-        elif mode == "3":
-            image_path = input("Enter image path: ").strip()
-            if image_path.lower() == "exit":
-                break
-
-            user_question = input("Enter your question about the image: ").strip()
-            if user_question.lower() == "exit":
-                break
-
-            results, answer = engine.answer_from_image_query(
-                image_path=image_path,
-                user_question=user_question,
-                top_k=5
-            )
-
-            print("\n🧠 Image -> Text Answer:\n")
-            print(answer)
-            print("\n" + "-" * 60 + "\n")
-
-        else:
-            print("Invalid choice.\n")

@@ -1,6 +1,3 @@
-from src.generator.llm_client import LocalLLMClient
-
-
 def build_image_prompt(user_query: str, results: list) -> str:
     if not results:
         return (
@@ -13,10 +10,10 @@ def build_image_prompt(user_query: str, results: list) -> str:
     for i, item in enumerate(results[:3], 1):
         evidence_blocks.append(
             f"[Evidence {i}]\n"
-            f"Source File: {item.get('source_file')}\n"
+            f"Source File: {item.get('source_file', 'unknown')}\n"
             f"Similarity Score: {item.get('score', 0):.4f}\n"
             f"Caption: {item.get('caption', '')}\n"
-            f"OCR Text: {item.get('ocr_text', '')[:500]}\n"
+            f"OCR Text: {str(item.get('ocr_text', ''))[:500]}\n"
         )
 
     evidence = "\n".join(evidence_blocks)
@@ -43,9 +40,9 @@ Write a concise answer grounded only in the evidence.
 
 
 class ImageAnswerGenerator:
-    def __init__(self, model_name: str = "Qwen/Qwen2-1.5B-Instruct"):
-        self.llm = LocalLLMClient(model_name=model_name)
+    def __init__(self, llm):
+        self.llm = llm
 
     def answer(self, user_query: str, results: list) -> str:
         prompt = build_image_prompt(user_query, results)
-        return self.llm.generate(prompt, max_new_tokens=220)
+        return self.llm.generate(prompt, max_new_tokens=180)
