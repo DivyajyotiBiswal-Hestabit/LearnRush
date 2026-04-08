@@ -172,22 +172,8 @@ Reason:
 
 ## 9. Outlier Detection & Removal
 
-Outliers were removed using **Z-score method**:
+Outliers were removed using **IQR method**:
 
-```python
-z = np.abs(stats.zscore(numeric_cols))
-df = df[(z < threshold).all(axis=1)]
-```
-
-Threshold used:
-
-* **3 standard deviations**
-
-Reason:
-
-* Removes extreme values that can distort model training
-
----
 
 ## 10. Data Scaling
 

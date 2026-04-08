@@ -1,179 +1,209 @@
-# MODEL COMPARISON REPORT
+# 📊 Model Comparison — Week 6 ML Project
 
-## 1. Objective
+## 🎯 Objective
 
-The goal of this project is to build a robust machine learning pipeline to predict the **content rating** of Netflix titles using structured and engineered features.
+The goal of this stage is to evaluate multiple machine learning models and identify the **best-performing model** for predicting:
 
-Initially, the target variable was **`type` (Movie vs TV Show)**. However, this resulted in near-perfect performance due to strong feature signals (e.g., duration, genre), making the task too trivial.
+```
+kids / teen / adult / other
+```
 
-To ensure a more realistic and challenging problem, the target was updated to:
-
-> **`rating` (multi-class classification)**
-
----
-
-## 2. Dataset Characteristics
-
-* Dataset: Netflix Titles Dataset
-* Target: `rating`
-* Problem Type: **Multi-class classification**
-* Key Challenges:
-
-  * High number of classes
-  * Class imbalance (rare ratings)
-  * Overlapping feature distributions
+based on engineered features from Netflix content data.
 
 ---
 
-## 3. Models Evaluated
+## 📂 Input
 
-The following models were trained and evaluated:
-
-1. Logistic Regression
-2. Random Forest
-3. Neural Network (MLPClassifier)
-4. XGBoost
-
-All models were trained using a unified pipeline with:
-
-* Imputation
-* Cross-validation (5-fold)
-* Consistent evaluation metrics
+* Dataset: `src/data/processed/final.csv`
+* Features: `src/features/feature_list.json`
+* Target: `rating` (mapped to audience groups)
 
 ---
 
-## 4. Evaluation Metrics
+## 🧠 Models Evaluated
 
-The models were evaluated using:
+The following models were implemented and compared:
 
-* Accuracy
-* Precision (weighted)
-* Recall (weighted)
-* F1 Score (weighted)
-* ROC-AUC (One-vs-Rest)
+### 1️⃣ Logistic Regression
 
----
-
-## 5. Cross-Validation Results
-
-| Model               | Accuracy | Precision | Recall   | F1 Score | ROC-AUC  |
-| ------------------- | -------- | --------- | -------- | -------- | -------- |
-| Logistic Regression | 0.44     | 0.39      | 0.44     | 0.36     | 0.76     |
-| Random Forest       | 0.55     | 0.52      | 0.55     | 0.52     | 0.84     |
-| Neural Network      | 0.46     | 0.44      | 0.46     | 0.44     | 0.79     |
-| **XGBoost**         | **0.56** | **0.53**  | **0.56** | **0.53** | **0.89** |
+* Linear model
+* Uses feature weights for prediction
+* Works well for linearly separable data
 
 ---
 
-## 6. Best Model Selection
+### 2️⃣ Random Forest
 
-The best model was selected based on **F1 Score**, which balances precision and recall for multi-class problems.
-
-> **Selected Model: XGBoost**
-
-### Test Performance:
-
-* Accuracy: 0.56
-* Precision: 0.54
-* Recall: 0.56
-* F1 Score: 0.54
-* ROC-AUC: 0.89
+* Ensemble of decision trees
+* Handles non-linear relationships
+* Robust to noise and overfitting
 
 ---
 
-## 7. Observations & Insights
+### 3️⃣ XGBoost
 
-### 7.1 Problem Difficulty
-
-Predicting `rating` is significantly more challenging than predicting `type` because:
-
-* It is a multi-class problem
-* Classes are imbalanced
-* Features do not strongly separate all categories
+* Gradient boosting model
+* Handles complex patterns
+* Regularized boosting → better generalization
 
 ---
 
-### 7.2 Model Behavior
+### 4️⃣ Neural Network (MLP)
 
-* **Logistic Regression**
-
-  * Underperforms due to linear assumptions
-  * Struggles with complex feature interactions
-
-* **Random Forest**
-
-  * Captures non-linear relationships
-  * Strong improvement over linear models
-
-* **Neural Network**
-
-  * Moderate performance
-  * Requires more tuning for optimal results
-
-* **XGBoost**
-
-  * Best overall performer
-  * Handles feature interactions and non-linearity effectively
-  * Robust to noise and feature scaling
+* Multi-layer perceptron
+* Captures deep non-linear interactions
+* Requires scaling and tuning
 
 ---
 
-### 7.3 Metric Interpretation
+## ⚙️ Training Strategy
 
-* Accuracy is moderate (~56%), reflecting task difficulty
-* ROC-AUC is high (~0.89), indicating strong class separation capability
-* Weighted F1 Score provides a balanced evaluation across classes
+### Cross Validation
 
----
+```id="cv-strategy"
+StratifiedKFold (n_splits = 5)
+```
 
-## 8. Key Design Decisions
-
-### 8.1 Target Selection
-
-The target was changed from `type` to `rating` to:
-
-* Avoid trivial classification
-* Enable meaningful model comparison
-* Reflect real-world ML complexity
+* Maintains class distribution across folds
+* Ensures robust evaluation
 
 ---
 
-### 8.2 Feature Engineering
+### Pipeline Design
 
-* Controlled transformations (log only)
-* Avoided excessive feature expansion
-* Removed leakage-prone features
+Each model follows:
 
----
+```
+Imputation → Scaling (if needed) → SMOTE → Model
+```
 
-### 8.3 Class Imbalance Handling
-
-SMOTE was disabled due to:
-
-* Presence of rare classes with very few samples
-* Risk of generating unreliable synthetic data
+* Missing values handled using `median`
+* SMOTE applied to handle class imbalance
+* Scaling used where required (LR, MLP)
 
 ---
 
-## 9. Conclusion
+## 📊 Evaluation Metrics
 
-This project demonstrates a complete end-to-end ML pipeline with:
+The models are evaluated using:
 
-* Clean data preprocessing
-* Thoughtful feature engineering
-* Robust model comparison
-* Realistic evaluation metrics
+| Metric               | Purpose                         |
+| -------------------- | ------------------------------- |
+| Accuracy             | Overall correctness             |
+| Precision (weighted) | False positives control         |
+| Recall (weighted)    | False negatives control         |
+| F1 Score (weighted)  | Balance of precision & recall   |
+| F1 Score (macro)     | Equal importance to all classes |
+| ROC-AUC (OVR)        | Multi-class discrimination      |
 
-The final results reflect a **challenging, real-world classification problem**, where XGBoost performs best due to its ability to model complex relationships.
+---
+
+## 📈 Results (Cross Validation)
+
+> 📌 Values are averaged across 5 folds
+
+| Model               | Accuracy  | F1 (Weighted) | F1 (Macro) | ROC-AUC   |
+| ------------------- | --------- | ------------- | ---------- | --------- |
+| Logistic Regression | ~0.62     | ~0.60         | ~0.52      | ~0.74     |
+| XGBoost             | ~0.66     | ~0.65         | ~0.57      | ~0.78     |
+| Neural Network      | ~0.67     | ~0.66         | ~0.58      | ~0.79     |
+| **RandomForest**    | **~0.69** | **~0.69**     | **~0.61**  | **~0.82** |
 
 ---
 
-## 10. Future Improvements
+## 🏆 Best Model Selection
 
-* Hyperparameter tuning (GridSearch / Optuna)
-* Feature importance analysis
-* Dimensionality reduction (PCA)
-* Handling rare classes more effectively
-* Model explainability (SHAP)
+Selection Criteria:
+
+```
+Primary metric → F1 (Weighted)
+```
+
+Reason:
+
+* Dataset is imbalanced
+* Weighted F1 balances precision and recall across classes
 
 ---
+
+### ✅ Selected Model: **RandomForest**
+
+Why:
+
+* Highest F1 (weighted)
+* Best overall generalization
+* Handles non-linear relationships well
+* Robust to feature interactions
+
+---
+
+## 🔍 Model Insights
+
+### Logistic Regression
+
+* Underperforms due to linear assumption
+* Cannot capture complex relationships
+
+---
+
+### Random Forest
+
+* Good baseline
+* Slight overfitting tendency
+* Less efficient than boosting
+
+---
+
+### Neural Network
+
+* Performs competitively
+* Sensitive to hyperparameters
+* Requires more tuning
+
+---
+
+### XGBoost
+
+* Best balance of bias vs variance
+* Handles feature interactions effectively
+* Regularization prevents overfitting
+
+---
+
+## ⚖️ Bias-Variance Analysis
+
+| Model               | Bias       | Variance    |
+| ------------------- | ---------- | ----------- |
+| Logistic Regression | High       | Low         |
+| Random Forest       | Low        | Medium      |
+| Neural Network      | Medium     | Medium      |
+| XGBoost             | Low-Medium | Low         |
+
+---
+
+## 📌 Final Decision
+
+```
+Chosen Model: Random Forest
+```
+
+---
+
+## Outputs Generated
+
+* `src/models/best_model.pkl`
+* `src/models/label_classes.json`
+* `src/evaluation/metrics.json`
+* `src/evaluation/confusion_matrix.png`
+
+---
+
+## Conclusion
+
+The model comparison process demonstrates that:
+
+* Feature engineering significantly impacts performance
+* Ensemble methods outperform simple models
+* XGBoost is the most suitable model for this problem
+
+

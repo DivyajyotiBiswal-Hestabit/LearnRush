@@ -9,7 +9,6 @@ st.set_page_config(page_title="Week 6 ML Dashboard", layout="wide")
 st.title("Know about your Movies")
 st.write("Enter feature values and get prediction")
 
-# Health check
 with st.expander("API Health Check", expanded=False):
     if st.button("Check API Health"):
         try:
@@ -25,75 +24,59 @@ st.subheader("Input Features")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    listed_in_freq_log = st.number_input("listed_in_freq_log", value=4.79)
-    kids_score = st.number_input("kids_score", value=1.0)
-    is_kids_like = st.selectbox("is_kids_like", [0, 1], index=0)
     genre_kids = st.selectbox("genre_kids", [0, 1], index=0)
     duration = st.number_input("duration", value=95.0)
-    country_freq_log = st.number_input("country_freq_log", value=5.10)
     genre_family = st.selectbox("genre_family", [0, 1], index=0)
-    genre_international = st.selectbox("genre_international", [0, 1], index=1)
-    genre_count = st.number_input("genre_count", value=2.0)
-    director_freq = st.number_input("director_freq", value=45.0)
-
-with col2:
-    genre_comedy = st.selectbox("genre_comedy", [0, 1], index=0)
-    genre_drama = st.selectbox("genre_drama", [0, 1], index=1)
-    is_long_duration = st.selectbox("is_long_duration", [0, 1], index=0)
-    text_len = st.number_input("text_len", value=250.0)
-    genre_horror = st.selectbox("genre_horror", [0, 1], index=0)
-    is_medium_duration = st.selectbox("is_medium_duration", [0, 1], index=1)
-    genre_crime = st.selectbox("genre_crime", [0, 1], index=1)
+    genre_international = st.selectbox("genre_international", [0, 1], index=0)
+    genre_drama = st.selectbox("genre_drama", [0, 1], index=0)
     title_len = st.number_input("title_len", value=18.0)
     release_year = st.number_input("release_year", value=2018.0)
-    is_movie = st.selectbox("is_movie", [0, 1], index=1)
+    director_freq_log = st.number_input("director_freq_log", value=2.5)
+
+with col2:
+    years_to_platform = st.number_input("years_to_platform", value=2.0)
+    has_kids_words = st.selectbox("has_kids_words", [0, 1], index=0)
+    has_mature_words = st.selectbox("has_mature_words", [0, 1], index=0)
+    is_long_duration = st.selectbox("is_long_duration", [0, 1], index=0)
+    genre_comedy = st.selectbox("genre_comedy", [0, 1], index=0)
+    description_len = st.number_input("description_len", value=120.0)
+    genre_romantic = st.selectbox("genre_romantic", [0, 1], index=0)
 
 with col3:
-    short_kids_content = st.selectbox("short_kids_content", [0, 1], index=0)
-    has_kids_words = st.selectbox("has_kids_words", [0, 1], index=0)
-    genre_action = st.selectbox("genre_action", [0, 1], index=1)
-    day_added = st.number_input("day_added", value=12.0)
     year_added = st.number_input("year_added", value=2020.0)
-    month_added = st.number_input("month_added", value=7.0)
-    genre_romantic = st.selectbox("genre_romantic", [0, 1], index=0)
     cast_count = st.number_input("cast_count", value=8.0)
-    cast_freq = st.number_input("cast_freq", value=180.0)
-    has_mature_words = st.selectbox("has_mature_words", [0, 1], index=1)
+    genre_crime = st.selectbox("genre_crime", [0, 1], index=0)
+    is_movie = st.selectbox("is_movie", [0, 1], index=1)
+    genre_horror = st.selectbox("genre_horror", [0, 1], index=0)
+    genre_action = st.selectbox("genre_action", [0, 1], index=0)
+    month_added = st.number_input("month_added", value=7.0)
 
 actual_label = st.text_input("actual_label (optional)", value="")
 
 payload = {
     "features": {
-        "listed_in_freq_log": float(listed_in_freq_log),
-        "kids_score": float(kids_score),
-        "is_kids_like": float(is_kids_like),
         "genre_kids": float(genre_kids),
         "duration": float(duration),
-        "country_freq_log": float(country_freq_log),
         "genre_family": float(genre_family),
         "genre_international": float(genre_international),
-        "genre_count": float(genre_count),
-        "director_freq": float(director_freq),
-        "genre_comedy": float(genre_comedy),
         "genre_drama": float(genre_drama),
-        "is_long_duration": float(is_long_duration),
-        "text_len": float(text_len),
-        "genre_horror": float(genre_horror),
-        "is_medium_duration": float(is_medium_duration),
-        "genre_crime": float(genre_crime),
         "title_len": float(title_len),
         "release_year": float(release_year),
-        "is_movie": float(is_movie),
-        "short_kids_content": float(short_kids_content),
+        "director_freq_log": float(director_freq_log),
+        "years_to_platform": float(years_to_platform),
         "has_kids_words": float(has_kids_words),
-        "genre_action": float(genre_action),
-        "day_added": float(day_added),
-        "year_added": float(year_added),
-        "month_added": float(month_added),
-        "genre_romantic": float(genre_romantic),
-        "cast_count": float(cast_count),
-        "cast_freq": float(cast_freq),
         "has_mature_words": float(has_mature_words),
+        "is_long_duration": float(is_long_duration),
+        "genre_comedy": float(genre_comedy),
+        "description_len": float(description_len),
+        "genre_romantic": float(genre_romantic),
+        "year_added": float(year_added),
+        "cast_count": float(cast_count),
+        "genre_crime": float(genre_crime),
+        "is_movie": float(is_movie),
+        "genre_horror": float(genre_horror),
+        "genre_action": float(genre_action),
+        "month_added": float(month_added),
     },
     "actual_label": actual_label if actual_label.strip() else None
 }

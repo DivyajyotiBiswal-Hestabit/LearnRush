@@ -217,9 +217,5 @@ week6-ml-api
 # 4. Open Swagger
 http://localhost:8000/docs
 
-# 5. Call /predict → logs generated automatically
-```
-
----
 
 

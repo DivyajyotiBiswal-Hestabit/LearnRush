@@ -1,226 +1,330 @@
-# FEATURE ENGINEERING REPORT — DAY 2
+# 📌Feature Engineering 
 
-## Feature Creation, Transformation & Selection
+##  Objective
 
----
+The goal of feature engineering is to transform raw Netflix dataset attributes into meaningful numerical representations that improve model performance for predicting **content category**:
 
-## 1. Objective
-
-The objective of Day 2 was to transform the cleaned dataset into a **machine learning-ready feature set** by:
-
-* Creating meaningful features
-* Applying controlled transformations
-* Encoding categorical variables
-* Selecting the most relevant features
-* Avoiding data leakage and overfitting
+* `kids`
+* `teen`
+* `adult`
+* `other`
 
 ---
 
-## 2. Pipeline Overview
+##  Source Data
+
+Input dataset:
+
+```
+src/data/processed/final.csv
+```
+
+Target column:
+
+```
+rating → mapped to → rating_group
+```
+
+---
+
+##  Target Transformation
+
+The original `rating` column is mapped into 4 categories:
+
+| Rating Values           | Group |
+| ----------------------- | ----- |
+| TV-Y, TV-Y7, TV-G, G    | kids  |
+| PG, TV-PG, PG-13, TV-14 | teen  |
+| R, NC-17, TV-MA         | adult |
+| NR, UR                  | other |
+
+---
+
+##  Feature Engineering Pipeline
 
 Feature engineering is implemented in:
 
-```text
-src/features/build_features.py
-src/features/feature_selector.py
 ```
-
-Flow:
-
-```text
-Clean Data → Feature Engineering → Feature Selection → Save Features
+src/features/build_features.py
 ```
 
 ---
 
-## 3. Feature Engineering Techniques
+#  Feature Categories
 
-### 3.1 Datetime Feature Extraction
+---
 
-The `date_added` column was processed to extract:
+## 1️ Genre-Based Features
 
+Derived from `listed_in` column.
+
+### 🔹 Binary Genre Flags
+
+Each genre is converted into a binary indicator:
+
+* `genre_kids`
+* `genre_family`
+* `genre_action`
+* `genre_comedy`
+* `genre_drama`
+* `genre_horror`
+* `genre_crime`
+* `genre_romantic`
+* `genre_international`
+
+ Purpose:
+
+* Captures content type explicitly
+* Helps model learn genre-to-audience mapping
+
+---
+
+### 🔹 Genre Count
+
+```
+genre_count = number of genres in a title
+```
+
+ Purpose:
+
+* More genres → more complex content
+
+---
+
+### 🔹 Genre Frequency
+
+```
+listed_in_freq = frequency of genre combinations
+listed_in_freq_log = log-transformed frequency
+```
+
+ Purpose:
+
+* Popular genres influence prediction
+* Log transform reduces skew
+
+---
+
+## 2️ Kids & Maturity Signals
+
+### 🔹 Kids Keywords Features
+
+Based on predefined keywords:
+
+```
+KIDS_WORDS = ["family", "kids", "school", "adventure", "animated", "friendship"]
+```
+
+Features:
+
+* `has_kids_words`
+* `kids_score`
+* `is_kids_like`
+
+ Purpose:
+
+* Detect child-friendly content beyond ratings
+
+---
+
+### 🔹 Mature Content Detection
+
+Based on:
+
+```
+MATURE_WORDS = ["murder", "violence", "crime", "dark", "war", "killer"]
+```
+
+Feature:
+
+* `has_mature_words`
+
+ Purpose:
+
+* Identify adult-oriented content
+
+---
+
+### 🔹 Short Kids Content
+
+```
+short_kids_content = (is_short_duration AND kids indicators)
+```
+
+ Purpose:
+
+* Captures cartoons / short children's content
+
+---
+
+## 3️ Duration-Based Features
+
+From `duration` column:
+
+* `duration`
+* `is_medium_duration`
+* `is_long_duration`
+
+ Purpose:
+
+* Kids → shorter
+* Adults → longer
+
+---
+
+## 4️ Text-Based Features
+
+Derived from `title`, `description`:
+
+* `text_len`
+* `title_len`
+
+ Purpose:
+
+* Longer descriptions often indicate complex content
+
+---
+
+## 5️ Popularity / Frequency Features
+
+From categorical columns:
+
+* `director_freq`
+* `cast_freq`
+* `cast_count`
+* `country_freq_log`
+
+ Purpose:
+
+* Popular actors/directors influence content type
+
+---
+
+## 6️ Temporal Features
+
+From `date_added` and `release_year`:
+
+* `release_year`
 * `year_added`
 * `month_added`
 * `day_added`
 
-Then the original column was removed.
+ Purpose:
 
-Reason:
-
-* Models cannot directly use raw datetime strings
-* Extracted features capture temporal patterns
+* Captures temporal trends in content
 
 ---
 
-### 3.2 Numerical Transformations
+## 7️ Content Type Feature
 
-Only **log transformation** was applied:
+* `is_movie`
 
-```python
-df[f"{col}_log"] = np.log1p(df[col])
-```
+ Purpose:
 
-Reason:
-
-* Reduces skewness
-* Handles large value ranges
-* Prevents over-expansion of features
-
-⚠️ Note:
-Square and square-root transformations were intentionally removed to avoid excessive feature generation and overfitting.
+* Movies vs TV Shows behave differently
 
 ---
 
-### 3.3 Categorical Encoding
+#  Removed Features (Correlation Reduction)
 
-Categorical variables were encoded using **Label Encoding**:
+Highly correlated features were removed to avoid redundancy:
 
-```python
-LabelEncoder()
-```
+| Removed Feature   | Reason                        |
+| ----------------- | ----------------------------- |
+| listed_in_freq    | duplicate of log version      |
+| country_freq      | replaced by log version       |
+| is_short_duration | redundant with duration flags |
+| release_decade    | redundant with release_year   |
 
-Reason:
+ Benefit:
 
-* Converts categories into numerical form
-* Efficient for tree-based models
-
-Important:
-
-* The **target column (`rating`) was excluded** from encoding to avoid leakage
-
----
-
-### 3.4 Text Features (Optional)
-
-TF-IDF vectorization module was implemented but not used:
-
-```python
-text_cols = []
-```
-
-Reason:
-
-* Text features like `cast` and `director` can be high-dimensional
-* Excluded to maintain model simplicity and stability
-
----
-
-### 3.5 Additional Feature Engineering
-
-Minimal feature generation was applied:
-
-* Removed:
-
-  * `numeric_sum` (global aggregation → potential leakage)
-  * `duration_per_year` (derived from strong feature)
-
-Reason:
-
-* Avoid creating features that indirectly reveal the target
-* Maintain realistic model performance
-
----
-
-## 4. Data Leakage Prevention
-
-Several steps were taken to prevent leakage:
-
-* Removed target-derived features (e.g., `rating_len`)
-* Excluded target column from transformations
-* Dropped overly strong proxy features during modeling
-* Avoided excessive feature combinations
-
----
-
-## 5. Feature Selection
-
-Feature selection was performed in two stages:
-
-### 5.1 Correlation-Based Filtering
-
-Highly correlated features (> 0.9) were removed:
-
-```python
-correlation_threshold()
-```
-
-Reason:
-
-* Reduces redundancy
+* Reduces multicollinearity
 * Improves model generalization
 
 ---
 
-### 5.2 Mutual Information Selection
+#  Final Feature Set
 
-Top features were selected using:
+Total features used:
 
-```python
-mutual_info_classif()
+```
+30 features
 ```
 
-* Top 20 features retained
+Saved in:
 
-Reason:
-
-* Captures non-linear relationships
-* Identifies most informative features
-
----
-
-## 6. Final Feature Set
-
-The selected features were saved in:
-
-```text
+```
 src/features/feature_list.json
 ```
 
-These features are used for:
+---
 
-* Model training
-* Consistent inference pipeline
+# 🔧 Feature Selection
+
+Two-step selection process:
+
+### 1. Correlation Filtering
+
+* Remove features with correlation > threshold
+
+### 2. Mutual Information
+
+* Select top-K informative features
 
 ---
 
-## 7. Design Decisions
+#  Why This Feature Engineering Works
 
-### 7.1 Controlled Feature Expansion
+### ✔ Captures Multiple Dimensions
 
-* Limited transformations to avoid overfitting
-* Avoided unnecessary polynomial features
-
----
-
-### 7.2 Simplicity Over Complexity
-
-* Prioritized stable, interpretable features
-* Avoided high-dimensional text representations
+* Content type → genres
+* Audience signals → kids/mature indicators
+* Structure → duration
+* Context → time-based features
+* Popularity → frequency encoding
 
 ---
 
-### 7.3 Leakage Awareness
+### ✔ Handles Non-Linearity
 
-* Removed features that could indirectly encode the target
-* Ensured transformations are independent of labels
-
----
-
-## 8. Observations
-
-* Excessive feature engineering can artificially inflate performance
-* Simpler, controlled transformations lead to more realistic results
-* Feature selection significantly reduces noise and improves model stability
+* Log transformations
+* Binary indicators
+* Interaction features
 
 ---
 
-## 9. Conclusion
+### ✔ Improves Model Performance
 
-The feature engineering pipeline successfully:
+* Reduced noise
+* Reduced redundancy
+* Better separability of classes
 
-* Converts raw data into structured features
-* Maintains data integrity
-* Avoids leakage and overfitting
-* Produces a robust feature set for model training
+---
 
+#  Summary
 
+This feature engineering pipeline:
+
+* Converts raw Netflix data into structured signals
+* Extracts semantic meaning (kids vs adult content)
+* Reduces dimensionality and correlation
+* Produces a clean, optimized feature set for modeling
+
+---
+
+#  Related Files
+
+```
+src/features/build_features.py
+src/features/feature_list.json
+src/config/config.yaml
+```
+
+---
+
+# Final Note
+
+Feature engineering is the **most important part of this project** —
+it directly impacts model performance more than algorithm choice.
+
+---

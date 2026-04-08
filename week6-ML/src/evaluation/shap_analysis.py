@@ -61,7 +61,7 @@ def main():
         plt.savefig("src/evaluation/shap_summary.png", bbox_inches="tight")
         plt.close()
 
-    # Linear models
+    # Linear Models
     elif estimator.__class__.__name__ == "LogisticRegression":
         explainer = shap.LinearExplainer(estimator, X_sample)
         shap_values = explainer.shap_values(X_sample)
@@ -72,7 +72,7 @@ def main():
         plt.savefig("src/evaluation/shap_summary.png", bbox_inches="tight")
         plt.close()
 
-    # Fallback for neural network / other models
+    
     else:
         background = X_sample.iloc[:50]
         explain_data = X_sample.iloc[:100]

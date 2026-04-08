@@ -15,7 +15,6 @@ from sklearn.model_selection import (
     GridSearchCV,
     RandomizedSearchCV
 )
-from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import (
     accuracy_score,
@@ -31,6 +30,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.cluster import KMeans
 
+from imblearn.pipeline import Pipeline as ImbPipeline
+from imblearn.over_sampling import SMOTE
+
 warnings.filterwarnings("ignore")
 
 
@@ -42,6 +44,23 @@ def load_config():
 
 def load_data(config):
     return pd.read_csv(config["data"]["processed_path"])
+
+
+def load_best_baseline_model_name():
+    metrics_path = "src/evaluation/metrics.json"
+    if not os.path.exists(metrics_path):
+        raise FileNotFoundError(
+            "src/evaluation/metrics.json not found. Run train.py first."
+        )
+
+    with open(metrics_path, "r") as f:
+        metrics = json.load(f)
+
+    best_model = metrics.get("best_model")
+    if not best_model:
+        raise ValueError("Could not find 'best_model' in src/evaluation/metrics.json")
+
+    return best_model
 
 
 def prepare_data(df, target_column):
@@ -60,6 +79,10 @@ def make_dirs():
     os.makedirs("src/tuning", exist_ok=True)
     os.makedirs("src/evaluation", exist_ok=True)
     os.makedirs("src/models", exist_ok=True)
+
+
+def get_sampler(use_smote=True):
+    return SMOTE(random_state=42) if use_smote else "passthrough"
 
 
 def evaluate_cv(model, X, y, cv):
@@ -98,10 +121,13 @@ def evaluate_cv(model, X, y, cv):
     }
 
 
-def tune_logistic_grid(X, y, cv):
-    pipe = Pipeline([
+def tune_logistic_grid(X, y, cv, use_smote=True):
+    sampler = get_sampler(use_smote)
+
+    pipe = ImbPipeline([
         ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler()),
+        ("smote", sampler),
         ("model", LogisticRegression(
             max_iter=2000,
             solver="saga",
@@ -125,9 +151,12 @@ def tune_logistic_grid(X, y, cv):
     return search.best_estimator_, search.best_params_, float(search.best_score_)
 
 
-def tune_rf_random(X, y, cv):
-    pipe = Pipeline([
+def tune_rf_random(X, y, cv, use_smote=True):
+    sampler = get_sampler(use_smote)
+
+    pipe = ImbPipeline([
         ("imputer", SimpleImputer(strategy="median")),
+        ("smote", sampler),
         ("model", RandomForestClassifier(
             random_state=42,
             class_weight="balanced"
@@ -135,16 +164,17 @@ def tune_rf_random(X, y, cv):
     ])
 
     param_dist = {
-        "model__n_estimators": [100, 200, 300, 500],
-        "model__max_depth": [None, 5, 10, 20],
-        "model__min_samples_split": [2, 5, 10],
-        "model__min_samples_leaf": [1, 2, 4]
+        "model__n_estimators": [200, 300, 400, 500, 600],
+        "model__max_depth": [None, 6, 8, 10, 15, 20],
+        "model__min_samples_split": [2, 4, 6, 10],
+        "model__min_samples_leaf": [1, 2, 4],
+        "model__max_features": ["sqrt", "log2", None]
     }
 
     search = RandomizedSearchCV(
         pipe,
         param_distributions=param_dist,
-        n_iter=15,
+        n_iter=20,
         scoring="f1_weighted",
         cv=cv,
         random_state=42,
@@ -154,10 +184,13 @@ def tune_rf_random(X, y, cv):
     return search.best_estimator_, search.best_params_, float(search.best_score_)
 
 
-def tune_mlp_random(X, y, cv):
-    pipe = Pipeline([
+def tune_mlp_random(X, y, cv, use_smote=True):
+    sampler = get_sampler(use_smote)
+
+    pipe = ImbPipeline([
         ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler()),
+        ("smote", sampler),
         ("model", MLPClassifier(random_state=42, max_iter=500))
     ])
 
@@ -170,7 +203,7 @@ def tune_mlp_random(X, y, cv):
     search = RandomizedSearchCV(
         pipe,
         param_distributions=param_dist,
-        n_iter=10,
+        n_iter=12,
         scoring="f1_weighted",
         cv=cv,
         random_state=42,
@@ -180,16 +213,19 @@ def tune_mlp_random(X, y, cv):
     return search.best_estimator_, search.best_params_, float(search.best_score_)
 
 
-def tune_xgb_optuna(X, y, cv):
+def tune_xgb_optuna(X, y, cv, use_smote=True):
     try:
         import optuna
         from xgboost import XGBClassifier
     except Exception:
         return None, None, None, "Optuna/XGBoost not available"
 
+    sampler = get_sampler(use_smote)
+
     def objective(trial):
-        model = Pipeline([
+        model = ImbPipeline([
             ("imputer", SimpleImputer(strategy="median")),
+            ("smote", sampler),
             ("model", XGBClassifier(
                 n_estimators=trial.suggest_int("n_estimators", 150, 500),
                 max_depth=trial.suggest_int("max_depth", 3, 10),
@@ -221,10 +257,9 @@ def tune_xgb_optuna(X, y, cv):
 
     best_params = study.best_trial.params
 
-    from xgboost import XGBClassifier
-
-    best_model = Pipeline([
+    best_model = ImbPipeline([
         ("imputer", SimpleImputer(strategy="median")),
+        ("smote", sampler),
         ("model", XGBClassifier(
             n_estimators=best_params["n_estimators"],
             max_depth=best_params["max_depth"],
@@ -243,6 +278,31 @@ def tune_xgb_optuna(X, y, cv):
 
     best_model.fit(X, y)
     return best_model, best_params, float(study.best_value), None
+
+
+def tune_only_best_model(best_model_name, X, y, cv, use_smote=True):
+    if best_model_name == "logistic_regression":
+        model, params, score = tune_logistic_grid(X, y, cv, use_smote=use_smote)
+        tuned_name = "logistic_regression_tuned"
+        error = None
+
+    elif best_model_name == "random_forest":
+        model, params, score = tune_rf_random(X, y, cv, use_smote=use_smote)
+        tuned_name = "random_forest_tuned"
+        error = None
+
+    elif best_model_name == "neural_network":
+        model, params, score = tune_mlp_random(X, y, cv, use_smote=use_smote)
+        tuned_name = "neural_network_tuned"
+        error = None
+
+    elif best_model_name == "xgboost":
+        model, params, score, error = tune_xgb_optuna(X, y, cv, use_smote=use_smote)
+        tuned_name = "xgboost_tuned"
+    else:
+        raise ValueError(f"Unsupported best model from train.py: {best_model_name}")
+
+    return tuned_name, model, params, score, error
 
 
 def feature_importance_plot(model, feature_names, path):
@@ -348,24 +408,22 @@ def main():
     with open("src/models/label_classes.json", "w") as f:
         json.dump(label_classes, f, indent=4)
 
+    best_baseline_model_name = load_best_baseline_model_name()
+    print("Best baseline model from train.py:", best_baseline_model_name)
+
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    use_smote = config.get("class_imbalance", {}).get("use_smote", True)
 
-    log_model, log_params, log_score = tune_logistic_grid(X, y, cv)
-    rf_model, rf_params, rf_score = tune_rf_random(X, y, cv)
-    mlp_model, mlp_params, mlp_score = tune_mlp_random(X, y, cv)
-    xgb_model, xgb_params, xgb_score, xgb_error = tune_xgb_optuna(X, y, cv)
+    tuned_name, tuned_model, tuned_params, tuned_cv_score, tuned_error = tune_only_best_model(
+        best_baseline_model_name,
+        X,
+        y,
+        cv,
+        use_smote=use_smote
+    )
 
-    tuned_candidates = {
-        "logistic_regression_tuned": (log_model, log_params, log_score),
-        "random_forest_tuned": (rf_model, rf_params, rf_score),
-        "neural_network_tuned": (mlp_model, mlp_params, mlp_score)
-    }
-
-    if xgb_model is not None:
-        tuned_candidates["xgboost_tuned"] = (xgb_model, xgb_params, xgb_score)
-
-    best_name = max(tuned_candidates, key=lambda k: tuned_candidates[k][2])
-    best_model, best_params, best_cv_score = tuned_candidates[best_name]
+    if tuned_model is None:
+        raise RuntimeError(f"Could not tune model '{best_baseline_model_name}'. Reason: {tuned_error}")
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
@@ -374,15 +432,15 @@ def main():
         random_state=42
     )
 
-    best_model, y_pred, test_metrics = fit_test_metrics(
-        best_model, X_train, y_train, X_test, y_test
+    tuned_model, y_pred, test_metrics = fit_test_metrics(
+        tuned_model, X_train, y_train, X_test, y_test
     )
 
     with open("src/models/best_model.pkl", "wb") as f:
-        pickle.dump(best_model, f)
+        pickle.dump(tuned_model, f)
 
     feature_importance_plot(
-        best_model,
+        tuned_model,
         X.columns.tolist(),
         "src/evaluation/feature_importance.png"
     )
@@ -400,27 +458,14 @@ def main():
         "src/tuning/error_clusters.json"
     )
 
-    tuned_cv_results = evaluate_cv(best_model, X, y, cv)
+    tuned_cv_results = evaluate_cv(tuned_model, X, y, cv)
 
     results = {
-        "tuned_models": {
-            "logistic_regression_tuned": {
-                "best_params": log_params,
-                "best_cv_f1_weighted": log_score
-            },
-            "random_forest_tuned": {
-                "best_params": rf_params,
-                "best_cv_f1_weighted": rf_score
-            },
-            "neural_network_tuned": {
-                "best_params": mlp_params,
-                "best_cv_f1_weighted": mlp_score
-            }
-        },
-        "best_model": best_name,
-        "best_model_params": best_params,
-        "best_model_cv_f1_weighted": best_cv_score,
-        "best_model_test_metrics": test_metrics,
+        "baseline_best_model_from_train": best_baseline_model_name,
+        "tuned_model": tuned_name,
+        "tuned_model_params": tuned_params,
+        "tuned_model_cv_f1_weighted": tuned_cv_score,
+        "tuned_model_test_metrics": test_metrics,
         "bias_variance_analysis": {
             "train_f1_weighted_mean": tuned_cv_results["train_f1_weighted_mean"],
             "val_f1_weighted_mean": tuned_cv_results["val_f1_weighted_mean"],
@@ -431,20 +476,17 @@ def main():
         }
     }
 
-    if xgb_model is not None:
-        results["tuned_models"]["xgboost_tuned"] = {
-            "best_params": xgb_params,
-            "best_cv_f1_weighted": xgb_score
-        }
-    if xgb_error is not None:
-        results["xgboost_status"] = xgb_error
+    if tuned_error is not None:
+        results["tuning_status"] = tuned_error
 
     with open("src/tuning/results.json", "w") as f:
         json.dump(results, f, indent=4)
 
     print("Tuning completed")
-    print("Best tuned model:", best_name)
+    print("Best baseline model:", best_baseline_model_name)
+    print("Best tuned model:", tuned_name)
     print("Results saved to: src/tuning/results.json")
+    print("Best model saved to: src/models/best_model.pkl")
     print("Feature importance saved to: src/evaluation/feature_importance.png")
     print("Error heatmap saved to: src/evaluation/error_heatmap.png")
 

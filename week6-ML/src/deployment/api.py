@@ -51,7 +51,12 @@ def load_feature_list():
         raise FileNotFoundError(f"Feature list not found at {FEATURE_LIST_PATH}")
 
     with open(FEATURE_LIST_PATH, "r") as f:
-        return json.load(f)
+        feature_list = json.load(f)
+
+    if not isinstance(feature_list, list):
+        raise ValueError("Feature list file must contain a JSON list")
+
+    return feature_list
 
 
 def load_label_classes():
@@ -129,9 +134,7 @@ def predict(payload: PredictionRequest, request: Request):
         )
 
     try:
-        # Keep only expected features and preserve exact training order
-        aligned_features = {f: float(incoming_features[f]) for f in FEATURE_LIST}
-
+        aligned_features = {feature: float(incoming_features[feature]) for feature in FEATURE_LIST}
         X = pd.DataFrame([aligned_features], columns=FEATURE_LIST)
 
         raw_prediction = MODEL.predict(X)[0]
@@ -152,11 +155,13 @@ def predict(payload: PredictionRequest, request: Request):
             probabilities = [float(p) for p in probs]
             confidence = float(max(probs))
 
+        prediction_value = int(prediction) if isinstance(prediction, (int, float)) else prediction
+
         log_row = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "request_id": request_id,
             "model_version": MODEL_VERSION,
-            "prediction": int(prediction) if isinstance(prediction, (int, float)) else prediction,
+            "prediction": prediction_value,
             "predicted_label": predicted_label,
             "confidence": confidence,
             "actual_label": payload.actual_label,
@@ -169,7 +174,7 @@ def predict(payload: PredictionRequest, request: Request):
         return {
             "request_id": request_id,
             "model_version": MODEL_VERSION,
-            "prediction": int(prediction) if isinstance(prediction, (int, float)) else prediction,
+            "prediction": prediction_value,
             "predicted_label": predicted_label,
             "confidence": confidence,
             "probabilities": probabilities,
