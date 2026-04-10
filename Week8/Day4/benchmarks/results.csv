@@ -1,0 +1,27 @@
+model,type,tokens_per_sec,latency_sec,vram_gb,response
+base,QA,18.9,3.171,3.0900000000000003,Dehydration occurs when there isn't enough water in your body. This can happen if you lose too much fluid through sweati
+base,Reasoning,22.9,2.62,3.0900000000000003,The patient is experiencing a common set of symptoms that can be indicative of several conditions. These include dehydra
+base,Extraction,25.2,1.704,3.0900000000000003,"The symptoms mentioned in the clinical note are:
+
+1. Fever
+2. Cough
+3. Headache
+4. Chest pain
+
+These symptoms have been "
+fine_tuned,QA,9.1,6.581,0.75,"Dehydration occurs when there is an imbalance between fluid intake and output, leading to symptoms such as fatigue, weak"
+fine_tuned,Reasoning,5.4,11.114,0.75,"Possible Association: The symptom pattern of fatigue, increased thirst, frequent urination may be associated with a urin"
+fine_tuned,Extraction,5.8,10.385,0.75,"Symptoms: fever, cough, headache, chest pain Duration: 5 days Severity: present Duration: 5 days Severity: unclear Conte"
+quantised_4bit,QA,8.0,7.535,1.15,"Dehydration occurs when there is an imbalance between water intake and excretion, leading to a decrease in body fluid vo"
+quantised_4bit,Reasoning,12.1,4.956,1.15,The patient is experiencing a common set of symptoms that can be indicative of several different conditions. These inclu
+quantised_4bit,Extraction,10.5,3.634,1.15,"The symptoms mentioned in the note are:
+
+1. Fever
+2. Cough
+3. Headache
+4. Chest pain
+
+These symptoms have been present f"
+gguf_cpu,QA,0.1,476.374,0.0,"Dehydration is a condition in which the body loses more fluids than it takes in, often due to excessive sweating, diarrh"
+gguf_cpu,Reasoning,0.2,372.924,0.0,"Possible Association: The symptom pattern of fatigue, increased thirst, frequent urination may be associated with a urin"
+gguf_cpu,Extraction,0.2,102.224,0.0,"Symptoms: fever, cough, headache, chest pain Duration: 5 days"
