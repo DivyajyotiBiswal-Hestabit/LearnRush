@@ -11,3 +11,4 @@ logs
 .env
 CHAT-LOGS.json
 memory_store.json
+uploaded_store.json

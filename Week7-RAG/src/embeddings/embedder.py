@@ -9,7 +9,6 @@ class LocalEmbedder:
             trust_remote_code=True
         )
 
-        # Important: keep input length controlled
         self.model.max_seq_length = 512
 
     def embed_texts(self, texts, batch_size: int = 8):

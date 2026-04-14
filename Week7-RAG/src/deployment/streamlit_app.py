@@ -65,37 +65,49 @@ def handle_response(response):
 with tab1:
     st.header("Ask Text RAG")
 
+    uploaded_file = st.file_uploader(
+        "Upload a document (PDF / TXT)",
+        type=["pdf", "txt"],
+        key="rag_file_upload"
+    )
+
     text_query = st.text_area("Enter your question", height=120, key="text_query")
     top_k = st.slider("Top K", min_value=1, max_value=10, value=5, key="text_topk")
 
     if st.button("Ask Text RAG"):
         if not text_query.strip():
             st.warning("Please enter a question.")
-        else:
-            try:
-                response = requests.post(
-                    f"{API_BASE}/ask",
-                    json={"query": text_query, "top_k": top_k},
-                    timeout=600
-                )
-                data = handle_response(response)
-                if not data:
-                    st.stop()
+            st.stop()
 
-                st.subheader("Answer")
-                st.write(data.get("answer", ""))
+        files = None
+        if uploaded_file:
+            files = {
+                "file": (uploaded_file.name, uploaded_file.getvalue())
+            }
 
-                render_eval(data.get("evaluation"))
+        try:
+            response = requests.post(
+                f"{API_BASE}/ask",
+                data={"query": text_query, "top_k": top_k},
+                files=files,
+                timeout=600
+            )
 
-                st.subheader("Sources")
-                for src in data.get("sources", []):
-                    st.json(src)
+            data = handle_response(response)
+            if not data:
+                st.stop()
 
-                st.subheader("Trace")
-                st.json(data.get("trace", {}))
+            st.subheader("Answer")
+            st.write(data.get("answer", ""))
 
-            except Exception as e:
-                st.error(f"Request failed: {e}")
+            render_eval(data.get("evaluation"))
+
+            st.subheader("Sources")
+            for src in data.get("sources", []):
+                st.json(src)
+
+        except Exception as e:
+            st.error(f"Request failed: {e}")
 
 
 with tab2:

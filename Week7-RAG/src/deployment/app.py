@@ -14,6 +14,12 @@ from src.generator.llm_client import LocalLLMClient
 from src.pipelines.context_builder import ContextBuilder
 from src.retriever.image_search import ImageSearchEngine
 from src.pipelines.sql_pipeline import SQLQAPipeline
+from PIL import Image
+from transformers import BlipProcessor, BlipForConditionalGeneration
+
+
+blip_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -218,7 +224,7 @@ Draft Answer:
 Refined Answer:
 """.strip()
 
-    return llm.generate(prompt, max_new_tokens=160)
+    return llm.generate(prompt, max_new_tokens=120)
 
 
 @app.get("/")
@@ -226,112 +232,177 @@ def root():
     return {"status": "ok", "message": "Week7 Capstone RAG API running"}
 
 
-@app.post("/ask")
-def ask(req: AskRequest):
-    try:
-        started = time.perf_counter()
+from fastapi import UploadFile, File, Form
+from src.utils.file_parser import parse_file
+from src.utils.chunker import chunk_text
+from src.embeddings.text_embedder import TextEmbedder
+import numpy as np
 
+
+UPLOAD_STORE = BASE_DIR / "uploaded_store.json"
+
+
+def load_uploaded_store():
+    if UPLOAD_STORE.exists():
+        with open(UPLOAD_STORE, "r") as f:
+            return json.load(f)
+    return []
+
+
+def save_uploaded_store(data):
+    with open(UPLOAD_STORE, "w") as f:
+        json.dump(data, f)
+
+
+@app.post("/ask")
+async def ask(
+    query: str = Form(...),
+    top_k: int = Form(5),
+    file: UploadFile = File(None)
+):
+    try:
         memory_text = memory.get_recent_context_text()
 
-        t1 = time.perf_counter()
-        retrieved = context_builder.build(query=req.query, top_k=req.top_k)
-        retrieval_ms = round((time.perf_counter() - t1) * 1000, 2)
+        # =========================
+        # FILE UPLOAD CASE
+        # =========================
+        if file:
+            if not file.filename.lower().endswith((".pdf", ".txt", ".csv")):
+                raise HTTPException(status_code=400, detail="Unsupported file type")
 
-        context = retrieved["context"]
-        sources = retrieved["sources"]
+            content = await file.read()
+            text = parse_file(file.filename, content)
 
-        if not context.strip():
-            response = {
-                "query": req.query,
-                "answer": "I could not find enough supporting context to answer this reliably.",
-                "sources": [],
-                "evaluation": {
-                    "context_match_score": 0.0,
-                    "faithfulness_score": 0.0,
-                    "hallucination_detected": True,
-                    "confidence_score": 0.0
-                },
-                "trace": {
-                    "draft_answer": "",
-                    "memory_used": memory.get_recent_messages(),
-                    "timings": {
-                        "retrieval_ms": retrieval_ms
-                    },
-                    "reason": "No retrieval context found"
-                }
-            }
-            return response
+            chunks = chunk_text(text, 800, 100)
+            embeddings = embedder.embed_texts(chunks)
 
-        prompt = build_text_prompt(req.query, context, memory_text)
+            store = load_uploaded_store()
 
-        t2 = time.perf_counter()
-        draft_answer = llm.generate(prompt, max_new_tokens=180)
-        generation_ms = round((time.perf_counter() - t2) * 1000, 2)
+            existing_chunks = {item["chunk"] for item in store}
 
-        draft_eval = evaluate_answer(draft_answer, context)
+            for c, e in zip(chunks, embeddings):
+                if c not in existing_chunks:
+                    store.append({
+                        "chunk": c,
+                        "embedding": e.tolist()
+                    })
 
-        refinement_ms = 0.0
-        if draft_eval["confidence_score"] < 0.7 or draft_eval["faithfulness_score"] < 0.7:
-            t3 = time.perf_counter()
-            final_answer = refine_answer(req.query, context, draft_answer, memory_text)
-            refinement_ms = round((time.perf_counter() - t3) * 1000, 2)
+            save_uploaded_store(store)
+
+            q_emb = embedder.embed_texts([query])[0]
+            emb_np = np.array(embeddings)
+
+            scores = np.dot(emb_np, q_emb)
+            idx = np.argsort(scores)[-top_k:][::-1]
+
+            retrieved = [chunks[i] for i in idx]
+
+        # =========================
+        # NO FILE CASE
+        # =========================
         else:
-            final_answer = draft_answer
+            store = load_uploaded_store()
 
-        t4 = time.perf_counter()
-        eval_result = evaluate_answer(final_answer, context)
-        evaluation_ms = round((time.perf_counter() - t4) * 1000, 2)
+            if store:
+                chunks = [x["chunk"] for x in store]
+                embeddings = np.array([x["embedding"] for x in store])
 
-        memory.add_message("user", req.query)
-        memory.add_message("assistant", final_answer)
+                q_emb = embedder.embed_texts([query])[0]
+                scores = np.dot(embeddings, q_emb)
 
-        total_ms = round((time.perf_counter() - started) * 1000, 2)
+                idx = np.argsort(scores)[-top_k:][::-1]
+                retrieved = [chunks[i] for i in idx]
 
-        record = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "endpoint": "/ask",
-            "query": req.query,
-            "context": context,
-            "sources": sources,
-            "draft_answer": draft_answer,
-            "final_answer": final_answer,
-            "evaluation": eval_result,
-            "memory_snapshot": memory.get_recent_messages(),
-            "trace": {
-                "timings": {
-                    "retrieval_ms": retrieval_ms,
-                    "generation_ms": generation_ms,
-                    "refinement_ms": refinement_ms,
-                    "evaluation_ms": evaluation_ms,
-                    "total_ms": total_ms
+            else:
+                data = context_builder.build(query=query, top_k=top_k)
+                context = data["context"]
+                sources = data["sources"]
+
+                prompt = build_text_prompt(query, context, memory_text)
+                answer = llm.generate(prompt)
+
+                return {
+                    "answer": answer,
+                    "sources": sources,
+                    "evaluation": evaluate_answer(answer, context)
                 }
-            }
-        }
-        append_chat_log(record)
+
+        context = "\n\n".join(retrieved)
+
+        prompt = build_text_prompt(query, context, memory_text)
+        draft = llm.generate(prompt, max_new_tokens=120)
+
+        eval_res = evaluate_answer(draft, context)
+
+        if eval_res["confidence_score"] < 0.5:
+            final = refine_answer(query, context, draft, memory_text)
+        else:
+            final = draft
+
+        memory.add_message("user", query)
+        memory.add_message("assistant", final)
 
         return {
-            "query": req.query,
-            "answer": final_answer,
-            "sources": sources,
-            "evaluation": eval_result,
-            "trace": {
-                "draft_answer": draft_answer,
-                "memory_used": memory.get_recent_messages(),
-                "timings": {
-                    "retrieval_ms": retrieval_ms,
-                    "generation_ms": generation_ms,
-                    "refinement_ms": refinement_ms,
-                    "evaluation_ms": evaluation_ms,
-                    "total_ms": total_ms
-                },
-                "context_chars": len(context),
-                "retrieval_count": len(sources)
-            }
+            "answer": final,
+            "sources": [{"chunk": c[:200]} for c in retrieved],
+            "evaluation": evaluate_answer(final, context)
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"/ask failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
+
+
+embedder = TextEmbedder()
+
+
+@app.post("/ask-file")
+async def ask_file(
+    query: str = Form(...),
+    top_k: int = Form(5),
+    file: UploadFile = File(None)
+
+):
+    try:
+        if file is None:
+            raise HTTPException(status_code=400, detail="No file uploaded.")
+
+        # 1. Read file
+        content = await file.read()
+        text = parse_file(file.filename, content)
+
+        # 2. Chunk
+        chunks = chunk_text(text, chunk_size=500, overlap=50)
+
+        # 3. Embed
+        embeddings = embedder.embed_texts(chunks)
+
+        # 4. Query embedding
+        q_emb = embedder.embed_texts([query])[0]
+
+        # 5. Similarity search (cosine)
+        scores = np.dot(embeddings, q_emb)
+        top_indices = np.argsort(scores)[-top_k:][::-1]
+
+        retrieved_chunks = [chunks[i] for i in top_indices]
+
+        context = "\n\n".join(retrieved_chunks)
+
+        # 6. Generate answer
+        prompt = build_text_prompt(query, context, "")
+        answer = llm.generate(prompt, max_new_tokens=200)
+
+        eval_result = evaluate_answer(answer, context)
+
+        return {
+            "query": query,
+            "answer": answer,
+            "sources": [{"chunk": c[:200]} for c in retrieved_chunks],
+            "evaluation": eval_result
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/ask-image")
 def ask_image(req: AskImageRequest):
@@ -413,68 +484,23 @@ def ask_image(req: AskImageRequest):
             if not os.path.exists(req.image_path):
                 raise ValueError(f"Image not found: {req.image_path}")
 
-            memory_text = memory.get_recent_context_text()
+            image = Image.open(req.image_path).convert("RGB")
 
-            t1 = time.perf_counter()
-            results, image_answer = image_engine.answer_from_image_query(
-                image_path=req.image_path,
-                user_question=req.question or "Explain this image.",
-                top_k=req.top_k
-            )
-            retrieval_ms = round((time.perf_counter() - t1) * 1000, 2)
+            inputs = blip_processor(images=image, return_tensors="pt")
+            out = blip_model.generate(**inputs)
 
-            context = "\n\n".join(
-                [
-                    f"Source: {r.get('source_file', 'unknown')}\n"
-                    f"Caption: {r.get('caption', '')}\n"
-                    f"OCR: {r.get('ocr_text', '')}"
-                    for r in results[:3]
-                ]
-            )
-
-            draft_eval = evaluate_answer(image_answer, context)
-
-            refinement_ms = 0.0
-            if draft_eval["confidence_score"] < 0.7 or draft_eval["faithfulness_score"] < 0.7:
-                t2 = time.perf_counter()
-                final_answer = refine_answer(
-                    req.question or "Explain this image.",
-                    context,
-                    image_answer,
-                    memory_text
-                )
-                refinement_ms = round((time.perf_counter() - t2) * 1000, 2)
-            else:
-                final_answer = image_answer
-
-            t3 = time.perf_counter()
-            eval_result = evaluate_answer(final_answer, context)
-            evaluation_ms = round((time.perf_counter() - t3) * 1000, 2)
-
-            memory.add_message("user", req.question or "Explain this image.")
-            memory.add_message("assistant", final_answer)
-
-            total_ms = round((time.perf_counter() - started) * 1000, 2)
-
+            caption = blip_processor.decode(out[0], skip_special_tokens=True)
+ 
             return {
                 "mode": req.mode,
                 "image_path": req.image_path,
                 "question": req.question,
-                "answer": final_answer,
-                "retrieved_results": results,
-                "evaluation": eval_result,
-                "trace": {
-                    "draft_answer": image_answer,
-                    "memory_used": memory.get_recent_messages(),
-                    "timings": {
-                        "retrieval_ms": retrieval_ms,
-                        "refinement_ms": refinement_ms,
-                        "evaluation_ms": evaluation_ms,
-                        "total_ms": total_ms
-                    },
-                    "retrieval_count": len(results)
-                }
+                "answer": caption,
+                "retrieved_results": [],  # no RAG here
+                "evaluation": {
+                    "note": "BLIP image captioning used"
             }
+        }
 
         else:
             raise ValueError(f"Unsupported mode: {req.mode}")
