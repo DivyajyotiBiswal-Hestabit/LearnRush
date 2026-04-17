@@ -11,10 +11,7 @@ def call_llm(system_prompt, messages):
         role = msg["role"]
         content = msg["content"]
 
-        if role == "user":
-            conversation += f"User: {content}\n"
-        else:
-            conversation += f"Assistant: {content}\n"
+        conversation += f"{role.upper()}: {content}\n"
 
     full_prompt = f"""
 SYSTEM:
@@ -34,4 +31,5 @@ Assistant:
         }
     )
 
-    return response.json()["response"]
+    res = response.json()
+    return res.get("response", "Error: No response from model")
