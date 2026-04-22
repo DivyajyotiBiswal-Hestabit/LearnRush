@@ -1,0 +1,11 @@
+product,region,units,revenue
+Widget A,North,120,14400
+Widget B,South,85,8500
+Widget A,East,210,25200
+Widget C,West,40,2400
+Widget B,North,175,17500
+Widget A,South,320,38400
+Widget C,East,90,5400
+Widget B,West,65,6500
+Widget D,North,55,3300
+Widget D,South,200,12000

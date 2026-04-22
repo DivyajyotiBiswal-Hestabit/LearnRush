@@ -1,0 +1,16 @@
+product,region,units,revenue,date
+Laptop,North,5,5000,2024-01-10
+Laptop,South,3,3000,2024-01-12
+Laptop,West,4,4000,2024-01-15
+Phone,North,10,7000,2024-01-11
+Phone,East,8,5600,2024-01-13
+Phone,South,6,4200,2024-01-16
+Tablet,East,7,3500,2024-01-14
+Tablet,West,5,2500,2024-01-17
+Tablet,North,6,3000,2024-01-18
+Headphones,South,12,2400,2024-01-19
+Headphones,East,9,1800,2024-01-20
+Headphones,West,11,2200,2024-01-21
+Monitor,North,4,2000,2024-01-22
+Monitor,South,3,1500,2024-01-23
+Monitor,East,5,2500,2024-01-24
