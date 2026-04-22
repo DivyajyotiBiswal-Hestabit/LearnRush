@@ -8,7 +8,7 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
-const mongoUri = process.env.MONGO_URI || "mongodb://mongo:27017/day2app";
+const mongoUri = process.env.MONGO_URI;
 
 mongoose
   .connect(mongoUri)
