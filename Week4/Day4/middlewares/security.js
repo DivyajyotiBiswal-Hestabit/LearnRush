@@ -7,7 +7,7 @@ const hpp = require("hpp");
 const applySecurity = (app) => {
   app.use(helmet());
 
-  app.use(express.json({ limit: "10kb" }));
+   
 
   app.use(hpp());
 

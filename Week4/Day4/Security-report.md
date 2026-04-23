@@ -1,4 +1,4 @@
-# 🔐 API Security Report
+#  API Security Report
 
 ## Implemented Protections
 

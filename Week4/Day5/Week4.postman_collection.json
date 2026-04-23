@@ -1,0 +1,193 @@
+{
+  "info": {
+    "_postman_id": "51a86dad-39e4-4499-b63d-03c0fdfdbce4",
+    "name": "Week4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52134259",
+    "_collection_link": "https://go.postman.co/collection/52134259-51a86dad-39e4-4499-b63d-03c0fdfdbce4?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "getProducts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/products",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search product",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "descprice",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "deleteProduct",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "includedDeleted",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "get users",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "check rate limiting",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "signup",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "sendEmail",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "SignupBatch",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n    {\n        \"firstName\": \"Anup1\",\n        \"lastName\": \"Biswas1\",\n        \"email\": \"user1@example.com\",\n        \"password\": \"secret1235789\"\n    },\n    {\n        \"firstName\": \"Anup2\",\n        \"lastName\": \"Biswas2\",\n        \"email\": \"user2@example.com\",\n        \"password\": \"secret1235789a\"\n    },\n    {\n        \"firstName\": \"Anup3\",\n        \"lastName\": \"Biswas3\",\n        \"email\": \"user3@example.com\",\n        \"password\": \"secret1235789ab\"\n    },\n    {\n        \"firstName\": \"Anup4\",\n        \"lastName\": \"Biswas4\",\n        \"email\": \"user4@example.com\",\n        \"password\": \"secret1235789abc\"\n    },\n    {\n        \"firstName\": \"Anup5\",\n        \"lastName\": \"Biswas5\",\n        \"email\": \"user5@example.com\",\n        \"password\": \"secret1235789abcd\"\n    },\n    {\n        \"firstName\": \"Anup6\",\n        \"lastName\": \"Biswas6\",\n        \"email\": \"user6@example.com\",\n        \"password\": \"secret1235789abcde\"\n    },\n    {\n        \"firstName\": \"Anup7\",\n        \"lastName\": \"Biswas7\",\n        \"email\": \"user7@example.com\",\n        \"password\": \"secret1235789abcdef\"\n    },\n    {\n        \"firstName\": \"Anup8\",\n        \"lastName\": \"Biswas8\",\n        \"email\": \"user8@example.com\",\n        \"password\": \"secret1235789abcdefg\"\n    },\n    {\n        \"firstName\": \"Anup9\",\n        \"lastName\": \"Biswas9\",\n        \"email\": \"user9@example.com\",\n        \"password\": \"secret1235789abcdefgh\"\n    },\n    {\n        \"firstName\": \"Anup10\",\n        \"lastName\": \"Biswas10\",\n        \"email\": \"user10@example.com\",\n        \"password\": \"secret1235789abcdefghi\"\n    },\n    {\n        \"firstName\": \"Anup11\",\n        \"lastName\": \"Biswas11\",\n        \"email\": \"user11@example.com\",\n        \"password\": \"secret1235789abcdefghij\"\n    },\n    {\n        \"firstName\": \"Anup12\",\n        \"lastName\": \"Biswas12\",\n        \"email\": \"user12@example.com\",\n        \"password\": \"secret1235789abcdefghijk\"\n    },\n    {\n        \"firstName\": \"Anup13\",\n        \"lastName\": \"Biswas13\",\n        \"email\": \"user13@example.com\",\n        \"password\": \"secret1235789abcdefghijkl\"\n    },\n\n        {\n        \"firstName\": \"Anup14\",\n        \"lastName\": \"Biswas14\",\n        \"email\": \"user14@example.com\",\n        \"password\": \"secret1235789abcdefghijklm\"\n    },\n    {\n        \"firstName\": \"Anup15\",\n        \"lastName\": \"Biswas15\",\n        \"email\": \"user15@example.com\",\n        \"password\": \"secret1235789abcdefghijklmn\"\n    },\n    {\n        \"firstName\": \"Anup16\",\n        \"lastName\": \"Biswas16\",\n        \"email\": \"user16@example.com\",\n        \"password\": \"secret1235789abcdefghijklmno\"\n    },\n    {\n        \"firstName\": \"Anup17\",\n        \"lastName\": \"Biswas17\",\n        \"email\": \"user17@example.com\",\n        \"password\": \"secret1235789abcdefghijklmnop\"\n    },\n        {\n        \"firstName\": \"Anup18\",\n        \"lastName\": \"Biswas18\",\n        \"email\": \"user18@example.com\",\n        \"password\": \"secret1235789abcdefghijklmnopq\"\n    },\n    {\n        \"firstName\": \"Anup19\",\n        \"lastName\": \"Biswas19\",\n        \"email\": \"user19@example.com\",\n        \"password\": \"secret1235789abcdefghijklmnopqr\"\n    },\n    {\n        \"firstName\": \"Anup20\",\n        \"lastName\": \"Biswas20\",\n        \"email\": \"user20@example.com\",\n        \"password\": \"secret1235789abcdefghijklmnopqrs\"\n    }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/users/signup",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "users",
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "limit",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "cursor",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "verify zod",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "helmet",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "nosql injection",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
