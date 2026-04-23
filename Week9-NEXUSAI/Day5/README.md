@@ -1,29 +1,29 @@
-# 🧠 NEXUS AI — Autonomous Multi-Agent System
+#  NEXUS AI — Autonomous Multi-Agent System
 
 > **Day 5 Capstone** — Production-grade autonomous AI system powered by **Groq (LLaMA 3.3)** with 9 specialized agents, DAG-based execution, FAISS persistent memory, and full observability.
 
 ---
 
-## ✨ Features
+##  Features
 
-| Capability | Implementation |
-|------------|----------------|
+| Capability                | Implementation                               |
+|---------------------------|----------------------------------------------|                
 | Multi-agent orchestration | 9 agents via AgentFactory + registry pattern |
-| DAG-based planning | NetworkX DAG with topological execution |
-| Tool use | File I/O, CSV analysis, code saving |
-| Persistent memory | FAISS vector store (cross-session recall) |
-| Session memory | Full conversation log (JSON) |
-| Similarity-based recall | Cosine similarity via FAISS / TF-IDF fallback |
-| Self-reflection | Every agent scores + critiques its own output |
-| Self-improvement | Critic → Optimizer feedback loop |
-| Multi-step planning | Planner decomposes goals into ordered DAG |
-| Role switching | Agents can adopt alternate personas mid-task |
-| Logs + Tracing | Structured logs + JSONL trace file |
-| Failure recovery | Auto-retry + Orchestrator recovery strategies |
+| DAG-based planning        | NetworkX DAG with topological execution      |
+| Tool use                  | File I/O, CSV analysis, code saving          |
+| Persistent memory         | FAISS vector store (cross-session recall)    |
+| Session memory            | Full conversation log (JSON)                 |
+| Similarity-based recall   | Cosine similarity via FAISS / TF-IDF fallback|
+| Self-reflection           | Every agent scores + critiques its own output|
+| Self-improvement          | Critic → Optimizer feedback loop             |
+| Multi-step planning       | Planner decomposes goals into ordered DAG    |
+| Role switching            | Agents can adopt alternate personas mid-task |
+| Logs + Tracing            | Structured logs + JSONL trace file           |
+| Failure recovery          | Auto-retry + Orchestrator recovery strategies|
 
 ---
 
-## 🗂️ Directory Structure
+##  Directory Structure
 
 ```
 nexus_ai/
@@ -62,7 +62,7 @@ data/
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Install dependencies
 
@@ -116,7 +116,7 @@ python -m nexus_ai.main
 
 ---
 
-## 🐍 Python API
+##  Python API
 
 ```python
 from nexus_ai.main import NexusAI
@@ -138,23 +138,23 @@ report = nexus.reporter.run("Summarise our Q3 findings", agent_outputs={...})
 
 ---
 
-## 🤖 The 9 Agents
+##  The 9 Agents
 
 | Agent | Role |
-|-------|------|
+|-------           |------|
 | **Orchestrator** | Routes tasks, manages agent lifecycle, drives DAG |
-| **Planner** | Decomposes goals into DAG of sub-tasks |
-| **Researcher** | Deep knowledge synthesis and fact gathering |
-| **Coder** | Writes and saves production-quality code |
-| **Analyst** | Data analysis + business intelligence |
-| **Critic** | Reviews outputs, scores quality, flags issues |
-| **Optimizer** | Applies critic feedback to improve outputs |
-| **Validator** | Final gate — certifies readiness |
-| **Reporter** | Compiles final polished reports |
+| **Planner**      | Decomposes goals into DAG of sub-tasks            |
+| **Researcher**   | Deep knowledge synthesis and fact gathering       |
+| **Coder**        | Writes and saves production-quality code          |
+| **Analyst**      | Data analysis + business intelligence             |
+| **Critic**       | Reviews outputs, scores quality, flags issues     |
+| **Optimizer**    | Applies critic feedback to improve outputs        |
+| **Validator**    | Final gate — certifies readiness                  |
+| **Reporter**     | Compiles final polished reports                   |
 
 ---
 
-## 🧠 Memory Architecture
+##  Memory Architecture
 
 ```
 Query
@@ -173,7 +173,7 @@ Memory is **automatically injected** into every agent's system prompt via `recal
 
 ---
 
-## 📊 Execution Flow
+##  Execution Flow
 
 ```
 User Goal
@@ -203,7 +203,7 @@ Reporter — compiles final report (saved to outputs/reports/)
 
 ---
 
-## ⚙️ Configuration
+##  Configuration
 
 Edit `nexus_ai/config.py`:
 
@@ -226,7 +226,7 @@ PLAN_RETRY_LIMIT = 3      # retries on failed nodes
 
 ---
 
-## 📁 Outputs
+##  Outputs
 
 - **Code** → `outputs/code/*.py` (auto-saved by CoderAgent)
 - **Reports** → `outputs/reports/*.md` (auto-saved by ReporterAgent)
@@ -235,7 +235,7 @@ PLAN_RETRY_LIMIT = 3      # retries on failed nodes
 
 ---
 
-## 🔧 Requirements
+##  Requirements
 
 ```
 openai>=1.0          # Groq uses OpenAI-compatible API
@@ -248,6 +248,6 @@ pandas>=2.0          # CSV analysis
 
 ---
 
-## 📝 License
+##  License
 
 MIT — built for learning and production use.

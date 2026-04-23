@@ -14,18 +14,18 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                       Memory Manager                            │
 │                                                                 │
-│   ┌─────────────────┐  ┌──────────────────┐  ┌──────────────┐  │
-│   │  Session Memory │  │  Vector Store    │  │  Long-Term   │  │
-│   │  (in-process)   │  │  (FAISS)         │  │  (SQLite)    │  │
-│   │                 │  │                  │  │              │  │
-│   │  • Sliding      │  │  • Semantic      │  │  • Episodic  │  │
-│   │    window       │  │    similarity    │  │    memory    │  │
-│   │  • Current      │  │    search        │  │  • Semantic  │  │
-│   │    conversation │  │  • Persistent    │  │    facts     │  │
-│   │  • AutoGen msg  │  │    FAISS index   │  │  • Full-text │  │
-│   │    formatting   │  │  • Fact + chunk  │  │    search    │  │
-│   └─────────────────┘  │    storage       │  └──────────────┘  │
-│                         └──────────────────┘                   │
+│   ┌─────────────────┐  ┌──────────────────┐  ┌──────────────┐   │
+│   │  Session Memory │  │  Vector Store    │  │  Long-Term   │   │
+│   │  (in-process)   │  │  (FAISS)         │  │  (SQLite)    │   │
+│   │                 │  │                  │  │              │   │
+│   │  • Sliding      │  │  • Semantic      │  │  • Episodic  │   │
+│   │    window       │  │    similarity    │  │    memory    │   │
+│   │  • Current      │  │    search        │  │  • Semantic  │   │
+│   │    conversation │  │  • Persistent    │  │    facts     │   │
+│   │  • AutoGen msg  │  │    FAISS index   │  │  • Full-text │   │
+│   │    formatting   │  │  • Fact + chunk  │  │    search    │   │
+│   └─────────────────┘  │    storage       │  └──────────────┘   │
+│                           ───────────────                   
 └─────────────────────────────────────────────────────────────────┘
                              │  context block
                              ▼

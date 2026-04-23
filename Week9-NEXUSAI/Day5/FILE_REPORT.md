@@ -25,17 +25,17 @@ A production-grade Python package (`nexus_ai/`) implementing:
 
 ## Agent Inventory
 
-| # | Agent | Key Capability |
-|---|-------|----------------|
+| # | Agent            | Key Capability                                  |
+|---|------------------|-------------------------------------------------|
 | 1 | **Orchestrator** | Goal analysis, failure recovery, DAG monitoring |
-| 2 | **Planner** | JSON DAG generation, dependency resolution |
-| 3 | **Researcher** | Knowledge synthesis, structured findings |
-| 4 | **Coder** | Code generation + automatic file save |
-| 5 | **Analyst** | Data/CSV analysis, business strategy |
-| 6 | **Critic** | Output review, quality scoring (0-10) |
-| 7 | **Optimizer** | Feedback-driven improvement |
-| 8 | **Validator** | Pass/fail gate with structured JSON verdict |
-| 9 | **Reporter** | Final report compilation + markdown save |
+| 2 | **Planner**      | JSON DAG generation, dependency resolution      |
+| 3 | **Researcher**   | Knowledge synthesis, structured findings        |
+| 4 | **Coder**        | Code generation + automatic file save           |
+| 5 | **Analyst**      | Data/CSV analysis, business strategy            |
+| 6 | **Critic**       | Output review, quality scoring (0-10)           |
+| 7 | **Optimizer**    | Feedback-driven improvement                     |
+| 8 | **Validator**    | Pass/fail gate with structured JSON verdict     |
+| 9 | **Reporter**     | Final report compilation + markdown save        |
 
 ---
 
@@ -52,31 +52,6 @@ A production-grade Python package (`nexus_ai/`) implementing:
 - Last 8 messages injected into every agent's system prompt
 - Keyed by session_id for multi-session support
 
----
-
-## Capabilities Checklist
-
-| Requirement | Status | Implementation |
-|-------------|--------|----------------|
-| Multi-agent orchestration | ✅ | AgentFactory + registry, 9 agents |
-| Tool use | ✅ | File save, CSV read, code generation |
-| Memory recall | ✅ | FAISS similarity search |
-| Persistent memory | ✅ | faiss.index + sessions.json |
-| Similarity-based recall | ✅ | Cosine sim via FAISS / TF-IDF fallback |
-| Conversation stored | ✅ | SessionStore (JSON log) |
-| Important facts summarised | ✅ | summarise_and_store() on every output |
-| Self-reflection | ✅ | BaseAgent.reflect() on every run |
-| Self-improvement | ✅ | Critic → Optimizer feedback loop |
-| Multi-step planning | ✅ | PlannerAgent + DAG |
-| DAG-based execution | ✅ | ExecutionDAG (NetworkX) |
-| Task graph generation | ✅ | JSON plan → DAG |
-| Agent registry pattern | ✅ | AGENT_REGISTRY dict + AgentFactory |
-| Role switching | ✅ | BaseAgent.switch_role() |
-| Logs | ✅ | logs/nexus.log (structured) |
-| Tracing | ✅ | logs/trace.jsonl (JSONL, per-event) |
-| Failure recovery | ✅ | retry + Orchestrator.recover_failure() |
-| Code saved to output folder | ✅ | outputs/code/ (auto-save) |
-| Reports saved | ✅ | outputs/reports/ (auto-save) |
 
 ---
 
@@ -108,33 +83,6 @@ Triggers: Researcher (RAG approaches) → Coder (implementation) → Critic → 
 
 ---
 
-## Files Delivered
-
-```
-nexus_ai/
-├── main.py          ✅  NexusAI class + CLI entry point
-├── config.py        ✅  Centralised configuration
-├── agents/
-│   ├── base_agent.py  ✅  Abstract base with reflection + memory
-│   ├── agents.py      ✅  All 9 specialized agents
-│   └── registry.py    ✅  Factory + registry pattern
-├── memory/
-│   └── memory_manager.py  ✅  FAISS + sessions + short-term
-└── utils/
-    ├── dag.py         ✅  DAG builder + executor
-    ├── llm_client.py  ✅  Groq API wrapper
-    └── logger.py      ✅  Logger + JSONL tracer
-
-logs/               ✅  nexus.log + trace.jsonl
-outputs/            ✅  code/ + reports/ + charts/
-data/memory/        ✅  faiss.index + sessions.json (auto-created)
-README.md           ✅
-ARCHITECTURE.md     ✅
-FINAL-REPORT.md     ✅  (this file)
-```
-
----
-
 ## Design Decisions
 
 **Why Groq?** Free tier with the fastest inference available (500+ tokens/sec on LLaMA 3.3). The OpenAI-compatible API means zero friction.
@@ -149,13 +97,4 @@ FINAL-REPORT.md     ✅  (this file)
 
 ---
 
-## Known Limitations & Next Steps
-
-1. **No true parallel execution** — DAG runs sequentially; add `ThreadPoolExecutor` for concurrent ready nodes
-2. **LLM-generated plans can be inconsistent** — add JSON schema validation + retry on malformed plans
-3. **No tool calling** — integrate actual web search, code execution sandbox, database queries
-4. **Memory grows unbounded** — add periodic summarisation + index pruning
-5. **No UI** — a web dashboard (Streamlit/FastAPI) would make traces visible in real-time
-
----
 

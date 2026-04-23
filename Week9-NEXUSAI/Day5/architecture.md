@@ -183,7 +183,7 @@ This design avoids tight coupling and makes each agent independently testable.
 ### 7.1 Logs (`logs/nexus.log`)
 
 ```
-2024-01-15 10:23:41 | INFO     | nexus.orchestrator  | [orchestrator] ✅ SUCCESS (2.3s) — Plan a startup...
+2024-01-15 10:23:41 | INFO     | nexus.orchestrator  | [orchestrator] SUCCESS (2.3s) — Plan a startup...
 2024-01-15 10:23:44 | INFO     | nexus.planner       | DAG built: 5 nodes, 4 edges
 2024-01-15 10:23:51 | INFO     | nexus.coder         | Code saved → outputs/code/plan_a_startup.py
 ```
