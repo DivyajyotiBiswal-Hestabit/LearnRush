@@ -1,0 +1,28 @@
+{
+    "baseline_best_model_from_train": "random_forest",
+    "tuned_model": "random_forest_tuned",
+    "tuned_model_params": {
+        "model__n_estimators": 500,
+        "model__min_samples_split": 6,
+        "model__min_samples_leaf": 2,
+        "model__max_features": "log2",
+        "model__max_depth": 20
+    },
+    "tuned_model_cv_f1_weighted": 0.6740461520447308,
+    "tuned_model_test_metrics": {
+        "accuracy": 0.6726708074534161,
+        "precision_weighted": 0.6705122300658986,
+        "recall_weighted": 0.6726708074534161,
+        "f1_weighted": 0.6703659781247142,
+        "f1_macro": 0.5755503617304243,
+        "roc_auc_ovr": 0.8602859785514385
+    },
+    "bias_variance_analysis": {
+        "train_f1_weighted_mean": 0.9434280253199236,
+        "val_f1_weighted_mean": 0.6740461520447308,
+        "train_f1_macro_mean": 0.9217855289169341,
+        "val_f1_macro_mean": 0.574364159427563,
+        "train_accuracy_mean": 0.9436366270472727,
+        "val_accuracy_mean": 0.6759877860945227
+    }
+}

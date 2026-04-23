@@ -1,0 +1,33 @@
+logs:
+  log_file: src/logs/pipeline.log
+
+data:
+  raw_path: src/data/raw/netflix_titles.csv
+  processed_path: src/data/processed/final.csv
+
+target_column: rating
+
+drop_columns:
+  - show_id
+  - title
+  - description 
+
+drop_correlated_features:
+  - listed_in_freq
+  - country_freq
+  - is_short_duration
+  - release_decade
+
+outliers:
+  threshold: 3
+
+scaling:
+  method: standard
+
+split:
+  train_size: 0.7
+  val_size: 0.15
+  test_size: 0.15
+
+class_imbalance:
+  use_smote: true
