@@ -1,0 +1,9 @@
+[
+  {
+    "image_id": "img_0000",
+    "source_file": "bar_chart_1 (3).png.jpg",
+    "processed_image_path": "src/data/images/processed/bar_chart_1 (3).png_processed.png",
+    "ocr_text": "Density bar graph\n\nMH viater density\n00d density\n@ stopper density\n\ngroups",
+    "caption": "a graph with a line graph and a bar graph"
+  }
+]
