@@ -10,17 +10,27 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Get initial session from localStorage
+    const initSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       setLoading(false)
-    })
+    }
+    initSession()
 
-    // Listen for auth changes
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (event, session) => {
         setUser(session?.user ?? null)
         setLoading(false)
+
+        if (event === 'SIGNED_IN') {
+          // Session is ready
+          console.log('User signed in:', session?.user?.email)
+        }
+        if (event === 'SIGNED_OUT') {
+          window.location.replace('/login')
+        }
       }
     )
 

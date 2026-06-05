@@ -9,33 +9,48 @@ const n8n = axios.create({
 })
 
 export const n8nClient = {
-  // Get all workflows
   getWorkflows: async () => {
     const res = await n8n.get('/api/v1/workflows')
     return res.data
   },
 
-  // Create workflow in n8n
+  getWorkflow: async (id) => {
+    const res = await n8n.get(`/api/v1/workflows/${id}`)
+    return res.data
+  },
+
   createWorkflow: async (workflowData) => {
     const res = await n8n.post('/api/v1/workflows', workflowData)
     return res.data
   },
 
-  // Delete workflow from n8n
-  deleteWorkflow: async (n8nWorkflowId) => {
-    const res = await n8n.delete(`/api/v1/workflows/${n8nWorkflowId}`)
+  activateWorkflow: async (id) => {
+    const res = await n8n.patch(`/api/v1/workflows/${id}`, { active: true })
     return res.data
   },
 
-  // Trigger workflow via webhook
-  triggerWorkflow: async (webhookUrl, payload) => {
-    const res = await axios.post(webhookUrl, payload)
+  deleteWorkflow: async (id) => {
+    const res = await n8n.delete(`/api/v1/workflows/${id}`)
     return res.data
   },
 
-  // Get execution details
+
+  triggerWorkflow: async (webhookPath, payload) => {
+    const res = await axios.post(
+      `${process.env.N8N_BASE_URL}/${process.env.N8N_WEBHOOK_PREFIX}/${webhookPath}`,
+      payload,
+      { headers: { 'Content-Type': 'application/json' } }
+    )
+    return res.data 
+  },
+
   getExecution: async (executionId) => {
     const res = await n8n.get(`/api/v1/executions/${executionId}`)
+    return res.data
+  },
+
+  getExecutions: async (workflowId) => {
+    const res = await n8n.get(`/api/v1/executions?workflowId=${workflowId}`)
     return res.data
   }
 }

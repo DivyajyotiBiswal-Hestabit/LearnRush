@@ -1,0 +1,356 @@
+{
+  "name": "Customer Enquiry Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customer-enquiry",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3e712708-9ee8-4d3d-9559-09528818b441",
+      "name": "Webhook",
+      "webhookId": "786bf3d1-72c3-41c4-b8b2-a8253b379549"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "823793f0-7473-4f98-bdf9-ad1dbc7ea3da",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "KG7nSUkjCIv3cIAG",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook').item.json.body.message }}",
+        "options": {
+          "systemMessage": "You are a customer inquiry classifier. \n\nAnalyze the incoming customer message and classify it into EXACTLY one of these categories:\n- order_inquiry (questions about orders, tracking, delivery)\n- return_refund (return requests, refund requests)  \n- product_question (questions about products, features, availability)\n- complaint (complaints, negative feedback, issues)\n- general_inquiry (anything else)\n\nAlso determine the priority:\n- high (angry customer, urgent issue, lost order)\n- medium (general questions, normal requests)\n- low (casual questions, information requests)\n\nRespond in this EXACT JSON format only, no other text:\n{\n  \"category\": \"category_here\",\n  \"priority\": \"priority_here\", \n  \"confidence\": 0.95,\n  \"summary\": \"one line summary of the inquiry\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4d953e49-dffb-42de-91c7-a14388aa9e68",
+      "name": "Classifier Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Customer message: {{ $json.body.message }}\nCategory: {{ $('Classifier Agent').item.json.output }}",
+        "options": {
+          "systemMessage": "=You are a research agent for a customer support system.\n\nYou receive a classified customer inquiry and need to find relevant information to answer it.\n\nBusiness Context: {{ $json.body.business_context }}\n\nBased on the inquiry category and the customer message, provide:\n1. Relevant information to answer the customer\n2. Suggested response points\n3. Any policies or procedures that apply\n\nRespond in this EXACT JSON format only:\n{\n  \"relevant_info\": \"key information found\",\n  \"response_points\": [\"point 1\", \"point 2\", \"point 3\"],\n  \"confidence\": 0.90\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "d334e524-eba1-484b-a729-2e592f830015",
+      "name": "Researcher Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Customer message: {{ $json.body.message }}\nCategory: {{ $('Classifier Agent').item.json.output }}\nResearch: {{ $('Researcher Agent').item.json.output }}",
+        "options": {
+          "systemMessage": "You are a lead qualifier and priority assessor for customer support.\n\nAnalyze the customer inquiry and research findings to determine:\n1. Is this a high-value customer interaction?\n2. Does this need human escalation?\n3. What is the best response strategy?\n\nRespond in this EXACT JSON format only:\n{\n  \"needs_escalation\": false,\n  \"is_high_value\": false,\n  \"response_strategy\": \"standard_reply\",\n  \"escalation_reason\": null,\n  \"recommended_tone\": \"friendly\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        912,
+        0
+      ],
+      "id": "3cc590be-ed00-4082-af1a-dd304e774c19",
+      "name": "Qualifier Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Customer message: {{ $json.body.message }}\nCategory: {{ $('Classifier Agent').item.json.output }}\nResearch findings: {{ $('Researcher Agent').item.json.output }}\nQualifier decision: {{ $('Qualifier Agent').item.json.output }}\nCustomer name: {{ $json.body.sender_name }}",
+        "options": {
+          "systemMessage": "=You are a customer response writer.\n\nWrite a professional, helpful reply to the customer inquiry.\n\nBusiness Context: {{ $json.body.business_context }}\nTone: Use the recommended tone from the qualifier\n\nGuidelines:\n- Be friendly and professional\n- Address the customer's specific concern\n- Be concise (max 3-4 paragraphs)\n- Sign off as \"Customer Support Team\"\n- Do NOT make up specific order numbers or prices\n\nRespond in this EXACT JSON format only:\n{\n  \"subject\": \"email subject line here\",\n  \"reply\": \"full reply message here\",\n  \"confidence\": 0.92\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "5d21e99a-01d4-4145-bea5-dd5fbe475c6a",
+      "name": "Responder Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Original message: {{ $json.body.message }}\nClassifier output: {{ $('Classifier Agent').item.json.output }}\nResearcher output: {{ $('Researcher Agent').item.json.output }}\nQualifier output: {{ $('Qualifier Agent').item.json.output }}\nResponder output: {{ $('Responder Agent').item.json.output }}",
+        "options": {
+          "systemMessage": "You are an execution coordinator. \n\nReview all agent outputs and create a final execution summary.\n\nRespond in this EXACT JSON format only:\n{\n  \"status\": \"completed\",\n  \"channel\": \"email\",\n  \"final_reply\": \"the final reply to send\",\n  \"subject\": \"email subject\",\n  \"execution_summary\": {\n    \"classifier\": \"what was classified\",\n    \"researcher\": \"what was found\",\n    \"qualifier\": \"qualification decision\",\n    \"responder\": \"reply drafted\"\n  }\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1616,
+        0
+      ],
+      "id": "7661138b-34e0-4b68-b49a-cd551ba43764",
+      "name": "Executor Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        432,
+        208
+      ],
+      "id": "7692281e-d058-43ca-a77c-d05808090988",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "KG7nSUkjCIv3cIAG",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        784,
+        208
+      ],
+      "id": "3fd229d2-7233-4814-bae8-0e109c1f7bdd",
+      "name": "Ollama Chat Model2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "KG7nSUkjCIv3cIAG",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        208
+      ],
+      "id": "bdf759bb-5ddd-4ad2-bc8d-9d6cd31bb4d5",
+      "name": "Ollama Chat Model3",
+      "credentials": {
+        "ollamaApi": {
+          "id": "KG7nSUkjCIv3cIAG",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        208
+      ],
+      "id": "9ef24c26-eaf3-4110-a4d4-0eda60aef8a3",
+      "name": "Ollama Chat Model4",
+      "credentials": {
+        "ollamaApi": {
+          "id": "KG7nSUkjCIv3cIAG",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1968,
+        0
+      ],
+      "id": "132013c8-f77e-4253-a37d-1196487f2581",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Classifier Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classifier Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classifier Agent": {
+      "main": [
+        [
+          {
+            "node": "Researcher Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Researcher Agent": {
+      "main": [
+        [
+          {
+            "node": "Qualifier Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualifier Agent": {
+      "main": [
+        [
+          {
+            "node": "Responder Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder Agent": {
+      "main": [
+        [
+          {
+            "node": "Executor Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Researcher Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Qualifier Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Responder Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Executor Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executor Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f8ae6148-b154-4e16-8557-2546ef54a37f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "01a0f1dee1e3912f4c5981498391cfae880897124ba16c22c004e563a09b2d4c"
+  },
+  "id": "2YVdVANQYiqb0gYV",
+  "tags": []
+}

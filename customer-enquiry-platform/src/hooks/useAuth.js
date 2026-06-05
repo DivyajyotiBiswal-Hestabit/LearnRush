@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 
 export function useAuthActions() {
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   const register = async (email, password, fullName) => {
     setLoading(true)
@@ -21,7 +19,9 @@ export function useAuthActions() {
       })
       if (error) throw error
       toast.success('Account created! Please log in.')
-      router.push('/login')
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 1000)
     } catch (error) {
       toast.error(error.message)
     } finally {
@@ -37,11 +37,16 @@ export function useAuthActions() {
         password
       })
       if (error) throw error
+
+      // Wait for session to be fully stored
+      await supabase.auth.getSession()
+
       toast.success('Welcome back!')
-      router.push('/dashboard')
+      setTimeout(() => {
+        window.location.replace('/dashboard')
+      }, 500)
     } catch (error) {
       toast.error(error.message)
-    } finally {
       setLoading(false)
     }
   }
@@ -49,12 +54,10 @@ export function useAuthActions() {
   const logout = async () => {
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-      router.push('/login')
+      await supabase.auth.signOut()
+      window.location.replace('/login')
     } catch (error) {
       toast.error(error.message)
-    } finally {
       setLoading(false)
     }
   }
