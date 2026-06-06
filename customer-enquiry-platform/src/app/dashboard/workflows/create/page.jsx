@@ -4,12 +4,21 @@ import { useState } from 'react'
 import { useWorkflows } from '@/hooks/useWorkflows'
 import { useRouter } from 'next/navigation'
 import { AGENT_ROLES, DEFAULT_AGENT_PROMPTS } from '@/constants/agentTemplates'
+import AgentConfigEditor from '@/components/workflows/AgentConfigEditor'
+import BranchRuleEditor from '@/components/workflows/BranchRuleEditor'
 import {
   ArrowLeft, ArrowRight, Check,
-  Mail, MessageCircle, ChevronDown, ChevronUp
+  Mail, MessageCircle, GitBranch, Settings
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
+
+const STEPS = [
+  { num: 1, label: 'Basic Info' },
+  { num: 2, label: 'Agent Prompts' },
+  { num: 3, label: 'Branching' },
+  { num: 4, label: 'Review' },
+]
 
 export default function CreateWorkflowPage() {
   const router = useRouter()
@@ -21,48 +30,37 @@ export default function CreateWorkflowPage() {
     name: '',
     business_context: '',
     trigger_channel: 'gmail',
+    branching_rules: [],
     agents: AGENT_ROLES.map(agent => ({
       role: agent.role,
       system_prompt: DEFAULT_AGENT_PROMPTS[agent.role],
-      tools: agent.tools
+      tools: agent.tools,
+      retry_policy: { max_retries: 3 },
+      fallback_prompt: '',
+      order_index: AGENT_ROLES.indexOf(agent) + 1
     }))
   })
 
-  const [expandedAgent, setExpandedAgent] = useState('classifier')
-
   const handleSubmit = async () => {
-    if (!formData.name) {
-      toast.error('Please enter a workflow name')
+    if (!formData.name || !formData.business_context) {
+      toast.error('Please fill in all required fields')
       return
     }
-    if (!formData.business_context) {
-      toast.error('Please enter your business context')
-      return
-    }
-
     setSaving(true)
     try {
       await createWorkflow(formData)
       toast.success('Workflow created successfully!')
       router.push('/dashboard/workflows')
     } catch (error) {
-      toast.error('Failed to create workflow: ' + error.message)
+      toast.error('Failed: ' + error.message)
     } finally {
       setSaving(false)
     }
   }
 
-  const updateAgentPrompt = (role, prompt) => {
-    setFormData(prev => ({
-      ...prev,
-      agents: prev.agents.map(a =>
-        a.role === role ? { ...a, system_prompt: prompt } : a
-      )
-    }))
-  }
-
   return (
     <div className="max-w-3xl mx-auto">
+
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Link
@@ -74,30 +72,31 @@ export default function CreateWorkflowPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">Create Workflow</h1>
           <p className="text-[#a0a0b8] text-sm mt-0.5">
-            Set up your multi-agent automation pipeline
+            Configure your multi-agent automation pipeline
           </p>
         </div>
       </div>
 
-      {/* Steps indicator */}
-      <div className="flex items-center gap-2 mb-8">
-        {[
-          { num: 1, label: 'Basic Info' },
-          { num: 2, label: 'Agent Prompts' },
-          { num: 3, label: 'Review' }
-        ].map((s, i) => (
+      {/* Step indicator */}
+      <div className="flex items-center gap-2 mb-8 flex-wrap">
+        {STEPS.map((s, i) => (
           <div key={s.num} className="flex items-center gap-2">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
-              step === s.num
-                ? 'bg-accent text-white'
-                : step > s.num
-                  ? 'bg-success/20 text-success'
-                  : 'bg-surface text-[#a0a0b8]'
-            }`}>
+            <button
+              onClick={() => step > s.num && setStep(s.num)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                step === s.num
+                  ? 'bg-accent text-white'
+                  : step > s.num
+                    ? 'bg-success/20 text-success cursor-pointer'
+                    : 'bg-surface text-[#a0a0b8]'
+              }`}
+            >
               {step > s.num ? <Check size={12} /> : s.num}
               {s.label}
-            </div>
-            {i < 2 && <div className="w-8 h-px bg-[#2e2e4e]" />}
+            </button>
+            {i < STEPS.length - 1 && (
+              <div className="w-6 h-px bg-[#2e2e4e]" />
+            )}
           </div>
         ))}
       </div>
@@ -109,7 +108,7 @@ export default function CreateWorkflowPage() {
 
           <div>
             <label className="block text-sm font-medium text-[#a0a0b8] mb-1.5">
-              Workflow Name
+              Workflow Name *
             </label>
             <input
               type="text"
@@ -122,23 +121,23 @@ export default function CreateWorkflowPage() {
 
           <div>
             <label className="block text-sm font-medium text-[#a0a0b8] mb-1.5">
-              Business Context
+              Business Context *
             </label>
             <textarea
               value={formData.business_context}
               onChange={e => setFormData({ ...formData, business_context: e.target.value })}
-              placeholder="Describe your business. e.g. We are an online clothing store selling ethnic wear. We ship within 5-7 business days. Our return policy allows returns within 30 days."
-              rows={4}
+              placeholder="Describe your business, products, policies, and tone. The more detail you provide, the better the agents will perform."
+              rows={5}
               className="w-full bg-[#0f0f17] border border-[#2e2e4e] rounded-lg px-4 py-3 text-white placeholder-[#4e4e6e] focus:outline-none focus:border-accent text-sm resize-none"
             />
             <p className="text-[#4e4e6e] text-xs mt-1">
-              This context is injected into all agents so they understand your business
+              This is injected into all agents as context
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[#a0a0b8] mb-3">
-              Trigger Channel
+              Trigger Channel *
             </label>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -170,7 +169,7 @@ export default function CreateWorkflowPage() {
           <button
             onClick={() => setStep(2)}
             disabled={!formData.name || !formData.business_context}
-            className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-50 text-white py-2.5 rounded-lg font-medium transition-colors text-sm"
+            className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-50 text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
           >
             Next: Configure Agents
             <ArrowRight size={16} />
@@ -178,56 +177,22 @@ export default function CreateWorkflowPage() {
         </div>
       )}
 
-      {/* Step 2 — Agent Prompts */}
+      {/* Step 2 — Agent Prompts + Retry */}
       {step === 2 && (
-        <div className="space-y-3">
-          <div className="bg-surface border border-[#2e2e4e] rounded-xl p-4 mb-2">
+        <div className="space-y-4">
+          <div className="bg-surface border border-[#2e2e4e] rounded-xl p-4">
             <p className="text-[#a0a0b8] text-sm">
-              Each agent has a default prompt. Customize them for your specific business needs.
-              The <span className="text-white">business context</span> you provided will be automatically injected.
+              Configure system prompts, retry policies and fallback actions for each agent.
+              Click any agent to expand its settings.
             </p>
           </div>
 
-          {AGENT_ROLES.map((agentRole, index) => (
-            <div key={agentRole.role} className="bg-surface border border-[#2e2e4e] rounded-xl overflow-hidden">
-              <button
-                onClick={() => setExpandedAgent(
-                  expandedAgent === agentRole.role ? null : agentRole.role
-                )}
-                className="w-full flex items-center justify-between p-4 hover:bg-[#16213e] transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-7 h-7 ${agentRole.color} rounded-lg flex items-center justify-center text-white text-xs font-bold`}>
-                    {index + 1}
-                  </div>
-                  <div className="text-left">
-                    <p className="text-white font-medium text-sm">{agentRole.label}</p>
-                    <p className="text-[#a0a0b8] text-xs">{agentRole.description}</p>
-                  </div>
-                </div>
-                {expandedAgent === agentRole.role
-                  ? <ChevronUp size={16} className="text-[#a0a0b8]" />
-                  : <ChevronDown size={16} className="text-[#a0a0b8]" />
-                }
-              </button>
+          <AgentConfigEditor
+            agents={formData.agents}
+            onChange={agents => setFormData({ ...formData, agents })}
+          />
 
-              {expandedAgent === agentRole.role && (
-                <div className="px-4 pb-4 border-t border-[#2e2e4e]">
-                  <label className="block text-xs font-medium text-[#a0a0b8] mt-3 mb-1.5">
-                    System Prompt
-                  </label>
-                  <textarea
-                    value={formData.agents.find(a => a.role === agentRole.role)?.system_prompt || ''}
-                    onChange={e => updateAgentPrompt(agentRole.role, e.target.value)}
-                    rows={8}
-                    className="w-full bg-[#0f0f17] border border-[#2e2e4e] rounded-lg px-4 py-3 text-white text-xs font-mono focus:outline-none focus:border-accent resize-none"
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3">
             <button
               onClick={() => setStep(1)}
               className="flex-1 border border-[#2e2e4e] text-[#a0a0b8] hover:text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
@@ -236,7 +201,44 @@ export default function CreateWorkflowPage() {
             </button>
             <button
               onClick={() => setStep(3)}
-              className="flex-1 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white py-2.5 rounded-lg font-medium transition-colors text-sm"
+              className="flex-1 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
+            >
+              Next: Branching Rules
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3 — Branching Rules */}
+      {step === 3 && (
+        <div className="space-y-4">
+          <div className="bg-surface border border-[#2e2e4e] rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <GitBranch size={16} className="text-accent" />
+              <h2 className="text-white font-semibold">Conditional Branching</h2>
+            </div>
+            <p className="text-[#a0a0b8] text-xs mb-5">
+              Define rules for when agents should take special actions based on
+              the inquiry type or qualification result.
+            </p>
+
+            <BranchRuleEditor
+              rules={formData.branching_rules}
+              onChange={rules => setFormData({ ...formData, branching_rules: rules })}
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setStep(2)}
+              className="flex-1 border border-[#2e2e4e] text-[#a0a0b8] hover:text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+            >
+              Back
+            </button>
+            <button
+              onClick={() => setStep(4)}
+              className="flex-1 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
             >
               Next: Review
               <ArrowRight size={16} />
@@ -245,8 +247,8 @@ export default function CreateWorkflowPage() {
         </div>
       )}
 
-      {/* Step 3 — Review */}
-      {step === 3 && (
+      {/* Step 4 — Review */}
+      {step === 4 && (
         <div className="bg-surface border border-[#2e2e4e] rounded-xl p-6">
           <h2 className="text-white font-semibold mb-5">Review & Create</h2>
 
@@ -263,29 +265,49 @@ export default function CreateWorkflowPage() {
 
             <div className="bg-[#0f0f17] rounded-lg p-4">
               <p className="text-[#a0a0b8] text-xs mb-1">Business Context</p>
-              <p className="text-white text-sm">{formData.business_context}</p>
+              <p className="text-white text-sm line-clamp-3">{formData.business_context}</p>
             </div>
 
             <div className="bg-[#0f0f17] rounded-lg p-4">
               <p className="text-[#a0a0b8] text-xs mb-2">Agent Pipeline</p>
               <div className="flex items-center gap-2 flex-wrap">
                 {AGENT_ROLES.map((agent, i) => (
-                  <div key={agent.role} className="flex items-center gap-2">
+                  <div key={agent.role} className="flex items-center gap-1.5">
                     <span className={`px-2 py-1 ${agent.color} bg-opacity-20 rounded text-xs text-white font-medium`}>
                       {agent.label}
                     </span>
                     {i < AGENT_ROLES.length - 1 && (
-                      <ArrowRight size={12} className="text-[#4e4e6e]" />
+                      <ArrowRight size={10} className="text-[#4e4e6e]" />
                     )}
                   </div>
                 ))}
               </div>
             </div>
+
+            {formData.branching_rules.length > 0 && (
+              <div className="bg-[#0f0f17] rounded-lg p-4">
+                <p className="text-[#a0a0b8] text-xs mb-2">
+                  Branching Rules ({formData.branching_rules.length})
+                </p>
+                {formData.branching_rules.map((rule, i) => (
+                  <p key={i} className="text-white text-xs">
+                    IF {rule.condition} → {rule.action}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            <div className="bg-[#0f0f17] rounded-lg p-4">
+              <p className="text-[#a0a0b8] text-xs mb-2">Retry Policy</p>
+              <p className="text-white text-xs">
+                {formData.agents[0]?.retry_policy?.max_retries || 3} retries per agent
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-3">
             <button
-              onClick={() => setStep(2)}
+              onClick={() => setStep(3)}
               className="flex-1 border border-[#2e2e4e] text-[#a0a0b8] hover:text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
             >
               Back
@@ -293,23 +315,19 @@ export default function CreateWorkflowPage() {
             <button
               onClick={handleSubmit}
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-50 text-white py-2.5 rounded-lg font-medium transition-colors text-sm"
+              className="flex-1 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-50 text-white py-2.5 rounded-lg font-medium text-sm transition-colors"
             >
               {saving ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating...
-                </>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <>
-                  <Check size={16} />
-                  Create Workflow
-                </>
+                <Check size={16} />
               )}
+              {saving ? 'Creating...' : 'Create Workflow'}
             </button>
           </div>
         </div>
       )}
+
     </div>
   )
 }

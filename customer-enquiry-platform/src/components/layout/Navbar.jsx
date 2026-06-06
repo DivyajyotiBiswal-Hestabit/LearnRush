@@ -28,7 +28,7 @@ export default function Navbar() {
   const userName = user?.user_metadata?.full_name || userEmail.split('@')[0]
 
   return (
-    <header className="h-14 bg-surface border-b border-[#2e2e4e] px-6 flex items-center justify-between flex-shrink-0">
+    <header className="h-14 bg-accent border-b border-[#2e2e4e] px-6 flex items-center justify-between flex-shrink-0">
 
       {/* Left — page title (empty for now, pages will set their own) */}
       <div />
@@ -48,7 +48,7 @@ export default function Navbar() {
             className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-lg hover:bg-[#16213e] transition-colors"
           >
             {/* Avatar */}
-            <div className="w-7 h-7 bg-accent rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="w-7 h-7 bg-accent rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 border border-white">
               {userInitial}
             </div>
             <span className="text-sm text-white font-medium max-w-[120px] truncate">

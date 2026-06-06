@@ -20,7 +20,7 @@ const COLORS = ['#f97316', '#3b82f6', '#8b5cf6', '#22c55e', '#f59e0b']
 
 function StatCard({ label, value, icon: Icon, color, bg, suffix }) {
   return (
-    <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5">
+    <div className="bg-accent border border-[#2e2e4e] rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[#a0a0b8] text-sm">{label}</span>
         <div className={`w-8 h-8 ${bg} rounded-lg flex items-center justify-center`}>
@@ -64,17 +64,17 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            Good morning, {userName} 👋
+          <h1 className="text-2xl font-bold text-accent">
+            Welcome, {userName} 
           </h1>
-          <p className="text-[#a0a0b8] text-sm mt-1">
+          <p className="text-accent text-m mt-1">
             Here's your automation performance overview
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 border border-[#2e2e4e] text-[#a0a0b8] hover:text-white px-3 py-2 rounded-lg text-sm transition-colors"
+            className="flex items-center gap-2 border border-[#2e2e4e] text-accent hover:text-accent px-3 py-2 rounded-lg text-sm transition-colors"
           >
             <Download size={14} />
             Export CSV
@@ -95,7 +95,7 @@ export default function DashboardPage() {
           label="Total Workflows"
           value={workflows.length}
           icon={GitBranch}
-          color="text-accent"
+          color="text-white"
           bg="bg-accent/10"
         />
         <StatCard
@@ -110,7 +110,7 @@ export default function DashboardPage() {
           value={analytics?.overview?.successRate || 0}
           suffix="%"
           icon={CheckCircle}
-          color="text-success"
+          color="text-white"
           bg="bg-success/10"
         />
         <StatCard
@@ -129,8 +129,8 @@ export default function DashboardPage() {
         {/* Inquiries over time */}
         <div className="lg:col-span-2 bg-surface border border-[#2e2e4e] rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-white font-semibold text-sm">Inquiries Over Time</h2>
-            <span className="text-[#4e4e6e] text-xs">Last 14 days</span>
+            <h2 className="text-white font-semibold text-m">Inquiries Over Time</h2>
+            <span className="text-white text-s">Last 14 days</span>
           </div>
           {loading ? (
             <div className="h-48 flex items-center justify-center">
@@ -145,16 +145,16 @@ export default function DashboardPage() {
                     <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2e2e4e" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#000803ff" />
                 <XAxis
                   dataKey="label"
-                  tick={{ fill: '#4e4e6e', fontSize: 10 }}
+                  tick={{ fill: '#4e4e6e', fontSize: 15 }}
                   tickLine={false}
                   axisLine={false}
                   interval={2}
                 />
                 <YAxis
-                  tick={{ fill: '#4e4e6e', fontSize: 10 }}
+                  tick={{ fill: '#4e4e6e', fontSize: 15 }}
                   tickLine={false}
                   axisLine={false}
                   allowDecimals={false}
@@ -181,8 +181,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Inquiry types */}
-        <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5">
-          <h2 className="text-white font-semibold text-sm mb-4">Inquiry Types</h2>
+        <div className="bg-[#01796F] border border-[#2e2e4e] rounded-xl p-5">
+          <h2 className="text-white font-semibold text-m mb-4">Inquiry Types</h2>
           {loading || !analytics?.inquiryTypes?.length ? (
             <div className="h-48 flex flex-col items-center justify-center">
               <p className="text-[#4e4e6e] text-xs">No data yet</p>
@@ -222,11 +222,11 @@ export default function DashboardPage() {
                         className="w-2 h-2 rounded-full"
                         style={{ background: COLORS[i % COLORS.length] }}
                       />
-                      <span className="text-[#a0a0b8] text-xs capitalize">
+                      <span className="text-white text-xs capitalize">
                         {item.type.replace('_', ' ')}
                       </span>
                     </div>
-                    <span className="text-white text-xs font-medium">{item.count}</span>
+                    <span className="text-white text-s font-medium">{item.count}</span>
                   </div>
                 ))}
               </div>
@@ -242,17 +242,17 @@ export default function DashboardPage() {
         {/* Recent workflows */}
         <div className="bg-surface border border-[#2e2e4e] rounded-xl">
           <div className="flex items-center justify-between px-5 py-4 border-b border-[#2e2e4e]">
-            <h2 className="text-white font-semibold text-sm">Recent Workflows</h2>
+            <h2 className="text-white font-semibold text-m">Recent Workflows</h2>
             <Link
               href="/dashboard/workflows"
-              className="flex items-center gap-1 text-accent text-xs hover:underline"
+              className="flex items-center gap-1 text-accent text-s hover:underline"
             >
               View all <ArrowRight size={12} />
             </Link>
           </div>
           {workflows.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-              <GitBranch size={22} className="text-[#4e4e6e] mb-3" />
+              <GitBranch size={22} className="text-white mb-3" />
               <p className="text-white text-sm font-medium mb-1">No workflows yet</p>
               <Link
                 href="/dashboard/workflows/create"
@@ -268,13 +268,13 @@ export default function DashboardPage() {
                 <Link
                   key={wf.id}
                   href={`/dashboard/workflows/${wf.id}`}
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-[#16213e] transition-colors"
+                  className="flex items-center gap-3 px-5 py-3 hover:bg-white transition-colors"
                 >
                   <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
                     <GitBranch size={14} className="text-accent" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{wf.name}</p>
+                    <p className="text-accent text-m font-medium truncate">{wf.name}</p>
                     <p className="text-[#4e4e6e] text-xs capitalize">{wf.trigger_channel}</p>
                   </div>
                   <div className={`w-2 h-2 rounded-full ${
@@ -289,10 +289,10 @@ export default function DashboardPage() {
         {/* Recent executions */}
         <div className="bg-surface border border-[#2e2e4e] rounded-xl">
           <div className="flex items-center justify-between px-5 py-4 border-b border-[#2e2e4e]">
-            <h2 className="text-white font-semibold text-sm">Recent Executions</h2>
+            <h2 className="text-white font-semibold text-m">Recent Executions</h2>
             <Link
               href="/dashboard/executions"
-              className="flex items-center gap-1 text-accent text-xs hover:underline"
+              className="flex items-center gap-1 text-accent text-s hover:underline"
             >
               View all <ArrowRight size={12} />
             </Link>
@@ -309,7 +309,7 @@ export default function DashboardPage() {
                 <Link
                   key={ex.id}
                   href={`/dashboard/executions/${ex.id}`}
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-[#16213e] transition-colors"
+                  className="flex items-center gap-3 px-5 py-3 hover:bg-white transition-colors"
                 >
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                     ex.status === 'completed' ? 'bg-success' :
@@ -318,7 +318,7 @@ export default function DashboardPage() {
                     'bg-warning'
                   }`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm truncate">
+                    <p className="text-accent text-m truncate">
                       {ex.original_message?.substring(0, 50)}...
                     </p>
                     <p className="text-[#4e4e6e] text-xs capitalize">{ex.status}</p>

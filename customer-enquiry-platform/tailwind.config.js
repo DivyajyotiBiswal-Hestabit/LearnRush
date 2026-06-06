@@ -8,15 +8,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#0f0f17',
-        surface: '#1a1a2e',
-        'surface-2': '#16213e',
-        border: '#2e2e4e',
+        background: '#FEFEFA',
+        surface: '#85B09A',
+        'surface-2': '#ACE1AF',
+        border: '#52796f',
         'text-primary': '#ffffff',
         'text-secondary': '#a0a0b8',
-        accent: '#f97316',
+        accent: '#2f3e46',
         'accent-hover': '#ea6c0a',
-        success: '#22c55e',
+        success: '#032c12ff',
         error: '#ef4444',
         warning: '#f59e0b',
       },

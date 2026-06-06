@@ -64,18 +64,18 @@ function WorkflowCard({ workflow, onDelete, onTrigger }) {
 
   return (
     <>
-      <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 hover:border-[#4e4e6e] transition-colors">
+      <div className="bg-[#F0FFF0] border border-[#2e2e4e] rounded-xl p-5 hover:border-[#4e4e6e] transition-colors">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-              <GitBranch size={18} className="text-accent" />
+            <div className="w-12 h-15 bg-accent/10 rounded-xl flex items-center justify-center">
+              <GitBranch size={19} className="text-accent" />
             </div>
             <div>
-              <h3 className="text-white font-semibold text-sm">{workflow.name}</h3>
+              <h3 className="text-accent font-semibold text-m">{workflow.name}</h3>
               <div className="flex items-center gap-1.5 mt-0.5">
                 {channelIcon}
-                <span className="text-[#a0a0b8] text-xs capitalize">
+                <span className="text-black text-xs capitalize">
                   {workflow.trigger_channel}
                 </span>
               </div>
@@ -98,7 +98,7 @@ function WorkflowCard({ workflow, onDelete, onTrigger }) {
             <div className="relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="p-1 text-[#a0a0b8] hover:text-white rounded transition-colors"
+                className="p-1 text-accent hover:text-surface rounded transition-colors"
               >
                 <MoreVertical size={16} />
               </button>
@@ -106,7 +106,7 @@ function WorkflowCard({ workflow, onDelete, onTrigger }) {
                 <div className="absolute right-0 top-full mt-1 w-36 bg-surface border border-[#2e2e4e] rounded-lg shadow-xl z-10">
                   <Link
                     href={`/dashboard/workflows/${workflow.id}`}
-                    className="flex items-center gap-2 px-3 py-2 text-xs text-[#a0a0b8] hover:text-white hover:bg-[#16213e] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-s text-accent hover:text-white hover:bg-[#16213e] transition-colors"
                     onClick={() => setMenuOpen(false)}
                   >
                     View Details
@@ -116,7 +116,7 @@ function WorkflowCard({ workflow, onDelete, onTrigger }) {
                       setMenuOpen(false)
                       onDelete(workflow.id)
                     }}
-                    className="flex items-center gap-2 px-3 py-2 text-xs text-error hover:bg-[#16213e] transition-colors w-full text-left"
+                    className="flex items-center gap-2 px-3 py-2 text-s text-error hover:bg-[#16213e] transition-colors w-full text-left"
                   >
                     <Trash2 size={12} />
                     Delete
@@ -128,7 +128,7 @@ function WorkflowCard({ workflow, onDelete, onTrigger }) {
         </div>
 
         {workflow.business_context && (
-          <p className="text-[#a0a0b8] text-xs mb-4 line-clamp-2">
+          <p className="text-accent text-xs mb-4 line-clamp-2">
             {workflow.business_context}
           </p>
         )}
@@ -144,7 +144,7 @@ function WorkflowCard({ workflow, onDelete, onTrigger }) {
               </div>
             ))}
           </div>
-          <span className="text-[#a0a0b8] text-xs">5 agents configured</span>
+          <span className="text-accent text-xs">5 agents configured</span>
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-[#2e2e4e]">
@@ -267,7 +267,7 @@ export default function WorkflowsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white">Workflows</h1>
-          <p className="text-[#a0a0b8] text-sm mt-1">
+          <p className="text-accent text-m mt-1">
             Manage your multi-agent automation workflows
           </p>
         </div>

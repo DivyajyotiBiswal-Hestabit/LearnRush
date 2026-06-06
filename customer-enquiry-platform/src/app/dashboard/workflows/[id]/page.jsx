@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useWorkflows } from '@/hooks/useWorkflows'
+import { GitBranch } from 'lucide-react'
 import {
   ArrowLeft, Play, Trash2, GitBranch,
   Mail, MessageCircle, Clock, CheckCircle,
@@ -133,7 +134,7 @@ export default function WorkflowDetailPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-white">{workflow.name}</h1>
-            <p className="text-[#a0a0b8] text-sm mt-0.5">
+            <p className="text-white text-sm mt-0.5">
               Created {formatDate(workflow.created_at)}
             </p>
           </div>
@@ -212,6 +213,26 @@ export default function WorkflowDetailPage() {
           ))}
         </div>
       </div>
+
+      {/* Branching rules */}
+      {workflow.branching_rules?.length > 0 && (
+         <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <GitBranch size={15} className="text-accent" />
+            <h2 className="text-white font-semibold text-sm">Branching Rules</h2>
+          </div>
+          <div className="space-y-2">
+            {workflow.branching_rules.map((rule, i) => (
+              <div key={i} className="bg-[#0f0f17] rounded-lg px-4 py-3 flex items-center gap-3">
+                <span className="text-accent text-xs font-bold bg-accent/10 px-2 py-0.5 rounded">IF</span>
+                <span className="text-white text-xs capitalize">{rule.condition?.replace(/_/g, ' ')}</span>
+                <span className="text-blue-400 text-xs font-bold bg-blue-400/10 px-2 py-0.5 rounded">THEN</span>
+                <span className="text-white text-xs capitalize">{rule.action?.replace(/_/g, ' ')}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Execution history */}
       <div className="bg-surface border border-[#2e2e4e] rounded-xl">

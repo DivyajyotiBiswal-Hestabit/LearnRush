@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import {branching_rules} from '@/components/workflows/BranchRuleEditor'
 
 // GET all workflows for logged in user
 export async function GET(req) {
@@ -57,7 +58,8 @@ export async function POST(req) {
         trigger_channel,
         status: 'active',
         n8n_workflow_id: process.env.N8N_WORKFLOW_ID,
-        n8n_webhook_url: `${process.env.N8N_BASE_URL}/webhook/${process.env.N8N_WEBHOOK_PATH}`
+        n8n_webhook_url: `${process.env.N8N_BASE_URL}/webhook/${process.env.N8N_WEBHOOK_PATH}`,
+        branching_rules: body.branching_rules || []
       })
       .select()
       .single()

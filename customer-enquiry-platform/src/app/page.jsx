@@ -6,9 +6,9 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-white">
 
       {/* Navbar */}
-      <nav className="border-b border-[#2e2e4e] px-6 py-4">
+      <nav className="bg-surface border-b border-[#2e2e4e] px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
               <Zap size={18} className="text-white" />
             </div>
@@ -17,7 +17,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-[#a0a0b8] hover:text-white transition-colors text-sm"
+              className="text-white hover:text-accent transition-colors text-sm"
             >
               Log in
             </Link>
@@ -33,16 +33,16 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#1a1a2e] border border-[#2e2e4e] rounded-full px-4 py-1.5 text-sm text-[#a0a0b8] mb-8">
-          <span className="w-2 h-2 bg-accent rounded-full"></span>
+        <div className="inline-flex items-center gap-2 bg-surface-2 border border-[#2e2e4e] rounded-full px-4 py-1.5 text-sm text-accent mb-8">
+          <span className="w-2 h-2 bg-surface-2 rounded-full"></span>
           Powered by AI Agents + n8n
         </div>
-        <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
+        <h1 className="text-5xl md:text-6xl text-accent font-bold leading-tight mb-6">
           Automate customer inquiries
           <br />
           <span className="text-accent">with AI agents</span>
         </h1>
-        <p className="text-[#a0a0b8] text-xl max-w-2xl mx-auto mb-10">
+        <p className="text-[#001219] text-xl max-w-2xl mx-auto mb-10">
           Connect Gmail and WhatsApp. Let specialized AI agents classify,
           research, qualify, and respond to every customer message automatically.
         </p>
@@ -56,7 +56,7 @@ export default function LandingPage() {
           </Link>
           <Link
             href="/login"
-            className="flex items-center gap-2 border border-[#2e2e4e] hover:border-[#4e4e6e] text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 border border-[#2e2e4e] hover:border-[#4e4e6e] text-accent px-6 py-3 rounded-lg font-medium transition-colors"
           >
             Sign in
           </Link>
@@ -68,30 +68,30 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              icon: <Bot size={24} className="text-accent" />,
+              icon: <Bot size={24} className="text-white" />,
               title: '5 Specialized AI Agents',
               description: 'Classifier, Researcher, Qualifier, Responder and Executor work together on every inquiry.'
             },
             {
-              icon: <Zap size={24} className="text-accent" />,
+              icon: <Zap size={24} className="text-white" />,
               title: 'Gmail & WhatsApp',
               description: 'Trigger workflows from real customer messages and send responses automatically.'
             },
             {
-              icon: <BarChart3 size={24} className="text-accent" />,
+              icon: <BarChart3 size={24} className="text-white" />,
               title: 'Live Monitoring',
               description: 'Watch every agent step in real time with detailed scorecards and analytics.'
             },
           ].map((feature, i) => (
             <div
               key={i}
-              className="bg-[#1a1a2e] border border-[#2e2e4e] rounded-xl p-6"
+              className="bg-[#ccd5ae] border border-[#2e2e4e] rounded-xl p-6"
             >
               <div className="w-12 h-12 bg-[#0f0f17] rounded-lg flex items-center justify-center mb-4">
                 {feature.icon}
               </div>
-              <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-              <p className="text-[#a0a0b8] text-sm leading-relaxed">{feature.description}</p>
+              <h3 className="text-lg text-accent font-semibold mb-2">{feature.title}</h3>
+              <p className="text-[#001219] text-sm leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -102,11 +102,11 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-accent rounded flex items-center justify-center">
-              <Zap size={12} className="text-white" />
+              <Zap size={12} className="text-red" />
             </div>
-            <span className="text-sm font-semibold">FlowAgent</span>
+            <span className="text-sm text-accent font-semibold">FlowAgent</span>
           </div>
-          <p className="text-[#a0a0b8] text-sm">
+          <p className="text-accent text-sm">
             Built with n8n + Ollama. Fully self-hosted.
           </p>
         </div>

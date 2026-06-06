@@ -350,6 +350,60 @@ ${execution?.final_reply}
         </div>
       </div>
 
+      {/* Shared Memory State */}
+      {logs.length > 0 && (
+        <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 mt-4">
+          <h2 className="text-white font-semibold text-sm mb-4">Shared Agent State</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              {
+                label: 'Classification',
+                agent: 'classifier',
+                field: 'category',
+                color: 'bg-blue-500'
+              },
+              {
+                label: 'Priority',
+                agent: 'classifier',
+                field: 'priority',
+                color: 'bg-blue-500'
+              },
+              {
+                label: 'Escalation Needed',
+                agent: 'qualifier',
+                field: 'needs_escalation',
+                color: 'bg-yellow-500'
+              },
+              {       
+                label: 'Response Strategy',
+                agent: 'qualifier',
+                field: 'response_strategy',
+                color: 'bg-yellow-500'
+              },
+            ].map((item) => {
+              const log = logs.find(l => l.agent_role === item.agent)
+              let value = '—'
+              try {
+                const parsed = JSON.parse(log?.output?.result || '{}')
+                value = String(parsed[item.field] ?? '—')
+              } catch (e) {}
+
+              return (
+                <div key={item.label} className="bg-[#0f0f17] rounded-lg p-3 flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${item.color} flex-shrink-0`} />
+                  <div>
+                    <p className="text-[#a0a0b8] text-xs">{item.label}</p>
+                    <p className="text-white text-sm font-medium capitalize">
+                      {value.replace(/_/g, ' ')}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Final reply */}
       {execution.final_reply && (
         <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5">
