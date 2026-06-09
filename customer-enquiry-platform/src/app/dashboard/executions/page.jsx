@@ -44,7 +44,7 @@ function ExecutionRow({ execution }) {
     <div className="border-b border-[#2e2e4e] last:border-0">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-4 px-5 py-4 hover:bg-[#16213e] transition-colors text-left"
+        className="w-full flex items-center gap-4 px-5 py-4 hover:bg-white transition-colors text-left"
       >
         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
           execution.status === 'completed' ? 'bg-success' :
@@ -59,10 +59,10 @@ function ExecutionRow({ execution }) {
         }
 
         <div className="flex-1 min-w-0">
-          <p className="text-white text-sm truncate">
+          <p className="text-black text-sm truncate">
             {truncate(execution.original_message, 80)}
           </p>
-          <p className="text-[#4e4e6e] text-xs mt-0.5">
+          <p className="text-accent text-xs mt-0.5">
             {formatDate(execution.started_at)}
           </p>
         </div>
@@ -83,13 +83,13 @@ function ExecutionRow({ execution }) {
 
       {expanded && (
         <div className="px-5 pb-5 space-y-4">
-          <div className="bg-[#0f0f17] rounded-lg p-4">
-            <p className="text-[#a0a0b8] text-xs font-medium mb-2">Original Message</p>
+          <div className="bg-accent rounded-lg p-4">
+            <p className="text-white text-xs font-medium mb-2">Original Message</p>
             <p className="text-white text-sm">{execution.original_message}</p>
           </div>
 
           {execution.final_reply && (
-            <div className="bg-[#0f0f17] rounded-lg p-4">
+            <div className="bg-accent rounded-lg p-4">
               <p className="text-[#a0a0b8] text-xs font-medium mb-2">Final Reply</p>
               <p className="text-white text-sm whitespace-pre-wrap">
                 {execution.final_reply}
@@ -100,13 +100,13 @@ function ExecutionRow({ execution }) {
           <div className="flex items-center gap-2">
             <Link
               href={`/dashboard/executions/${execution.id}`}
-              className="flex items-center gap-1.5 text-accent text-xs hover:underline"
+              className="flex items-center gap-1.5 text-accent text-s hover:underline"
             >
               View full trace →
             </Link>
             <button
               onClick={exportJSON}
-              className="flex items-center gap-1.5 text-[#a0a0b8] hover:text-white text-xs ml-auto border border-[#2e2e4e] px-3 py-1.5 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 text-accent hover:text-accent hover:bg-white text-xs ml-auto border border-[#2e2e4e] px-3 py-1.5 rounded-lg transition-colors"
             >
               <Download size={12} />
               Export JSON
@@ -140,7 +140,7 @@ export default function ExecutionsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white">Executions</h1>
-          <p className="text-[#a0a0b8] text-sm mt-1">
+          <p className="text-accent text-sm mt-1">
             All automation runs across your workflows
           </p>
         </div>
@@ -148,20 +148,20 @@ export default function ExecutionsPage() {
 
       <div className="grid grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total', value: stats.total, color: 'text-white' },
+          { label: 'Total', value: stats.total, color: 'text-purple-600' },
           { label: 'Completed', value: stats.completed, color: 'text-success' },
           { label: 'Failed', value: stats.failed, color: 'text-error' },
           { label: 'Running', value: stats.running, color: 'text-blue-400' },
         ].map((stat, i) => (
-          <div key={i} className="bg-surface border border-[#2e2e4e] rounded-xl p-4 text-center">
+          <div key={i} className="bg-[#F0FFF0] border border-[#2e2e4e] rounded-xl p-4 text-center">
             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-            <p className="text-[#a0a0b8] text-xs mt-1">{stat.label}</p>
+            <p className="text-accent text-xs mt-1">{stat.label}</p>
           </div>
         ))}
       </div>
 
       <div className="flex items-center gap-2 mb-4">
-        <Filter size={14} className="text-[#a0a0b8]" />
+        <Filter size={14} className="text-accent" />
         {['all', 'completed', 'failed', 'running'].map(f => (
           <button
             key={f}
@@ -169,7 +169,7 @@ export default function ExecutionsPage() {
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize ${
               filter === f
                 ? 'bg-accent text-white'
-                : 'bg-surface text-[#a0a0b8] hover:text-white border border-[#2e2e4e]'
+                : 'bg-surface text-accent hover:text-white border border-[#2e2e4e]'
             }`}
           >
             {f}

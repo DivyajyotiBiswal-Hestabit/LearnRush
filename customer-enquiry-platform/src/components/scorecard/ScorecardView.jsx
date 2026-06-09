@@ -20,7 +20,7 @@ function ScoreBar({ label, score, color }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[#a0a0b8] text-xs capitalize">{label}</span>
+        <span className="text-accent text-s capitalize">{label}</span>
         <span className={`text-xs font-bold ${
           score >= 8 ? 'text-success' :
           score >= 6 ? 'text-warning' :
@@ -33,7 +33,7 @@ function ScoreBar({ label, score, color }) {
         <div
           className={`h-1.5 rounded-full transition-all duration-700 ${
             score >= 8 ? 'bg-success' :
-            score >= 6 ? 'bg-warning' :
+            score >= 6 ? 'bg-[#EC5800]' :
             'bg-error'
           }`}
           style={{ width: `${score * 10}%` }}
@@ -129,7 +129,7 @@ export default function ScorecardView({ executionId }) {
         <button
           onClick={handleGenerate}
           disabled={generating}
-          className="flex items-center gap-1.5 text-[#a0a0b8] hover:text-white text-xs transition-colors"
+          className="flex items-center gap-1.5 text-accent hover:text-white text-s transition-colors"
         >
           <RefreshCw size={12} className={generating ? 'animate-spin' : ''} />
           Regenerate
@@ -145,13 +145,13 @@ export default function ScorecardView({ executionId }) {
              scorecard.overall_score >= 6 ? 'Good' :
              scorecard.overall_score >= 4 ? 'Fair' : 'Needs Improvement'}
           </p>
-          <p className="text-[#a0a0b8] text-sm">Overall quality score</p>
+          <p className="text-accent text-s">Overall quality score</p>
           <div className="flex items-center gap-3 mt-2">
-            <div className="flex items-center gap-1 text-xs text-[#a0a0b8]">
-              <TrendingUp size={12} className="text-success" />
+            <div className="flex items-center gap-1 text-xs text-accent">
+              <TrendingUp size={13} className="text-success" />
               Relevance: {scorecard.response_relevance}/10
             </div>
-            <div className="flex items-center gap-1 text-xs text-[#a0a0b8]">
+            <div className="flex items-center gap-1 text-xs text-accent">
               Completeness: {scorecard.response_completeness}/10
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function ScorecardView({ executionId }) {
 
       {/* Per-agent scores */}
       <div>
-        <p className="text-white text-sm font-medium mb-3">Per-Agent Scores</p>
+        <p className="text-accent text-sm font-medium mb-3">Per-Agent Scores</p>
         <div className="space-y-3">
           {[
             { key: 'classifier_score', label: 'Classifier Agent' },
@@ -180,14 +180,14 @@ export default function ScorecardView({ executionId }) {
 
       {/* Bottleneck */}
       {scorecard.bottleneck_agent && (
-        <div className="bg-warning/5 border border-warning/20 rounded-lg p-4">
+        <div className="bg-warning/4 border border-[#EC5800] rounded-lg p-4">
           <div className="flex items-center gap-2 mb-1">
-            <AlertTriangle size={14} className="text-warning" />
-            <p className="text-warning text-xs font-medium">
+            <AlertTriangle size={14} className="text-[#EC5800]" />
+            <p className="text-white text-s font-medium">
               Bottleneck: {scorecard.bottleneck_agent} Agent
             </p>
           </div>
-          <p className="text-[#a0a0b8] text-xs">
+          <p className="text-accent text-s">
             {scorecard.bottleneck_reason}
           </p>
         </div>
@@ -196,12 +196,12 @@ export default function ScorecardView({ executionId }) {
       {/* Suggestions */}
       {scorecard.suggestions?.length > 0 && (
         <div>
-          <p className="text-white text-sm font-medium mb-2">Improvement Suggestions</p>
+          <p className="text-white text-s font-medium mb-2">Improvement Suggestions</p>
           <ul className="space-y-2">
             {scorecard.suggestions.map((suggestion, i) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="text-accent text-xs mt-0.5">•</span>
-                <span className="text-[#a0a0b8] text-xs">{suggestion}</span>
+                <span className="text-accent text-s">{suggestion}</span>
               </li>
             ))}
           </ul>

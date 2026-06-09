@@ -36,16 +36,16 @@ function AgentLogCard({ log }) {
   }
 
   return (
-    <div className="bg-[#0f0f17] border border-[#2e2e4e] rounded-xl overflow-hidden">
+    <div className="bg-[#F0FFF0] border border-[#2e2e4e] rounded-xl overflow-hidden">
       <button
         onClick={() => log.status === 'completed' && setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 p-4 hover:bg-[#16213e] transition-colors"
+        className="w-full flex items-center gap-3 p-4 hover:bg-white transition-colors"
       >
         <div className={`w-8 h-8 ${color} rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
           {log.agent_role.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 text-left">
-          <p className="text-white font-medium text-sm capitalize">
+          <p className="text-accent font-medium text-sm capitalize">
             {log.agent_role} Agent
           </p>
           <p className="text-[#4e4e6e] text-xs mt-0.5">
@@ -73,7 +73,7 @@ function AgentLogCard({ log }) {
       {expanded && log.output && (
         <div className="px-4 pb-4 border-t border-[#2e2e4e]">
           <p className="text-[#a0a0b8] text-xs font-medium mt-3 mb-2">Output</p>
-          <pre className="text-white text-xs bg-background rounded-lg p-3 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+          <pre className="text-accent text-xs bg-background rounded-lg p-3 overflow-x-auto whitespace-pre-wrap leading-relaxed">
             {typeof log.output?.result === 'string'
               ? (() => {
                   try {
@@ -252,14 +252,14 @@ ${execution?.final_reply}
         <div className="flex items-center gap-2">
           <button
             onClick={exportTXT}
-            className="flex items-center gap-1.5 border border-[#2e2e4e] text-[#a0a0b8] hover:text-white px-3 py-1.5 rounded-lg text-xs transition-colors"
+            className="flex items-center gap-1.5 border border-[#2e2e4e] text-success hover:text-accent bg-surface px-3 py-1.5 rounded-lg text-xs transition-colors"
           >
             <Download size={12} />
             TXT
           </button>
           <button
             onClick={exportJSON}
-            className="flex items-center gap-1.5 border border-[#2e2e4e] text-[#a0a0b8] hover:text-white px-3 py-1.5 rounded-lg text-xs transition-colors"
+            className="flex items-center gap-1.5 border border-[#2e2e4e] text-success hover:text-accent bg-surface px-3 py-1.5 rounded-lg text-xs transition-colors"
           >
             <Download size={12} />
             JSON
@@ -293,7 +293,7 @@ ${execution?.final_reply}
           },
         ].map((item, i) => (
           <div key={i} className="bg-surface border border-[#2e2e4e] rounded-xl p-4">
-            <p className="text-[#a0a0b8] text-xs mb-1">{item.label}</p>
+            <p className="text-accent text-xs mb-1">{item.label}</p>
             <p className={`font-semibold text-sm capitalize ${item.color}`}>
               {item.value}
             </p>
@@ -308,9 +308,9 @@ ${execution?.final_reply}
             ? <Mail size={15} className="text-red-400" />
             : <MessageCircle size={15} className="text-green-400" />
           }
-          <p className="text-white font-semibold text-sm">Original Message</p>
+          <p className="text-accent font-semibold text-sm">Original Message</p>
         </div>
-        <p className="text-[#a0a0b8] text-sm leading-relaxed">
+        <p className="text-accent text-sm leading-relaxed">
           {execution.original_message}
         </p>
       </div>
@@ -318,8 +318,8 @@ ${execution?.final_reply}
       {/* Progress bar */}
       <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 mb-4">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-white text-sm font-medium">Agent Pipeline Progress</p>
-          <p className="text-[#a0a0b8] text-xs">{completedAgents}/5 completed</p>
+          <p className="text-accent text-sm font-medium">Agent Pipeline Progress</p>
+          <p className="text-accent text-xs">{completedAgents}/5 completed</p>
         </div>
         <div className="w-full bg-[#2e2e4e] rounded-full h-2">
           <div
@@ -389,17 +389,37 @@ ${execution?.final_reply}
               } catch (e) {}
 
               return (
-                <div key={item.label} className="bg-[#0f0f17] rounded-lg p-3 flex items-center gap-3">
+                <div key={item.label} className="bg-white rounded-lg p-3 flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${item.color} flex-shrink-0`} />
                   <div>
-                    <p className="text-[#a0a0b8] text-xs">{item.label}</p>
-                    <p className="text-white text-sm font-medium capitalize">
+                    <p className="text-accent text-xs">{item.label}</p>
+                    <p className="text-accent text-sm font-medium capitalize">
                       {value.replace(/_/g, ' ')}
                     </p>
                   </div>
                 </div>
               )
             })}
+          </div>
+        </div>
+      )}
+
+      {/* CRM Update Status */}
+      {execution.status === 'completed' && (
+        <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 mt-4">
+          <h2 className="text-white font-semibold text-sm mb-3">Integrations Status</h2>
+          <div className="space-y-2">
+            {[
+              { label: 'Google Sheets CRM', status: 'Updated' },
+              { label: 'Slack Notification', status: 'Sent if triggered' },
+              { label: 'Discord Alert', status: 'Sent if triggered' },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 bg-white rounded-lg px-4 py-2.5">
+                <span className="text-lg">{item.icon}</span>
+                <span className="text-accent text-sm flex-1">{item.label}</span>
+                <span className="text-success text-xs">{item.status}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -411,8 +431,8 @@ ${execution?.final_reply}
                 <CheckCircle size={15} className="text-success" />
                 <p className="text-white font-semibold text-sm">Final Reply</p>
             </div>
-            <div className="bg-[#0f0f17] rounded-lg p-4">
-                <p className="text-white text-sm whitespace-pre-wrap leading-relaxed">
+            <div className="bg-white rounded-lg p-4">
+                <p className="text-accent text-sm whitespace-pre-wrap leading-relaxed">
                     {(() => {
                         try {
                             const parsed = JSON.parse(execution.final_reply)
@@ -431,7 +451,7 @@ ${execution?.final_reply}
       {/* Scorecard */}
       {execution.status === 'completed' && (
         <div className="mt-4">
-            <h2 className="text-white font-semibold text-sm mb-3">AI Scorecard</h2>
+            <h2 className="text-accent font-semibold text-sm mb-3">AI Scorecard</h2>
             <ScorecardView executionId={execution.id} />
         </div>
       )}

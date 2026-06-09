@@ -62,6 +62,38 @@ export function useIntegrations() {
     })
     return res.json()
   }
+  const connectSlack = async (webhookUrl, channelName) => {
+    const token = await getToken()
+    const res = await fetch('/api/integrations/slack', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ webhook_url: webhookUrl, channel_name: channelName })
+    })
+    return res.json()
+  }
+
+  const connectDiscord = async (webhookUrl) => {
+    const token = await getToken()
+    const res = await fetch('/api/integrations/discord', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ webhook_url: webhookUrl })
+    })
+    return res.json()
+  }
+
+  const connectCalendar = async (userId) => {
+    const res = await fetch('/api/integrations/google-calendar')
+    const { authUrl } = await res.json()
+    window.location.href = authUrl + `&state=${userId}`
+  }
+
 
   const disconnect = async (type) => {
     const token = await getToken()
@@ -69,7 +101,10 @@ export function useIntegrations() {
       gmail: '/api/integrations/gmail',
       google_drive: '/api/integrations/google-drive',
       google_sheets: '/api/integrations/google-sheets',
+      oogle_calendar: '/api/integrations/google-calendar',
       whatsapp: '/api/integrations/whatsapp',
+      slack: '/api/integrations/slack',
+      discord: '/api/integrations/discord',
     }
     await fetch(endpoints[type], {
       method: 'DELETE',
@@ -99,6 +134,9 @@ export function useIntegrations() {
     connectDrive,
     connectSheets,
     connectWhatsApp,
+    connectDiscord,
+    connectSlack,
+    connectCalendar,
     disconnect,
     getStatus,
     getEmail,

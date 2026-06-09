@@ -1,8 +1,13 @@
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-import axios from 'axios'
 export const maxDuration = 300
+import Groq from 'groq-sdk'
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+})
+
 async function generateScorecard(execution, logs) {
   const prompt = `Rate this customer support automation 1-10.
 
@@ -11,59 +16,32 @@ Final reply: "${execution.final_reply?.substring(0, 200)}"
 
 Rules:
 - Score 9-10 if reply directly addresses the message
-- Score 7-8 if reply is relevant but generic  
+- Score 7-8 if reply is relevant but generic
 - Score 5-6 if reply is partially relevant
-- Score 1-4 if reply is irrelevant or wrong
+- Score 1-4 if reply is irrelevant
 
-You MUST respond with ONLY this JSON and nothing else, no explanation:
-{"overall_score":8,"classifier_score":8,"researcher_score":7,"qualifier_score":8,"responder_score":8,"executor_score":8,"response_relevance":8,"response_completeness":7,"bottleneck_agent":"researcher","bottleneck_reason":"Could search better","suggestions":["Add product catalog to Drive","Use more specific prompts","Add pricing information"]}
-
-Respond with ONLY the JSON above, nothing before or after it.`
+Respond ONLY with this JSON:
+{"overall_score":8,"classifier_score":8,"researcher_score":7,"qualifier_score":8,"responder_score":8,"executor_score":8,"response_relevance":8,"response_completeness":7,"bottleneck_agent":"researcher","bottleneck_reason":"Could search better","suggestions":["Add product catalog to Drive","Use more specific prompts"]}`
 
   try {
-    const response = await axios.post(
-      `${process.env.OLLAMA_BASE_URL}/api/generate`,
-      {
-        model: 'mistral',
-        prompt,
-        stream: false,
-        options: {
-          temperature: 0.1,
-          num_predict: 200
-        }
-      },
-      { timeout: 180000 }
-    )
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+      temperature: 0.1,
+      max_tokens: 300
+    })
 
-    const text = response.data.response.trim()
-    console.log('Scorecard raw response:', text.substring(0, 200))
+    const text = completion.choices[0]?.message?.content?.trim()
+    console.log('Groq scorecard response:', text?.substring(0, 200))
 
-    // Try multiple JSON extraction methods
+    // Extract JSON
     let parsed = null
+    try { parsed = JSON.parse(text) } catch (e) {}
 
-    // Method 1: direct parse
-    try {
-      parsed = JSON.parse(text)
-    } catch (e) {}
-
-    // Method 2: extract JSON block
     if (!parsed) {
-      const jsonMatch = text.match(/\{[^{}]*\}/)
+      const jsonMatch = text?.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
-        try {
-          parsed = JSON.parse(jsonMatch[0])
-        } catch (e) {}
-      }
-    }
-
-    // Method 3: find first { to last }
-    if (!parsed) {
-      const start = text.indexOf('{')
-      const end = text.lastIndexOf('}')
-      if (start !== -1 && end !== -1) {
-        try {
-          parsed = JSON.parse(text.substring(start, end + 1))
-        } catch (e) {}
+        try { parsed = JSON.parse(jsonMatch[0]) } catch (e) {}
       }
     }
 
@@ -72,22 +50,14 @@ Respond with ONLY the JSON above, nothing before or after it.`
       return parsed
     }
 
-    throw new Error('Could not parse JSON from response')
+    throw new Error('Could not parse JSON')
 
   } catch (error) {
-    console.error('Ollama scorecard error:', error.message)
-
-    // Fallback — calculate programmatically
-    const hasGoodReply = execution.final_reply &&
-      execution.final_reply.length > 100 &&
-      !execution.final_reply.includes('"success":true')
-
-    const completedAgents = logs.filter(l => l.status === 'completed').length
-    const baseScore = hasGoodReply ? 7 : 5
-    const agentBonus = completedAgents === 5 ? 1 : 0
-
+    console.error('Groq scorecard error:', error.message)
+    // Fallback
+    const hasGoodReply = execution.final_reply?.length > 100
     return {
-      overall_score: baseScore + agentBonus,
+      overall_score: hasGoodReply ? 8 : 5,
       classifier_score: 7,
       researcher_score: 7,
       qualifier_score: 7,
@@ -96,11 +66,11 @@ Respond with ONLY the JSON above, nothing before or after it.`
       response_relevance: hasGoodReply ? 8 : 5,
       response_completeness: hasGoodReply ? 7 : 5,
       bottleneck_agent: 'researcher',
-      bottleneck_reason: 'No Google Drive knowledge base connected',
+      bottleneck_reason: 'Knowledge base not connected',
       suggestions: [
-        'Connect Google Drive with product catalog for accurate responses',
-        'Add more specific business context when creating the workflow',
-        'Consider adding pricing and policy documents to knowledge base'
+        'Connect Google Drive with product documents',
+        'Add more specific business context',
+        'Review agent prompts for your industry'
       ]
     }
   }

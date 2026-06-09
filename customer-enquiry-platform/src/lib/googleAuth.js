@@ -37,6 +37,23 @@ export function getDriveAuthUrl() {
   })
 }
 
+export function getCalendarAuthUrl() {
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_CALENDAR_REDIRECT_URI ||
+    'http://localhost:3000/api/integrations/google-calendar/callback'
+  )
+  return oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: [
+      'https://www.googleapis.com/auth/calendar.events',
+      'https://www.googleapis.com/auth/userinfo.email',
+    ],
+    prompt: 'consent'
+  })
+}
+
 export function getSheetsAuthUrl() {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,

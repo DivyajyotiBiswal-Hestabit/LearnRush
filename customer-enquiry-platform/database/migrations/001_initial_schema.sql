@@ -224,3 +224,30 @@ alter table public.templates enable row level security;
 create policy "Anyone can read templates"
   on public.templates for select
   using (is_public = true);  
+
+
+alter publication supabase_realtime add table executions;
+alter publication supabase_realtime add table execution_logs;
+
+
+
+select tablename 
+from pg_publication_tables 
+where pubname = 'supabase_realtime';
+
+
+-- Add retry and fallback to agents table
+alter table public.agents
+add column if not exists retry_policy jsonb default '{"max_retries": 3, "retry_on": ["error", "timeout"]}',
+add column if not exists fallback_prompt text,
+add column if not exists conditions jsonb;
+
+-- Add shared memory and branching to workflows table
+alter table public.workflows
+add column if not exists shared_memory jsonb default '{}',
+add column if not exists branching_rules jsonb default '[]';
+
+
+alter table public.integrations
+add column if not exists webhook_url text,
+add column if not exists config jsonb default '{}';

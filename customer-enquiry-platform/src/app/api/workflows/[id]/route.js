@@ -49,7 +49,10 @@ export async function PUT(req, { params }) {
         business_context: body.business_context,
         trigger_channel: body.trigger_channel,
         status: body.status,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        ...(body.sheets_id !== undefined && {
+          sheets_id: body.sheets_id
+        })
       })
       .eq('id', id)
       .eq('user_id', user.id)

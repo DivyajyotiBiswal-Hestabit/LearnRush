@@ -65,12 +65,12 @@ function TemplatePreviewModal({ template, onClose, onUse }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#2e2e4e] flex-shrink-0">
           <div>
-            <h2 className="text-white font-semibold text-lg">{template.name}</h2>
+            <h2 className="text-accent font-bold text-lg">{template.name}</h2>
             <p className="text-accent text-s mt-0.5">{template.description}</p>
           </div>
           <button
             onClick={onClose}
-            className="text-[#a0a0b8] hover:text-white transition-colors p-1"
+            className="text-accent hover:text-white transition-colors p-1"
           >
             <X size={20} />
           </button>
@@ -263,14 +263,14 @@ function TemplateCard({ template, onPreview }) {
   const agentCount = Object.keys(agentPrompts).length
 
   return (
-    <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 hover:border-[#4e4e6e] transition-all group">
+    <div className="bg-[#F0FFF0] border border-[#2e2e4e] rounded-xl p-5 hover:border-[#4e4e6e] transition-all group">
 
       {/* Icon + industry */}
       <div className="flex items-start justify-between mb-4">
         <div className="w-11 h-11 bg-accent/10 rounded-xl flex items-center justify-center">
           <LayoutTemplate size={20} className="text-accent" />
         </div>
-        <span className={`text-xs px-2 py-0.5 rounded-full border ${
+        <span className={`text-sm px-2 py-0.5 rounded-full border ${
           INDUSTRY_COLORS[template.industry] || 'bg-[#2e2e4e] text-[#a0a0b8] border-[#2e2e4e]'
         }`}>
           {template.industry}
@@ -278,8 +278,8 @@ function TemplateCard({ template, onPreview }) {
       </div>
 
       {/* Name + description */}
-      <h3 className="text-white font-semibold text-sm mb-2">{template.name}</h3>
-      <p className="text-[#a0a0b8] text-xs leading-relaxed mb-4 line-clamp-2">
+      <h3 className="text-accent font-semibold text-m mb-2">{template.name}</h3>
+      <p className="text-accent text-s leading-relaxed mb-4 line-clamp-2">
         {template.description}
       </p>
 
@@ -332,7 +332,7 @@ export default function TemplatesPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Templates</h1>
-        <p className="text-[#a0a0b8] text-sm mt-1">
+        <p className="text-accent text-sm mt-1">
           Pre-built workflows to get started instantly
         </p>
       </div>
@@ -346,7 +346,7 @@ export default function TemplatesPage() {
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               filter === industry
                 ? 'bg-accent text-white'
-                : 'bg-surface border border-[#2e2e4e] text-[#a0a0b8] hover:text-white'
+                : 'bg-surface border border-[#2e2e4e] text-accent hover:text-white'
             }`}
           >
             {industry}

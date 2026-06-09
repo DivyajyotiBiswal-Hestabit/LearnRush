@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useWorkflows } from '@/hooks/useWorkflows'
-import { GitBranch } from 'lucide-react'
 import {
   ArrowLeft, Play, Trash2, GitBranch,
   Mail, MessageCircle, Clock, CheckCircle,
@@ -13,6 +12,7 @@ import {
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatDate, formatDuration } from '@/lib/utils'
+import SheetsConfig from '@/components/workflows/SheetsConfig'
 
 export default function WorkflowDetailPage() {
   const params = useParams()
@@ -160,7 +160,7 @@ export default function WorkflowDetailPage() {
       {/* Info cards */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-surface border border-[#2e2e4e] rounded-xl p-4">
-          <p className="text-[#a0a0b8] text-xs mb-1">Status</p>
+          <p className="text-accent text-sm mb-1">Status</p>
           <div className={`flex items-center gap-1.5 ${
             workflow.status === 'active' ? 'text-success' : 'text-[#a0a0b8]'
           }`}>
@@ -172,11 +172,11 @@ export default function WorkflowDetailPage() {
           </div>
         </div>
         <div className="bg-surface border border-[#2e2e4e] rounded-xl p-4">
-          <p className="text-[#a0a0b8] text-xs mb-1">Channel</p>
+          <p className="text-accent text-sm mb-1">Channel</p>
           <div className="flex items-center gap-1.5">
             {workflow.trigger_channel === 'gmail'
               ? <Mail size={14} className="text-red-400" />
-              : <MessageCircle size={14} className="text-green-400" />
+              : <MessageCircle size={14} className="text-green-800" />
             }
             <span className="text-white font-medium text-sm capitalize">
               {workflow.trigger_channel}
@@ -184,7 +184,7 @@ export default function WorkflowDetailPage() {
           </div>
         </div>
         <div className="bg-surface border border-[#2e2e4e] rounded-xl p-4">
-          <p className="text-[#a0a0b8] text-xs mb-1">Total Executions</p>
+          <p className="text-accent text-sm mb-1">Total Executions</p>
           <p className="text-white font-medium text-sm">{executions.length}</p>
         </div>
       </div>
@@ -192,7 +192,15 @@ export default function WorkflowDetailPage() {
       {/* Business context */}
       <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 mb-6">
         <h2 className="text-white font-semibold text-sm mb-2">Business Context</h2>
-        <p className="text-[#a0a0b8] text-sm">{workflow.business_context}</p>
+        <p className="text-accent text-sm">{workflow.business_context}</p>
+      </div>
+
+      {/* Google Sheets CRM */}
+      <div className="bg-surface border border-[#2e2e4e] rounded-xl p-5 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="text-white font-semibold text-sm">Google Sheets CRM</h2>
+        </div>
+        <SheetsConfig workflowId={workflow.id} currentSheetsId={workflow.sheets_id} />
       </div>
 
       {/* Agent pipeline */}
@@ -200,7 +208,7 @@ export default function WorkflowDetailPage() {
         <h2 className="text-white font-semibold text-sm mb-4">Agent Pipeline</h2>
         <div className="space-y-2">
           {workflow.agents?.sort((a, b) => a.order_index - b.order_index).map((agent, i) => (
-            <div key={agent.id} className="bg-[#0f0f17] rounded-lg p-3">
+            <div key={agent.id} className="bg-accent rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-accent/20 rounded flex items-center justify-center text-accent text-xs font-bold">
                   {i + 1}

@@ -240,9 +240,9 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
         {/* Recent workflows */}
-        <div className="bg-surface border border-[#2e2e4e] rounded-xl">
+        <div className="bg-[#F0FFF0] border border-[#2e2e4e] rounded-xl">
           <div className="flex items-center justify-between px-5 py-4 border-b border-[#2e2e4e]">
-            <h2 className="text-white font-semibold text-m">Recent Workflows</h2>
+            <h2 className="text-accent font-semibold text-m">Recent Workflows</h2>
             <Link
               href="/dashboard/workflows"
               className="flex items-center gap-1 text-accent text-s hover:underline"
@@ -287,9 +287,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent executions */}
-        <div className="bg-surface border border-[#2e2e4e] rounded-xl">
+        <div className="bg-[#F0FFF0] border border-[#2e2e4e] rounded-xl">
           <div className="flex items-center justify-between px-5 py-4 border-b border-[#2e2e4e]">
-            <h2 className="text-white font-semibold text-m">Recent Executions</h2>
+            <h2 className="text-accent font-semibold text-m">Recent Executions</h2>
             <Link
               href="/dashboard/executions"
               className="flex items-center gap-1 text-accent text-s hover:underline"
