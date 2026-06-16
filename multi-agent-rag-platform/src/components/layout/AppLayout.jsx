@@ -17,11 +17,13 @@ import {
   Menu,
   X,
   Bot,
+  Layout,
 } from 'lucide-react'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Agent Teams', href: '/teams', icon: Users },
+  { label: 'Templates', href: '/templates', icon: Layout },       
   { label: 'Knowledge Base', href: '/knowledge-base', icon: Database },
   { label: 'Research Chat', href: '/chat', icon: MessageSquare },
   { label: 'History', href: '/history', icon: History },
@@ -59,7 +61,8 @@ export function AppLayout({ children, user }) {
       {/* Nav Links */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
         {navItems.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + '/')
+          const active = pathname === href ||
+            (href !== '/dashboard' && pathname.startsWith(href))
           return (
             <Link
               key={href}
@@ -82,8 +85,17 @@ export function AppLayout({ children, user }) {
       {/* User + Logout */}
       <div className="px-3 py-4 border-t border-gray-100">
         <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">
-            {user?.fullName?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? 'U'}
+          {/* Replace the initials-only avatar with this: */}
+          <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold overflow-hidden flex-shrink-0">
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.fullName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              user?.fullName?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? 'U'
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-gray-900 truncate">

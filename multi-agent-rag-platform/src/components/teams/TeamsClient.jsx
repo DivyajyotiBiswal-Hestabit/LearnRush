@@ -1,8 +1,9 @@
 'use client'
-
+import { Layout } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Users, Plus } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { TeamCard } from '@/components/teams/TeamCard'
@@ -13,11 +14,11 @@ export function TeamsClient({ initialTeams }) {
 
   function handleDelete(teamId) {
     setTeams(prev => prev.filter(t => t.id !== teamId))
+    toast.success('Team deleted successfully')
   }
 
   return (
     <div className="p-8">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Agent Teams</h1>
@@ -25,23 +26,38 @@ export function TeamsClient({ initialTeams }) {
             Build and manage your multi-agent research teams
           </p>
         </div>
-        <Button onClick={() => router.push('/teams/new')}>
-          <Plus className="w-4 h-4 mr-2" />
-          New Team
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/templates')}
+          >
+            <Layout className="w-4 h-4 mr-2" />
+            Browse Templates
+          </Button>
+          <Button onClick={() => router.push('/teams/new')}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Team
+          </Button>
+        </div>
       </div>
 
-      {/* Teams Grid */}
+
       {teams.length === 0 ? (
         <EmptyState
           icon={Users}
           title="No teams yet"
-          description="Create your first multi-agent team to start running research queries."
+          description="Start from a pre-built template or create a custom team from scratch."
           action={
-            <Button onClick={() => router.push('/teams/new')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Team
-            </Button>
+            <div className="flex gap-3">
+              <Button onClick={() => router.push('/templates')}>
+                <Layout className="w-4 h-4 mr-2" />
+                Browse Templates
+              </Button>
+              <Button variant="outline" onClick={() => router.push('/teams/new')}>
+                <Plus className="w-4 h-4 mr-2" />
+                Custom Team
+              </Button>
+            </div>
           }
         />
       ) : (

@@ -1,4 +1,5 @@
 'use client'
+import { toast } from 'sonner'
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -37,9 +38,9 @@ export function ProfileForm({ user }) {
       .eq('id', user.id)
 
     if (updateError) {
-      setError('Failed to update profile')
+      toast.errror('Failed to update profile')
     } else {
-      setMessage('Profile updated successfully')
+      toast.success('Profile updated successfully')
     }
 
     setLoading(false)

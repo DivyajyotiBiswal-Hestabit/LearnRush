@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/Button'
 import { AgentForm } from '@/components/teams/AgentForm'
 import { AGENT_ROLE_DEFAULTS, DEFAULT_MODEL } from '@/config/models'
 import { COLLABORATION_MODES } from '@/config/agents'
+import { toast } from 'sonner'
+
 
 function createDefaultAgent(role = 'researcher', index = 0) {
   const prompts = {
@@ -115,6 +117,7 @@ export function TeamForm({ initialData = null, onSuccess }) {
       if (onSuccess) {
         onSuccess(data.team)
       } else {
+        toast.success(isEditing ? 'Team updated!' : 'Team created!')
         router.push('/teams')
       }
     } catch (err) {

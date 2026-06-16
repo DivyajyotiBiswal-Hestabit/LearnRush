@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MoreVertical, Edit, Trash2, MessageSquare, Bot } from 'lucide-react'
+import { MoreVertical, Edit, Trash2, MessageSquare, Bot, Settings } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { formatDate } from '@/lib/utils/format'
 
@@ -81,6 +81,16 @@ export function TeamCard({ team, onDelete }) {
                 >
                   <Edit className="w-3.5 h-3.5" />
                   Edit Team
+                </button>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false)
+                    router.push(`/teams/${team.id}/config`)
+                  }}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  Advanced Config
                 </button>
                 <button
                   onClick={handleDelete}

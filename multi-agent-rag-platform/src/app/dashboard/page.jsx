@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { AppLayout } from '@/components/layout/AppLayout'
 import Link from 'next/link'
-import { Users, MessageSquare, Database, Plus } from 'lucide-react'
+import { Users, MessageSquare, Database, Plus, Layout } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -24,6 +24,7 @@ export default async function DashboardPage() {
     id: user.id,
     email: user.email,
     fullName: profile?.full_name ?? user.user_metadata?.full_name ?? 'User',
+    avatarUrl: profile?.avatar_url ?? null,
   }
 
   const stats = [
@@ -105,6 +106,14 @@ export default async function DashboardPage() {
             >
               <Database className="w-4 h-4" />
               Upload Documents
+            </Link>
+
+            <Link
+              href="/templates"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <Layout className="w-4 h-4" />
+              Browse Templates
             </Link>
           </div>
         </div>

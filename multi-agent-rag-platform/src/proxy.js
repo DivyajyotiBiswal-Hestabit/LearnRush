@@ -35,7 +35,7 @@ export async function proxy(request) {
 
   const { pathname } = request.nextUrl
 
-  const publicRoutes = ['/login', '/register']
+  const publicRoutes = ['/', '/login', '/register']
   const isPublicRoute = publicRoutes.includes(pathname)
 
   if (!user && !isPublicRoute) {
@@ -43,12 +43,15 @@ export async function proxy(request) {
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
-
-  if (user && isPublicRoute) {
+  if (
+    user &&
+    (pathname === '/login' || pathname === '/register')
+  ) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
+  
 
   return supabaseResponse
 }

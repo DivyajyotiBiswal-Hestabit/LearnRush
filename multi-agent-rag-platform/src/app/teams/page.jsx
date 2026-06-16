@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { TeamsClient } from '@/components/teams/TeamsClient'
+export const metadata = { title: 'Agent Teams' }
 
 export default async function TeamsPage() {
   const supabase = await createClient()
@@ -23,6 +24,7 @@ export default async function TeamsPage() {
     id: user.id,
     email: user.email,
     fullName: profile?.full_name ?? user.user_metadata?.full_name ?? 'User',
+    avatarUrl: profile?.avatar_url ?? null,
   }
 
   return (
