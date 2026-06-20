@@ -35,6 +35,41 @@ export async function generateEmbeddings(texts) {
   return embeddings
 }
 
+const embeddingCache = new Map()
+
+export async function generateEmbedding(text) {
+  // Return cached embedding if same text was seen before
+  const cacheKey = text.slice(0, 100) // use first 100 chars as key
+  if (embeddingCache.has(cacheKey)) {
+    return embeddingCache.get(cacheKey)
+  }
+
+  const response = await fetch(`${OLLAMA_BASE_URL}/api/embeddings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: EMBEDDING_MODEL,
+      prompt: text,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Embedding generation failed: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  const embedding = data.embedding
+
+  // Cache it (limit cache to 100 entries)
+  if (embeddingCache.size > 100) {
+    const firstKey = embeddingCache.keys().next().value
+    embeddingCache.delete(firstKey)
+  }
+  embeddingCache.set(cacheKey, embedding)
+
+  return embedding
+}
+
 /**
  * Compute cosine similarity between two vectors
  */

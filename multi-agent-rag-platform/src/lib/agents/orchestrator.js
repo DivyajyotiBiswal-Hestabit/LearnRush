@@ -224,6 +224,56 @@ async function runDebate(agents, question, context, memoryContext, debateConfig,
   return traces
 }
 
+async function runParallel(agents, question, context, memoryContext, onTraceUpdate) {
+  // All agents run at the same time instead of one after another
+  const results = await Promise.all(
+    agents.map(async (agent, i) => {
+      const startTime = Date.now()
+
+      onTraceUpdate({
+        agentName: agent.name,
+        role: agent.role,
+        modelId: agent.model_id,
+        status: 'running',
+        stepIndex: i,
+      })
+
+      const prompt = buildAgentPrompt(agent, question, context, memoryContext, [])
+
+      try {
+        const { output, modelUsed } = await runAgentWithRouting(agent, prompt, question)
+        const trace = {
+          agentName: agent.name,
+          agentId: agent.id,
+          role: agent.role,
+          modelId: modelUsed,
+          output,
+          processingTime: Date.now() - startTime,
+          stepIndex: i,
+          status: 'completed',
+        }
+        onTraceUpdate({ ...trace })
+        return trace
+      } catch (error) {
+        const trace = {
+          agentName: agent.name,
+          agentId: agent.id,
+          role: agent.role,
+          modelId: agent.model_id,
+          output: `Error: ${error.message}`,
+          processingTime: Date.now() - startTime,
+          stepIndex: i,
+          status: 'failed',
+        }
+        onTraceUpdate({ ...trace })
+        return trace
+      }
+    })
+  )
+
+  return results
+}
+
 async function runHierarchical(agents, question, context, memoryContext, onTraceUpdate) {
   if (agents.length < 2) return runSequential(agents, question, context, memoryContext, onTraceUpdate)
 
@@ -353,10 +403,13 @@ export async function runMultiAgentPipeline({
   // 4. Run agents
   let agentTraces = []
 
+  // In the collaboration mode routing section:
   if (collaborationMode === 'debate') {
     agentTraces = await runDebate(sortedAgents, question, context, memoryContext, debateConfig, onTraceUpdate)
   } else if (collaborationMode === 'hierarchical') {
     agentTraces = await runHierarchical(sortedAgents, question, context, memoryContext, onTraceUpdate)
+  } else if (collaborationMode === 'parallel') {
+    agentTraces = await runParallel(sortedAgents, question, context, memoryContext, onTraceUpdate)
   } else {
     agentTraces = await runSequential(sortedAgents, question, context, memoryContext, onTraceUpdate)
   }

@@ -1,33 +1,56 @@
+import { groqChat, isGroqAvailable } from '@/lib/groq'
+
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434'
 
 /**
- * Send a prompt to an Ollama model and get a full response
+ * Smart chat — uses Groq if API key is set, falls back to Ollama
  */
 export async function ollamaChat(model, messages, options = {}) {
+  // Use Groq if available (much faster)
+  if (isGroqAvailable()) {
+    return groqChat(model, messages, options)
+  }
+
+  // Fallback to local Ollama
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 600000) // 10 min
+  const timeout = setTimeout(() => controller.abort(), 600000)
 
-  const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    signal: controller.signal,
-    body: JSON.stringify({
-      model,
-      messages,
-      stream: false,
-      options: {
-        temperature: options.temperature ?? 0.7,
-        num_ctx: options.num_ctx ?? 2048,
-        ...options,
-      },
-    }),
-  })
+  try {
+    const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model,
+        messages,
+        stream: false,
+        options: {
+          temperature: options.temperature ?? 0.7,
+          num_ctx: options.num_ctx ?? 2048,
+        },
+      }),
+    })
 
-  clearTimeout(timeout)
+    clearTimeout(timeout)
+
+    if (!response.ok) {
+      const err = await response.text()
+      throw new Error(`Ollama error (${model}): ${err}`)
+    }
+
+    const data = await response.json()
+    return data.message?.content ?? ''
+  } catch (error) {
+    clearTimeout(timeout)
+    if (error.name === 'AbortError') {
+      throw new Error(`Model ${model} timed out`)
+    }
+    throw error
+  }
 }
 
 /**
- * Stream a response from Ollama — yields text chunks
+ * Stream from Ollama (kept for local use)
  */
 export async function* ollamaChatStream(model, messages, options = {}) {
   const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
@@ -39,8 +62,7 @@ export async function* ollamaChatStream(model, messages, options = {}) {
       stream: true,
       options: {
         temperature: options.temperature ?? 0.7,
-        num_ctx: options.num_ctx ?? 4096,
-        ...options,
+        num_ctx: options.num_ctx ?? 2048,
       },
     }),
   })
@@ -85,10 +107,6 @@ export async function isModelAvailable(modelId) {
   }
 }
 
-/**
- * Warm up a model by sending a tiny prompt
- * Call this when the app starts to pre-load models into memory
- */
 export async function warmUpModel(modelId) {
   try {
     await ollamaChat(modelId, [{ role: 'user', content: 'hi' }], { num_ctx: 512 })
