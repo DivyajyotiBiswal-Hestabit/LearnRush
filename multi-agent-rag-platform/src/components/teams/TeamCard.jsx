@@ -40,12 +40,12 @@ export function TeamCard({ team, onDelete }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-4 hover:border-indigo-200 hover:shadow-sm transition-all">
+    <div className="bg-[#D2B48C] rounded-xl border border-gray-200 p-5 flex flex-col gap-4 hover:border-indigo-200 hover:shadow-sm transition-all">
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-base font-semibold text-gray-900 truncate">
+            <h3 className="text-base font-semibold text-[#1B4D3E] truncate">
               {team.name}
             </h3>
             <Badge variant={MODE_COLORS[team.collaboration_mode] ?? 'default'}>
@@ -53,7 +53,7 @@ export function TeamCard({ team, onDelete }) {
             </Badge>
           </div>
           {team.research_domain && (
-            <p className="text-xs text-gray-400 mt-0.5">{team.research_domain}</p>
+            <p className="text-xs text-white mt-0.5">{team.research_domain}</p>
           )}
           {team.description && (
             <p className="text-sm text-gray-500 mt-1 line-clamp-2">{team.description}</p>
@@ -64,7 +64,7 @@ export function TeamCard({ team, onDelete }) {
         <div className="relative flex-shrink-0">
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-gray-400 hover:bg-[#1B4D3E] transition-colors"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -74,10 +74,10 @@ export function TeamCard({ team, onDelete }) {
                 className="fixed inset-0 z-10"
                 onClick={() => setMenuOpen(false)}
               />
-              <div className="absolute right-0 top-8 z-20 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-40">
+              <div className="absolute right-0 top-8 z-20 bg-[#ACE1AF] border border-gray-200 rounded-sm shadow-lg py-1 w-40">
                 <button
                   onClick={() => { setMenuOpen(false); router.push(`/teams/${team.id}/edit`) }}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#1B4D3E] hover:bg-gray-50"
                 >
                   <Edit className="w-3.5 h-3.5" />
                   Edit Team
@@ -87,7 +87,7 @@ export function TeamCard({ team, onDelete }) {
                     setMenuOpen(false)
                     router.push(`/teams/${team.id}/config`)
                   }}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#1B4D3E] hover:bg-gray-50"
                 >
                   <Settings className="w-3.5 h-3.5" />
                   Advanced Config
@@ -114,8 +114,8 @@ export function TeamCard({ team, onDelete }) {
         <div className="flex flex-col gap-1">
           {team.agents?.map(agent => (
             <div key={agent.id} className="flex items-center gap-2">
-              <Bot className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
-              <span className="text-sm text-gray-700 truncate">{agent.name}</span>
+              <Bot className="w-3.5 h-3.5 text-[#1B4D3E] flex-shrink-0" />
+              <span className="text-sm text-[#1B4D3E] truncate">{agent.name}</span>
               <Badge variant={ROLE_COLORS[agent.role] ?? 'default'}>
                 {agent.role}
               </Badge>
@@ -129,10 +129,10 @@ export function TeamCard({ team, onDelete }) {
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-        <p className="text-xs text-gray-400">Created {formatDate(team.created_at)}</p>
+        <p className="text-xs text-[#1B4D3E]">Created {formatDate(team.created_at)}</p>
         <button
           onClick={() => router.push(`/chat?team=${team.id}`)}
-          className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+          className="flex items-center gap-1.5 text-sm text-[#1B4D3E] hover:text-indigo-700 font-medium"
         >
           <MessageSquare className="w-3.5 h-3.5" />
           Start Research

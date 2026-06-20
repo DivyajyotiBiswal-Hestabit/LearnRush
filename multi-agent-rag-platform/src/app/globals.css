@@ -1,63 +1,81 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --card: #f9fafb;
-  --card-foreground: #0a0a0a;
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #111827;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --accent: #f3f4f6;
-  --accent-foreground: #111827;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --ring: #6366f1;
-  --radius: 0.5rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --card: #111827;
-    --card-foreground: #ededed;
-    --border: #1f2937;
-    --input: #1f2937;
-    --primary: #818cf8;
-    --primary-foreground: #0a0a0a;
-    --secondary: #1f2937;
-    --secondary-foreground: #f9fafb;
-    --muted: #1f2937;
-    --muted-foreground: #9ca3af;
-    --accent: #1f2937;
-    --accent-foreground: #f9fafb;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --ring: #818cf8;
-  }
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #111318 !important;
+  color: #94a3b8;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+html, body { max-width: 100vw; overflow-x: hidden; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0C0F16; }
+::-webkit-scrollbar-thumb { background: #1C2230; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #2A3A52; }
+
+/* Dark page wrapper used by all inner pages */
+.page-content {
+  padding: 32px 36px;
+  max-width: 1100px;
+  color: #94a3b8;
+  font-family: 'Inter', sans-serif;
 }
+
+/* Dark form inputs */
+input, select, textarea {
+  background: #0A0D13 !important;
+  color: #CBD5E1 !important;
+  border-color: #1a2234 !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #334155 !important;
+}
+
+/* Override any white backgrounds from old Tailwind classes */
+.bg-white { background: #0C0F16 !important; }
+.bg-gray-50 { background: #111318 !important; }
+.bg-gray-100 { background: #0A0D13 !important; }
+.border-gray-200 { border-color: #1a2234 !important; }
+.border-gray-100 { border-color: #1a2234 !important; }
+.text-gray-900 { color: #F1F5F9 !important; }
+.text-gray-800 { color: #CBD5E1 !important; }
+.text-gray-700 { color: #94a3b8 !important; }
+.text-gray-600 { color: #64748b !important; }
+.text-gray-500 { color: #475569 !important; }
+.text-gray-400 { color: #334155 !important; }
+
+/* Cards */
+.rounded-xl { border-color: #1a2234; }
+
+/* Buttons override */
+.bg-indigo-600 { background: #7C3AED !important; }
+.hover\:bg-indigo-700:hover { background: #6D28D9 !important; }
+.bg-indigo-50 { background: rgba(124,58,237,0.1) !important; }
+.text-indigo-600 { color: #a78bfa !important; }
+.text-indigo-700 { color: #c4b5fd !important; }
+.border-indigo-200 { border-color: rgba(124,58,237,0.3) !important; }
+.ring-indigo-500 { --tw-ring-color: rgba(124,58,237,0.5) !important; }
+
+/* Badge colors */
+.bg-green-100 { background: rgba(16,185,129,0.1) !important; }
+.text-green-700 { color: #34d399 !important; }
+.bg-red-100 { background: rgba(239,68,68,0.1) !important; }
+.text-red-700 { color: #f87171 !important; }
+.bg-yellow-100 { background: rgba(245,158,11,0.1) !important; }
+.text-yellow-700 { color: #fbbf24 !important; }
+.bg-blue-100 { background: rgba(37,99,235,0.1) !important; }
+.text-blue-700 { color: #60a5fa !important; }
+.bg-purple-100 { background: rgba(139,92,246,0.1) !important; }
+.text-purple-700 { color: #c4b5fd !important; }
+
+/* Scrollbars inside components */
+.overflow-y-auto::-webkit-scrollbar { width: 4px; }
+.overflow-y-auto::-webkit-scrollbar-track { background: #0C0F16; }
+.overflow-y-auto::-webkit-scrollbar-thumb { background: #1a2234; border-radius: 2px; }
+
+/* Modal/dialog */
+.fixed.inset-0 { background: rgba(0,0,0,0.7) !important; }

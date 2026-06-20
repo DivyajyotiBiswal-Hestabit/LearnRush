@@ -4,111 +4,137 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { cn } from '@/lib/utils/cn'
 import {
-  LayoutDashboard,
-  Users,
-  Database,
-  MessageSquare,
-  History,
-  BarChart2,
-  User,
-  LogOut,
-  Menu,
-  X,
-  Bot,
-  Layout,
+  LayoutDashboard, Users, Database, MessageSquare,
+  History, BarChart2, User, LogOut, Menu, Layout,
 } from 'lucide-react'
 
-const navItems = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Agent Teams', href: '/teams', icon: Users },
-  { label: 'Templates', href: '/templates', icon: Layout },       
-  { label: 'Knowledge Base', href: '/knowledge-base', icon: Database },
-  { label: 'Research Chat', href: '/chat', icon: MessageSquare },
-  { label: 'History', href: '/history', icon: History },
-  { label: 'Analytics', href: '/analytics', icon: BarChart2 },
-  { label: 'Profile', href: '/profile', icon: User },
+const NAV = [
+  { label: 'Dashboard',     href: '/dashboard',      icon: LayoutDashboard },
+  { label: 'Agent Teams',   href: '/teams',           icon: Users },
+  { label: 'Templates',     href: '/templates',       icon: Layout },
+  { label: 'Knowledge Base',href: '/knowledge-base',  icon: Database },
+  { label: 'Research Chat', href: '/chat',             icon: MessageSquare },
+  { label: 'History',       href: '/history',          icon: History },
+  { label: 'Analytics',     href: '/analytics',        icon: BarChart2 },
+  { label: 'Profile',       href: '/profile',          icon: User },
 ]
 
 export function AppLayout({ children, user }) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   async function handleLogout() {
     await supabase.auth.signOut()
     router.push('/login')
   }
 
-  const Sidebar = ({ mobile = false }) => (
-    <div className={cn(
-      'flex flex-col h-full bg-white border-r border-gray-200',
-      mobile ? 'w-full' : 'w-64'
-    )}>
+  const Sidebar = () => (
+    <div style={{
+      width: 220, height: '100%',
+      background: '#ACE1AF',
+      borderRight: '1px solid #1a2234',
+      display: 'flex', flexDirection: 'column',
+    }}>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
-        <div className="flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-lg">
-          <Bot className="w-4 h-4 text-white" />
-        </div>
-        <div>
-          <p className="text-sm font-bold text-gray-900">MultiAgent RAG</p>
-          <p className="text-xs text-gray-400">Research Platform</p>
+      <div style={{ padding: '18px 16px 14px', borderBottom: '1px solid #1a2234' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <div style={{
+            width: 30, height: 30, borderRadius: 8,
+            background: 'linear-gradient(135deg, #7C3AED, #4F46E5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 15, flexShrink: 0,
+          }}>🤖</div>
+          <div>
+            <p style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 13, fontWeight: 700, color: '#F1F5F9', lineHeight: 1.2,
+            }}>MultiAgent RAG</p>
+            <p style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 9, color: '#2A3A52', letterSpacing: '0.05em',
+            }}>Research Platform</p>
+          </div>
         </div>
       </div>
 
-      {/* Nav Links */}
-      <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
-        {navItems.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href ||
-            (href !== '/dashboard' && pathname.startsWith(href))
+      {/* Nav */}
+      <nav style={{ flex: 1, padding: '10px 8px', overflowY: 'auto' }}>
+        {NAV.map(({ label, href, icon: Icon }) => {
+          const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
           return (
             <Link
               key={href}
               href={href}
-              onClick={() => setSidebarOpen(false)}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                active
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              )}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 9,
+                padding: '8px 10px', borderRadius: 7, marginBottom: 1,
+                textDecoration: 'none',
+                background: active ? '#00563B' : 'transparent',
+                border: `1px solid ${active ? 'rgba(124,58,237,0.25)' : 'transparent'}`,
+                transition: 'all 0.15s',
+              }}
             >
-              <Icon className={cn('w-4 h-4', active ? 'text-indigo-600' : 'text-gray-400')} />
-              {label}
+              <Icon size={14} color={active ? '#a78bfa' : '#334155'} />
+              <span style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 13, fontWeight: active ? 600 : 400,
+                color: active ? 'white' : '#475569',
+              }}>{label}</span>
+              {active && (
+                <div style={{
+                  marginLeft: 'auto', width: 4, height: 4,
+                  borderRadius: '50%', background: '#00563B',
+                }} />
+              )}
             </Link>
           )
         })}
       </nav>
 
-      {/* User + Logout */}
-      <div className="px-3 py-4 border-t border-gray-100">
-        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          {/* Replace the initials-only avatar with this: */}
-          <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold overflow-hidden flex-shrink-0">
-            {user?.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt={user.fullName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              user?.fullName?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? 'U'
-            )}
+      {/* User */}
+      <div style={{ padding: '10px 8px', borderTop: '1px solid #1a2234' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 9,
+          padding: '9px 10px', borderRadius: 8, marginBottom: 4,
+          background: 'rgba(255,255,255,0.02)', border: '1px solid #1a2234',
+        }}>
+          <div style={{
+            width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+            background: 'linear-gradient(135deg, #7C3AED, #4F46E5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, fontWeight: 700, color: '#fff', overflow: 'hidden',
+          }}>
+            {user?.avatarUrl
+              ? <img src={user.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : (user?.fullName?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase()
+            }
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-gray-900 truncate">
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 500, color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user?.fullName ?? 'User'}
             </p>
-            <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+            <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#1e2d40', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {user?.email}
+            </p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 9,
+            width: '100%', padding: '8px 10px', borderRadius: 7,
+            border: 'none', background: 'transparent', cursor: 'pointer',
+            fontFamily: "'Inter', sans-serif", fontSize: 12, color: '#334155',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.color = '#ef4444' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#334155' }}
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut size={13} />
           Sign Out
         </button>
       </div>
@@ -116,45 +142,56 @@ export function AppLayout({ children, user }) {
   )
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:flex-shrink-0">
-        <div className="w-64">
+    <>
+      <style>{`
+        @media (max-width: 767px) {
+          .desktop-sidebar { display: none !important; }
+          .mobile-topbar { display: flex !important; }
+        }
+        @media (min-width: 768px) {
+          .mobile-topbar { display: none !important; }
+        }
+      `}</style>
+
+      <div style={{ display: 'flex', height: '100vh', background: '#111318', overflow: 'hidden' }}>
+
+        {/* Desktop sidebar */}
+        <div className="desktop-sidebar" style={{ flexShrink: 0 }}>
           <Sidebar />
         </div>
-      </div>
 
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div
-            className="absolute inset-0 bg-black/30"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <div className="absolute left-0 top-0 bottom-0 w-72 z-10">
-            <Sidebar mobile />
+        {/* Mobile overlay */}
+        {mobileOpen && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 50 }}>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.7)' }} onClick={() => setMobileOpen(false)} />
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 220, zIndex: 10 }}>
+              <Sidebar />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Main Content */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        {/* Mobile Header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-100"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <span className="text-sm font-semibold text-gray-900">MultiAgent RAG</span>
-        </div>
+        {/* Content */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+          {/* Mobile topbar */}
+          <div className="mobile-topbar" style={{
+            display: 'none', alignItems: 'center', gap: 12,
+            padding: '0 16px', height: 52,
+            background: '#0A0D13', borderBottom: '1px solid #1a2234', flexShrink: 0,
+          }}>
+            <button onClick={() => setMobileOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569' }}>
+              <Menu size={19} />
+            </button>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 14, fontWeight: 700, color: '#F1F5F9' }}>
+              MultiAgent RAG
+            </span>
+          </div>
+
+          <main style={{ flex: 1, overflowY: 'auto', background: '#F0FFF0', padding: '32px'}}>
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

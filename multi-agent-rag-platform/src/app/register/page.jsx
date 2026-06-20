@@ -94,11 +94,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F0FFF0] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo / Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-600 rounded-xl mb-4">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-[#355E3B] rounded-xl mb-4">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.5 3.5 0 01-4.95 0l-.347-.347z" />
             </svg>
@@ -108,7 +108,7 @@ export default function RegisterPage() {
         </div>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 bg-[#DAC8AE] w-10px h-16px">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {serverError && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
@@ -164,7 +164,7 @@ export default function RegisterPage() {
                 type="submit"
                 size="lg"
                 loading={loading}
-                className="w-full mt-2"
+                className="w-full mt-2 bg-[#00563B] hover:bg-[#C19A6B]"
               >
                 Create Account
               </Button>
@@ -174,7 +174,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-gray-500 mt-4">
           Already have an account?{' '}
-          <Link href="/login" className="text-indigo-600 hover:underline font-medium">
+          <Link href="/login" className="text-[#00693E] hover:underline font-medium">
             Sign in
           </Link>
         </p>

@@ -69,7 +69,7 @@ export function TemplatesClient() {
           <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
             <Layout className="w-4 h-4 text-indigo-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Team Templates</h1>
+          <h1 className="text-2xl font-bold text-[#1B4D3E]">Team Templates</h1>
         </div>
         <p className="text-gray-500 text-sm">
           Pre-built agent teams for common research tasks — create in one click
@@ -96,7 +96,7 @@ export function TemplatesClient() {
             <button
               key={cat.id}
               onClick={() => setCategory(cat.id)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 text-m font-medium rounded-s transition-colors whitespace-nowrap ${
                 category === cat.id
                   ? 'bg-indigo-600 text-white'
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
@@ -137,7 +137,7 @@ export function TemplatesClient() {
       )}
 
       {/* Custom Team CTA */}
-      <div className="mt-10 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl text-center">
+      <div className="mt-10 p-10 bg-[#F0FFF0]border border-indigo-100 rounded-2xl text-center">
         <p className="text-base font-semibold text-gray-900 mb-1">
           Need something custom?
         </p>

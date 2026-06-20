@@ -89,11 +89,15 @@ export function UploadZone({ knowledgeBaseId, onUploadComplete }) {
   }
 
   function handleFiles(files) {
-    const allowed = ['application/pdf', 'text/plain', 'image/png', 'image/jpeg', 'image/webp']
+    const allowed = [
+      'application/pdf', 'text/plain', 'text/csv', 'text/markdown',
+      'image/png', 'image/jpeg', 'image/webp', 'image/gif',
+      'image/tiff', 'image/bmp', 'application/json',
+    ]
     const validFiles = Array.from(files).filter(f => allowed.includes(f.type))
 
     if (validFiles.length === 0) {
-      alert('Please upload PDF, TXT, or image files only.')
+      alert('Supported: PDF, TXT, CSV, PNG, JPG, WEBP, TIFF, BMP')
       return
     }
 
@@ -131,7 +135,7 @@ export function UploadZone({ knowledgeBaseId, onUploadComplete }) {
           ref={inputRef}
           type="file"
           multiple
-          accept=".pdf,.txt,.png,.jpg,.jpeg,.webp"
+          accept=".pdf,.txt,.csv,.md,.json,.png,.jpg,.jpeg,.webp,.gif,.tiff,.bmp"
           className="hidden"
           onChange={e => handleFiles(e.target.files)}
         />
@@ -143,7 +147,7 @@ export function UploadZone({ knowledgeBaseId, onUploadComplete }) {
           Drop files here or click to browse
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          PDF, TXT, PNG, JPG, WEBP — max 20MB each
+          PDF, TXT, CSV, PNG, JPG, WEBP, TIFF, BMP — max 50MB each
         </p>
       </div>
 

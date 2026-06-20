@@ -10,7 +10,18 @@ function buildAgentPrompt(agent, question, context, memoryContext, previousOutpu
     prompt += `${memoryContext}\n\n`
   }
 
-  prompt += `## Knowledge Base Context\n${context}\n\n`
+  // Enhanced context header that explains multi-modal sources
+  prompt += `## Knowledge Base Context
+The following sources have been retrieved. Sources may include:
+- Regular text passages
+- Extracted table data [marked with "Table:"]
+- Image descriptions [marked with "Visual Description"]  
+- OCR-extracted text from scanned documents [marked with "Scanned Page"]
+- Chart/diagram analysis [marked with "Visual Content"]
+
+Use ALL source types to answer the question thoroughly.
+
+${context}\n\n`
 
   if (previousOutputs.length > 0) {
     prompt += `## Previous Agent Outputs\n`
@@ -20,7 +31,7 @@ function buildAgentPrompt(agent, question, context, memoryContext, previousOutpu
   }
 
   prompt += `## User Question\n${question}\n\n`
-  prompt += `## Your Response\nBased on the context and your role as ${agent.role}, provide your analysis:`
+  prompt += `## Your Response\nBased on ALL context types above (text, tables, images, charts), provide your analysis as ${agent.role}:`
 
   return prompt
 }

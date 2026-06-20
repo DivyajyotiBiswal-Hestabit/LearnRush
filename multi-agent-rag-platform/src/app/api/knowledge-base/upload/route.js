@@ -21,19 +21,25 @@ export async function POST(request) {
     const allowedTypes = [
       'application/pdf',
       'text/plain',
+      'text/csv',
+      'text/markdown',
+      'application/json',
       'image/png',
       'image/jpeg',
       'image/jpg',
       'image/webp',
+      'image/gif',
+      'image/tiff',
+      'image/bmp',
     ]
     if (!allowedTypes.includes(file.type)) {
       return Response.json({
-        error: 'Unsupported file type. Allowed: PDF, TXT, PNG, JPG, WEBP'
+        error: 'Unsupported file type.'
       }, { status: 400 })
     }
 
     // Validate file size (max 20MB)
-    const MAX_SIZE = 20 * 1024 * 1024
+    const MAX_SIZE = 50 * 1024 * 1024
     if (file.size > MAX_SIZE) {
       return Response.json({ error: 'File too large. Max 20MB.' }, { status: 400 })
     }

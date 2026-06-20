@@ -21,7 +21,7 @@ export function TeamsClient({ initialTeams }) {
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Agent Teams</h1>
+          <h1 className="text-2xl font-bold text-[#1B4D3E]">Agent Teams</h1>
           <p className="text-gray-500 text-sm mt-1">
             Build and manage your multi-agent research teams
           </p>

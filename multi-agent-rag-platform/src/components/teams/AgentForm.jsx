@@ -16,7 +16,7 @@ const ROLE_OPTIONS = [
 
 const STYLE_OPTIONS = [
   { value: 'concise', label: 'Concise' },
-  { value: 'balanced', label: 'Balanced' },
+  { value: 'balanced', label: 'Balanced' }, 
   { value: 'detailed', label: 'Detailed' },
 ]
 

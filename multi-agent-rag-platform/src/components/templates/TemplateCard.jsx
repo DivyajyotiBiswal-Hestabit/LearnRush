@@ -40,12 +40,12 @@ export function TemplateCard({ template, onUse }) {
 
   return (
     <div className={cn(
-      'bg-white rounded-xl border border-gray-200 overflow-hidden',
+      'bg-[#E5AA70] rounded-xl border border-gray-200 overflow-hidden',
       'hover:border-indigo-200 hover:shadow-sm transition-all'
     )}>
       {/* Header */}
       <div className="p-5">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-5">
           {/* Icon */}
           <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center text-2xl flex-shrink-0">
             {template.icon}

@@ -51,7 +51,7 @@ function AgentPipeline() {
               {/* Content */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, flexWrap: 'wrap' }}>
-                  <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>
+                  <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 600, color: '#C46210' }}>
                     {agent.name}
                   </span>
                   <span style={{
@@ -76,7 +76,7 @@ function AgentPipeline() {
                     </span>
                   )}
                 </div>
-                <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: '#64748b', lineHeight: 1.55 }}>
+                <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: 'black', lineHeight: 1.55 }}>
                   {i === 0 && 'Retrieved 6 relevant chunks. Attention mechanisms allow models to weigh the relevance of input tokens when producing each output...'}
                   {i === 1 && "The researcher's analysis is sound but omits computational complexity trade-offs discussed in section 3.2..."}
                   {i === 2 && 'Combining outputs from both agents to produce final answer...'}
@@ -125,7 +125,7 @@ function FeatureCard({ icon, title, description }) {
       padding: '22px',
       borderRadius: 12,
       border: '1px solid #1C2230',
-      background: '#D0F0C0',
+      background: '#EDC9AF',
       transition: 'border-color 0.2s',
     }}
       onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(124,58,237,0.4)'}
@@ -148,20 +148,20 @@ function Step({ n, title, body }) {
     <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
       <div style={{
         width: 28, height: 28, borderRadius: '50%',
-        background: 'rgba(124,58,237,0.15)',
+        background: 'rgba(28, 177, 97, 0.15)',
         border: '1px solid rgba(124,58,237,0.3)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0,
         fontFamily: "'IBM Plex Mono', monospace",
-        fontSize: 11, fontWeight: 700, color: '#7C3AED',
+        fontSize: 11, fontWeight: 700, color: '#8ae279ff',
       }}>
         {n}
       </div>
       <div>
-        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 14, fontWeight: 600, color: '#CBD5E1', marginBottom: 4 }}>
+        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 14, fontWeight: 600, color: '#1b5515ff', marginBottom: 4 }}>
           {title}
         </p>
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: '#3D4F68', lineHeight: 1.65 }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: '#357a50ff', lineHeight: 1.65 }}>
           {body}
         </p>
       </div>
@@ -319,7 +319,7 @@ export default function LandingPage() {
                 marginBottom: 24,
               }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ACE1AF', display: 'inline-block' }} />
-                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#40826D', letterSpacing: '0.06em' }}>
+                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#27c593ff', letterSpacing: '0.06em' }}>
                   100% FREE · LOCAL · OPEN SOURCE
                 </span>
               </div>
@@ -485,19 +485,19 @@ export default function LandingPage() {
             <div style={{
               borderRadius: 14,
               border: '1px solid #1C2230',
-              background: '#0C0F16',
+              background: '#baf7baff',
               overflow: 'hidden',
             }}>
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '12px 16px',
                 borderBottom: '1px solid #1C2230',
-                background: '#0E1118',
+                background: '#1f7a50ff',
               }}>
                 {['#2A2A2A', '#2A2A2A', '#2A2A2A'].map((c, i) => (
                   <div key={i} style={{ width: 9, height: 9, borderRadius: '50%', background: c }} />
                 ))}
-                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#2A3A52', marginLeft: 8 }}>
+                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#022203ff', marginLeft: 8 }}>
                   research session · sequential mode
                 </span>
               </div>
@@ -506,20 +506,20 @@ export default function LandingPage() {
                 {/* Query */}
                 <div style={{
                   padding: '10px 14px', borderRadius: 8,
-                  background: 'rgba(124,58,237,0.1)',
+                  background: 'rgba(25, 61, 25, 0.1)',
                   border: '1px solid rgba(124,58,237,0.2)',
                   marginBottom: 14,
                 }}>
-                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: '#c4b5fd' }}>
-                    💬 "What are the key findings on attention mechanisms in transformer models?"
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: '#072c08ff' }}>
+                    "What are the key findings on attention mechanisms in transformer models?"
                   </p>
                 </div>
 
                 {/* Agent outputs */}
                 {[
-                  { name: 'Literature Researcher', model: 'llama3', color: '#7C3AED', time: '38.2s', excerpt: 'Found 6 relevant chunks. Attention mechanisms allow models to focus on relevant parts of the input...' },
-                  { name: 'Methodology Critic', model: 'mistral', color: '#DC2626', time: '51.4s', excerpt: "The researcher's analysis is sound but omits computational complexity trade-offs..." },
-                  { name: 'Academic Synthesizer', model: 'phi3', color: '#059669', time: null, excerpt: null },
+                  { name: 'Literature Researcher', model: 'llama3', color: '#CC7F3B', time: '38.2s', excerpt: 'Found 6 relevant chunks. Attention mechanisms allow models to focus on relevant parts of the input...' },
+                  { name: 'Methodology Critic', model: 'mistral', color: '#C19A6B', time: '51.4s', excerpt: "The researcher's analysis is sound but omits computational complexity trade-offs..." },
+                  { name: 'Academic Synthesizer', model: 'phi3', color: '#DAA06D', time: null, excerpt: null },
                 ].map((agent, i) => (
                   <div key={i} style={{
                     marginBottom: 8, padding: '11px 14px',
@@ -529,7 +529,7 @@ export default function LandingPage() {
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: agent.excerpt ? 6 : 0, flexWrap: 'wrap' }}>
                       <span style={{ width: 7, height: 7, borderRadius: '50%', background: agent.color, display: 'inline-block', flexShrink: 0 }} />
-                      <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 12, fontWeight: 600, color: '#cbd5e1' }}>
+                      <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 12, fontWeight: 600, color: '#021a03ff' }}>
                         {agent.name}
                       </span>
                       <span style={{
@@ -616,7 +616,7 @@ export default function LandingPage() {
           <div style={{
             borderRadius: 20,
             border: '1px solid rgba(124,58,237,0.25)',
-            background: 'rgba(124,58,237,0.05)',
+            background: 'rgba(25, 68, 14, 0.05)',
             padding: '56px 48px',
             textAlign: 'center',
             position: 'relative',
@@ -626,7 +626,7 @@ export default function LandingPage() {
             <div style={{
               position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
               width: 400, height: 200,
-              background: 'radial-gradient(ellipse, rgba(124,58,237,0.15) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse, rgba(44, 201, 65, 0.15) 0%, transparent 0%)',
               pointerEvents: 'none',
             }} />
 

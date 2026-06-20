@@ -2,13 +2,7 @@ import { cn } from '@/lib/utils/cn'
 
 export function Card({ children, className, ...props }) {
   return (
-    <div
-      className={cn(
-        'bg-white rounded-xl border border-gray-200 shadow-sm',
-        className
-      )}
-      {...props}
-    >
+    <div className={cn('bg-[#0C0F16] rounded-xl border border-[#1a2234]', className)} {...props}>
       {children}
     </div>
   )
@@ -16,7 +10,7 @@ export function Card({ children, className, ...props }) {
 
 export function CardHeader({ children, className, ...props }) {
   return (
-    <div className={cn('px-6 py-5 border-b border-gray-100', className)} {...props}>
+    <div className={cn('px-5 py-4 border-b border-[#1a2234]', className)} {...props}>
       {children}
     </div>
   )
@@ -24,7 +18,7 @@ export function CardHeader({ children, className, ...props }) {
 
 export function CardContent({ children, className, ...props }) {
   return (
-    <div className={cn('px-6 py-5', className)} {...props}>
+    <div className={cn('px-5 py-4', className)} {...props}>
       {children}
     </div>
   )
@@ -32,7 +26,7 @@ export function CardContent({ children, className, ...props }) {
 
 export function CardFooter({ children, className, ...props }) {
   return (
-    <div className={cn('px-6 py-4 bg-gray-50 rounded-b-xl border-t border-gray-100', className)} {...props}>
+    <div className={cn('px-5 py-3 bg-[#0A0D13] rounded-b-xl border-t border-[#1a2234]', className)} {...props}>
       {children}
     </div>
   )

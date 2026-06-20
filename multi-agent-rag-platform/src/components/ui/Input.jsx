@@ -5,26 +5,24 @@ const Input = forwardRef(function Input({ className, label, error, ...props }, r
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-xs font-medium text-slate-500" style={{ fontFamily: "'Inter', sans-serif" }}>
           {label}
         </label>
       )}
       <input
         ref={ref}
         className={cn(
-          'w-full px-3 py-2 text-sm border rounded-lg transition-colors',
-          'bg-white text-gray-900 placeholder:text-gray-400',
-          'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
+          'w-full px-3 py-2 text-sm rounded-lg transition-colors outline-none',
+          'bg-[#0A0D13] text-slate-200 placeholder:text-slate-600',
+          'border focus:ring-1',
           error
-            ? 'border-red-400 focus:ring-red-400'
-            : 'border-gray-300 hover:border-gray-400',
+            ? 'border-red-500/50 focus:ring-red-500/30'
+            : 'border-[#1a2234] hover:border-[#2A3A52] focus:border-violet-500/50 focus:ring-violet-500/20',
           className
         )}
         {...props}
       />
-      {error && (
-        <p className="text-xs text-red-500">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   )
 })
