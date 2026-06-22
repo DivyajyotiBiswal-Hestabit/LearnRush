@@ -119,6 +119,21 @@ export async function POST(request) {
           })
         }
 
+        if (result.chunks?.length > 0) {
+          const citationRows = result.chunks.map((chunk, index) => ({
+            query_id: queryRecord.id,
+            chunk_id: chunk.id ?? null,
+            document_id: chunk.document_id ?? null,
+            user_id: user.id,
+            cited_text: chunk.content?.slice(0, 500) ?? '',
+            relevance_score: chunk.hybrid_score ?? chunk.similarity ?? 0,
+          }))
+
+          await admin
+            .from('citations')
+            .insert(citationRows)
+        }
+
         if (team.memory_config?.enabled && result.finalAnswer) {
           const firstModel = agents[0]?.model_id ?? 'llama3:latest'
           await extractAndSaveMemories(
@@ -156,6 +171,18 @@ export async function POST(request) {
           chunksRetrieved: result.chunks.length,
           queryId: queryRecord.id,
           sessionId: currentSessionId,
+          retrievalMethod: result.retrievalMethod,       
+          retrievalRewrites: result.retrievalRewrites,   
+          retrievalEmpty: result.retrievalEmpty,
+          citations: result.chunks.map((chunk, i) => ({  
+            index: i + 1,
+            content: chunk.content?.slice(0, 300) ?? '',
+            fileName: chunk.metadata?.file_name ?? 'Unknown source',
+            score: chunk.hybrid_score ?? chunk.similarity ?? 0,
+            chunkType: chunk.chunk_type ?? 'text',
+            pageNumber: chunk.page_number ?? null,
+            documentId: chunk.document_id ?? null,
+          })), 
         })
 
         sendEvent('done', {})

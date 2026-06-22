@@ -9,11 +9,11 @@ export const AVAILABLE_MODELS = [
   },
   {
     id: 'mistral:latest',
-    name: 'Mistral Saba 24B',
+    name: 'Llama 3.3 70B',
     description: 'Great for analysis and critique via Groq',
     strengths: ['analysis', 'structured', 'critique'],
-    contextWindow: 32768,
-    groqModel: 'mistral-saba-24b',
+    contextWindow: 128000,
+    groqModel: 'llama-3.3-70b-versatile',
   },
   {
     id: 'phi3:latest',

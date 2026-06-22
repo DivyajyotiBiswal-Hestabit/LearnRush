@@ -1,3 +1,9 @@
+import { createWorker } from 'tesseract.js'
+
+/**
+ * OCR utility using Tesseract.js
+ * Extracts text from images and scanned documents
+ */
 /**
  * OCR utility using Tesseract.js
  * Extracts text from images and scanned documents
@@ -8,11 +14,8 @@
  */
 export async function extractTextWithOCR(imageBuffer, options = {}) {
   try {
-    const { createWorker } = await import('tesseract.js')
 
-    const worker = await createWorker('eng', 1, {
-      logger: () => {}, // suppress logs
-    })
+    const worker = await createWorker('eng')
 
     // Convert buffer to base64 data URL
     const base64 = imageBuffer.toString('base64')

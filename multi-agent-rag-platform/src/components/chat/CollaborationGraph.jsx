@@ -63,11 +63,11 @@ function AgentNode({ agent, status, isActive, isSynthesis, processingTime }) {
       <div className="text-center">
         <p className={cn(
           'text-xs font-medium truncate max-w-[72px]',
-          isActive ? 'text-gray-900' : 'text-gray-500'
+          isActive ? 'text-red-700' : 'text-white'
         )}>
           {agent.name}
         </p>
-        <p className="text-[10px] text-gray-400">
+        <p className="text-[10px] text-white">
           {agent.model_id?.replace(':latest', '')}
         </p>
         {processingTime && status === 'completed' && (
@@ -154,7 +154,7 @@ export function CollaborationGraph({ agents, traces, collaborationMode, isProces
   if (collaborationMode === 'debate') {
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4 text-center">
+        <p className="text-xs font-semibold text-white uppercase tracking-wide mb-4 text-center">
           Debate Collaboration
         </p>
         <DebateLayout
@@ -171,7 +171,7 @@ export function CollaborationGraph({ agents, traces, collaborationMode, isProces
 
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4 text-center">
+        <p className="text-xs font-semibold text-white uppercase tracking-wide mb-4 text-center">
           Hierarchical Delegation
         </p>
         {/* Lead agent at top */}
@@ -206,11 +206,38 @@ export function CollaborationGraph({ agents, traces, collaborationMode, isProces
       </div>
     )
   }
-
+  
+  if (collaborationMode === 'parallel') {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <p className="text-xs font-semibold text-white uppercase tracking-wide mb-4 text-center">
+          Parallel Execution ⚡
+        </p>
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          {agents.map((agent, i) => {
+            const trace = traces.filter(t => t.agentName === agent.name).pop()
+            const isActive = activeAgent?.agentName === agent.name
+            return (
+              <AgentNode
+                key={i}
+                agent={agent}
+                status={trace?.status ?? 'pending'}
+                isActive={isActive}
+                processingTime={trace?.processingTime}
+              />
+            )
+          })}
+        </div>
+        <p className="text-xs text-gray-400 text-center mt-3">
+          All agents running simultaneously
+        </p>
+      </div>
+    )
+  }
   // Sequential (default)
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4 text-center">
+    <div className="bg-[#177245] rounded-xl border border-gray-200 p-4">
+      <p className="text-xs font-semibold text-white uppercase tracking-wide mb-4 text-center">
         Sequential Pipeline
       </p>
       <div className="flex items-start justify-center gap-0 flex-wrap">

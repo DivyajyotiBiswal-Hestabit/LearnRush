@@ -19,10 +19,10 @@ export function TeamsClient({ initialTeams }) {
 
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-12">
         <div>
           <h1 className="text-2xl font-bold text-[#1B4D3E]">Agent Teams</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-gray-500 text-m mt-1">
             Build and manage your multi-agent research teams
           </p>
         </div>
@@ -61,7 +61,7 @@ export function TeamsClient({ initialTeams }) {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
           {teams.map(team => (
             <TeamCard key={team.id} team={team} onDelete={handleDelete} />
           ))}

@@ -43,16 +43,16 @@ export function DangerZone({ userEmail }) {
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-red-200 p-5">
+      <div className="bg-[#2E8B57] rounded-xl border border-red-200 p-5">
         <div className="flex items-center gap-2 mb-4">
           <AlertTriangle className="w-4 h-4 text-red-500" />
-          <h3 className="text-sm font-semibold text-red-700">Danger Zone</h3>
+          <h3 className="text-sm font-semibold text-red-800">Danger Zone</h3>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-800">Delete Account</p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-sm text-black mt-0.5">
               Permanently delete your account and all data. This cannot be undone.
             </p>
           </div>
@@ -73,8 +73,8 @@ export function DangerZone({ userEmail }) {
         title="Delete Account"
         size="sm"
       >
-        <div className="flex flex-col gap-4">
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div className="flex flex-col gap-4 border-black">
+          <div className="p-3 bg-red-50 border border-black rounded-lg">
             <p className="text-sm text-red-700 font-medium">
               This will permanently delete:
             </p>
@@ -99,14 +99,14 @@ export function DangerZone({ userEmail }) {
               onClick={handleDeleteAccount}
               disabled={!isConfirmed}
               loading={loading}
-              className="flex-1"
+              className="flex-1 bg-[#D0F0C0]"
             >
               Permanently Delete
             </Button>
             <Button
               variant="outline"
               onClick={() => { setModalOpen(false); setConfirmText('') }}
-              className="flex-1"
+              className="flex-1 bg-[#D0F0C0]"
             >
               Cancel
             </Button>

@@ -4,6 +4,7 @@ import { TeamForm } from '@/components/teams/TeamForm'
 import { notFound } from 'next/navigation'
 
 export default async function EditTeamPage({ params }) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -16,7 +17,7 @@ export default async function EditTeamPage({ params }) {
   const { data: team } = await supabase
     .from('teams')
     .select('*, agents(*)')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
@@ -35,8 +36,8 @@ export default async function EditTeamPage({ params }) {
     <AppLayout user={appUser}>
       <div className="p-8 max-w-3xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Edit Team</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-[#004225]">Edit Team</h1>
+          <p className="text-[#004225] text-sm mt-1">
             Update your team configuration and agent settings
           </p>
         </div>

@@ -8,6 +8,7 @@ import { TracePanel } from '@/components/chat/TracePanel'
 import { SourcePreview } from '@/components/chat/SourcePreview'
 import { ScoreCard } from '@/components/chat/ScoreCard'
 import { cn } from '@/lib/utils/cn'
+import { CitationsPanel } from '@/components/chat/CitationsPanel'
 
 const TABS = [
   { id: 'graph', label: 'Graph', icon: GitBranch },
@@ -20,6 +21,7 @@ export function EnhancedRightPanel({
   team,
   traces,
   chunks,
+  citations,
   scores,
   processingTime,
   chunksRetrieved,
@@ -29,7 +31,7 @@ export function EnhancedRightPanel({
   const [activeTab, setActiveTab] = useState('graph')
 
   return (
-    <div className="hidden lg:flex flex-col w-96 border-l border-gray-200 bg-white flex-shrink-0 overflow-hidden">
+    <div className="hidden lg:flex flex-col w-96 border-5 border-[#1B4D3E] bg-[#E9FFDB] flex-shrink-0 overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
         <p className="text-sm font-semibold text-gray-900">Live Research Trace</p>
@@ -49,7 +51,7 @@ export function EnhancedRightPanel({
             className={cn(
               'flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors',
               activeTab === tab.id
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
+                ? 'text-[#1B4D3E] border-b-2 border-indigo-600'
                 : 'text-gray-500 hover:text-gray-700'
             )}
           >
@@ -84,8 +86,7 @@ export function EnhancedRightPanel({
             {/* Empty state */}
             {!isProcessing && traces.length === 0 && (
               <div className="text-center py-8">
-                <GitBranch className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-[#1B4D3E]">
                   Ask a question to see the collaboration graph
                 </p>
               </div>
@@ -98,25 +99,11 @@ export function EnhancedRightPanel({
         )}
 
         {activeTab === 'sources' && (
-          <div>
-            {chunks && chunks.length > 0 ? (
-              <SourcePreview
-                chunks={chunks}
-                query={lastQuestion}
-                isVisible={true}
-              />
-            ) : (
-              <div className="text-center py-8">
-                <FileText className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                <p className="text-xs text-gray-400">
-                  {isProcessing
-                    ? 'Retrieving sources...'
-                    : 'No sources yet — ask a question with a knowledge base selected'
-                  }
-                </p>
-              </div>
-            )}
-          </div>
+          <CitationsPanel
+            citations={citations}
+            query={lastQuestion}
+            isVisible={true}
+          />
         )}
 
         {activeTab === 'score' && (

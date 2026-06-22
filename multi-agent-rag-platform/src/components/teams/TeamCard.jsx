@@ -8,6 +8,7 @@ import { formatDate } from '@/lib/utils/format'
 
 const MODE_COLORS = {
   sequential: 'blue',
+  parallel: 'success',
   debate: 'warning',
   hierarchical: 'purple',
 }
@@ -40,7 +41,7 @@ export function TeamCard({ team, onDelete }) {
   }
 
   return (
-    <div className="bg-[#D2B48C] rounded-xl border border-gray-200 p-5 flex flex-col gap-4 hover:border-indigo-200 hover:shadow-sm transition-all">
+    <div className="bg-[#D0F0C0] rounded-xl border border-gray-200 p-5 flex flex-col gap-4 hover:border-indigo-200 hover:shadow-sm transition-all">
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -53,10 +54,10 @@ export function TeamCard({ team, onDelete }) {
             </Badge>
           </div>
           {team.research_domain && (
-            <p className="text-xs text-white mt-0.5">{team.research_domain}</p>
+            <p className="text-xs text-[#1B4D3E] mt-0.5">{team.research_domain}</p>
           )}
           {team.description && (
-            <p className="text-sm text-gray-500 mt-1 line-clamp-2">{team.description}</p>
+            <p className="text-sm text-[#1B4D3E] mt-1 line-clamp-2">{team.description}</p>
           )}
         </div>
 
@@ -108,7 +109,7 @@ export function TeamCard({ team, onDelete }) {
 
       {/* Agents */}
       <div className="flex flex-col gap-1.5">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+        <p className="text-xs font-medium text-[#1B4D3E] uppercase tracking-wide">
           Agents ({team.agents?.length ?? 0})
         </p>
         <div className="flex flex-col gap-1">

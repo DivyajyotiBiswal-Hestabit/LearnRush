@@ -125,7 +125,7 @@ function FeatureCard({ icon, title, description }) {
       padding: '22px',
       borderRadius: 12,
       border: '1px solid #1C2230',
-      background: '#EDC9AF',
+      background: '#DAC8AE',
       transition: 'border-color 0.2s',
     }}
       onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(124,58,237,0.4)'}

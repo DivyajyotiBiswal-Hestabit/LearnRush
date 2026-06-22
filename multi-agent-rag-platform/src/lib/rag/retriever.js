@@ -16,7 +16,7 @@ export async function retrieveByVector(
   const admin = createAdminClient()
 
   const { data: chunks, error } = await admin.rpc('match_document_chunks', {
-    query_embedding: JSON.stringify(queryEmbedding),
+    query_embedding: queryEmbedding,
     match_threshold: threshold,
     match_count: topK,
     filter_knowledge_base_id: knowledgeBaseId,
@@ -42,7 +42,7 @@ export async function retrieveHybrid(
 
   const { data: chunks, error } = await admin.rpc('hybrid_search_chunks', {
     query_text: query,
-    query_embedding: JSON.stringify(queryEmbedding),
+    query_embedding: queryEmbedding,
     match_count: topK * 2, // over-fetch for reranking
     vector_weight: vectorWeight,
     keyword_weight: keywordWeight,

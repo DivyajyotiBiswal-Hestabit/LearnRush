@@ -39,7 +39,7 @@ export function TeamForm({ initialData = null, onSuccess }) {
     name: initialData?.name ?? '',
     description: initialData?.description ?? '',
     research_domain: initialData?.research_domain ?? '',
-    collaboration_mode: initialData?.collaboration_mode ?? 'sequential',
+    collaboration_mode: initialData?.collaboration_mode ?? 'parallel',
   })
 
   const [agents, setAgents] = useState(
@@ -136,8 +136,8 @@ export function TeamForm({ initialData = null, onSuccess }) {
       )}
 
       {/* Team Details */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-4">
-        <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+      <div className="bg-[#ACE1AF] rounded-xl border border-gray-200 p-5 flex flex-col gap-4">
+        <h2 className="text-sm font-semibold text-[#1B4D3E] uppercase tracking-wide">
           Team Details
         </h2>
 
@@ -167,7 +167,7 @@ export function TeamForm({ initialData = null, onSuccess }) {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-[#1B4D3E]">
             Description (optional)
           </label>
           <textarea
@@ -175,7 +175,7 @@ export function TeamForm({ initialData = null, onSuccess }) {
             placeholder="What will this team research?"
             value={formData.description}
             onChange={e => handleFormField('description', e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className="w-full px-3 py-2 text-sm color-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
           />
         </div>
       </div>
@@ -211,13 +211,13 @@ export function TeamForm({ initialData = null, onSuccess }) {
 
       {/* Submit */}
       <div className="flex items-center gap-3 pt-2">
-        <Button type="submit" loading={loading} size="lg">
+        <Button type="submit" loading={loading} size="sm">
           {isEditing ? 'Save Changes' : 'Create Team'}
         </Button>
         <Button
           type="button"
           variant="ghost"
-          size="lg"
+          size="sm"
           onClick={() => router.push('/teams')}
         >
           Cancel

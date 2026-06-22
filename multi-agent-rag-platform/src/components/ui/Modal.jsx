@@ -16,10 +16,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#1B4D3E] backdrop-blur-sm" onClick={onClose} />
       <div className={cn(
         'relative w-full rounded-2xl z-10 max-h-[90vh] flex flex-col',
-        'bg-[#0C0F16] border border-[#1a2234]',
+        'bg-[#1B4D3E] border border-[#1a2234]',
         sizes[size]
       )}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#1a2234] flex-shrink-0">

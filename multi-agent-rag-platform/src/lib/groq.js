@@ -7,7 +7,7 @@ const client = new Groq({
 // Model mapping — maps your Ollama model names to Groq equivalents
 export const GROQ_MODEL_MAP = {
   'llama3:latest':   'llama-3.1-8b-instant',
-  'mistral:latest':  'mistral-saba-24b',
+  'mistral:latest':  'llama-3.3-70b-versatile',
   'phi3:latest':     'llama-3.1-8b-instant',
   'qwen:7b':         'llama-3.1-8b-instant',
   'tinyllama:latest':'llama-3.1-8b-instant',

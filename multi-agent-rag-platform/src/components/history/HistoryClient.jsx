@@ -44,7 +44,7 @@ export function HistoryClient({ initialQueries }) {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Research History</h1>
+        <h1 className="text-2xl font-bold text-[#004225]">Research History</h1>
         <p className="text-gray-500 text-sm mt-1">
           {queries.length} total queries — click any to view full trace
         </p>
@@ -54,7 +54,6 @@ export function HistoryClient({ initialQueries }) {
       <div className="flex items-center gap-3 mb-6">
         {/* Search */}
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             placeholder="Search queries..."
@@ -70,10 +69,10 @@ export function HistoryClient({ initialQueries }) {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg capitalize transition-colors ${
+              className={`px-3 py-1.5 text-sm font-small rounded-lg capitalize transition-colors ${
                 statusFilter === status
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ? 'bg-[#004225] text-white'
+                  : 'bg-white border border-gray-200 text-white hover:bg-gray-50'
               }`}
             >
               {status}

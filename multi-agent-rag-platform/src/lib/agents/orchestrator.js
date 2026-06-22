@@ -2,56 +2,74 @@ import { ollamaChat } from '@/lib/ollama'
 import { retrieveRelevantChunks, formatChunksAsContext } from '@/lib/rag/retriever'
 import { getTeamMemories, formatMemoriesAsContext } from '@/lib/agents/memory'
 import { applyRoutingRules } from '@/lib/agents/router'
+import { retrieveWithFallback, formatRetrievalResult } from '@/lib/rag/retrievalWithFallback'
+
 
 function buildAgentPrompt(agent, question, context, memoryContext, previousOutputs = []) {
-  let prompt = `${agent.system_prompt}\n\n`
+  const systemPrompt = agent.system_prompt?.slice(0, 300) ?? ''
+
+  let prompt = `${systemPrompt}\n\n`
 
   if (memoryContext) {
     prompt += `${memoryContext}\n\n`
   }
 
-  // Enhanced context header that explains multi-modal sources
-  prompt += `## Knowledge Base Context
-The following sources have been retrieved. Sources may include:
-- Regular text passages
-- Extracted table data [marked with "Table:"]
-- Image descriptions [marked with "Visual Description"]  
-- OCR-extracted text from scanned documents [marked with "Scanned Page"]
-- Chart/diagram analysis [marked with "Visual Content"]
+  // Check if context indicates empty retrieval
+  const isEmptyContext = context?.startsWith('⚠️ No relevant information') ||
+    context?.startsWith('No knowledge base') ||
+    context?.startsWith('Knowledge base retrieval')
 
-Use ALL source types to answer the question thoroughly.
-
-${context}\n\n`
-
-  if (previousOutputs.length > 0) {
-    prompt += `## Previous Agent Outputs\n`
-    previousOutputs.forEach(output => {
-      prompt += `### ${output.agentName} (${output.role}):\n${output.output}\n\n`
-    })
+  if (isEmptyContext) {
+    prompt += `## Knowledge Base Status\n${context}\n\n`
+    prompt += `## Important Instructions
+Since no relevant documents were found in the knowledge base:
+- DO NOT hallucinate or make up information
+- Clearly state that the knowledge base does not contain information about this topic
+- If you have general knowledge about the topic, share it but CLEARLY label it as general knowledge not from the documents
+- Suggest what types of documents the user should upload to answer this question\n\n`
+  } else {
+    prompt += `## Knowledge Base Context\n${context}\n\n`
   }
 
-  prompt += `## User Question\n${question}\n\n`
-  prompt += `## Your Response\nBased on ALL context types above (text, tables, images, charts), provide your analysis as ${agent.role}:`
+  if (previousOutputs.length > 0) {
+    const lastOutput = previousOutputs[previousOutputs.length - 1]
+    prompt += `## Previous Analysis (${lastOutput.agentName})\n${lastOutput.output?.slice(0, 500)}\n\n`
+  }
+
+  prompt += `## Question\n${question}\n\nYour response:`
 
   return prompt
 }
 
 function buildSynthesisPrompt(question, agentOutputs, context, memoryContext) {
-  let prompt = `You are the final synthesizer. Combine insights from multiple specialized agents into one clear, well-structured answer.\n\n`
+  let prompt = `You are the final synthesizer. Combine insights from multiple specialized agents into one clear, well-structured answer.
+
+IMPORTANT: You MUST cite your sources. When you use information from the context, add a citation like [Source 1], [Source 2], etc. matching the source numbers in the context below.
+
+`
 
   if (memoryContext) {
     prompt += `${memoryContext}\n\n`
   }
 
   prompt += `## Original Question\n${question}\n\n`
-  prompt += `## Knowledge Base Context\n${context}\n\n`
+  prompt += `## Knowledge Base Context (CITE THESE)\n${context}\n\n`
   prompt += `## Agent Analyses\n`
 
   agentOutputs.forEach(output => {
     prompt += `### ${output.agentName} (${output.role}) using ${output.modelId}:\n${output.output}\n\n`
   })
 
-  prompt += `## Final Synthesized Answer\nCombine the above analyses into a comprehensive, well-structured answer. Include citations to sources where relevant:`
+  prompt += `## Final Synthesized Answer
+Write a comprehensive answer. After each claim from the documents, add [Source N] citation.
+End with a "## Sources" section listing each source you cited with its filename.
+
+Format:
+[Your answer with inline citations like [Source 1], [Source 2]]
+
+## Sources
+- [Source 1]: filename.pdf — brief description of what this source says
+- [Source 2]: filename.pdf — brief description`
 
   return prompt
 }
@@ -368,25 +386,42 @@ export async function runMultiAgentPipeline({
 
   // 1. Retrieve RAG chunks
   let chunks = []
-  let context = 'No knowledge base connected.'
+  let context = 'No knowledge base connected. Answer from your general knowledge.'
+  let retrievalMethod = 'none'
+  let retrievalRewrites = []
 
   if (knowledgeBaseId) {
     try {
-      chunks = await retrieveRelevantChunks(
-        question, 
-        knowledgeBaseId, 
-        ragOptions.topK  ?? 6, 
-        ragOptions.threshold ?? 0.3,
-        {
-          useLLMRerank: ragOptions.useLLMRerank ?? false,
-          vectorWeight: ragOptions.vectorWeight ?? 0.7,
-          keywordWeight: ragOptions.keywordWeight ?? 0.3,
-        }
-      )
-      context = formatChunksAsContext(chunks)
+      const retrievalResult = await retrieveWithFallback({
+        query: question,
+        knowledgeBaseId,
+        userId,
+        topK: ragOptions?.topK ?? 5,
+        threshold: ragOptions?.threshold ?? 0.3,
+        options: {
+          useLLMRerank: ragOptions?.useLLMRerank ?? false,
+          vectorWeight: ragOptions?.vectorWeight ?? 0.7,
+          keywordWeight: ragOptions?.keywordWeight ?? 0.3,
+        },
+      })
+
+      chunks = retrievalResult.chunks
+      retrievalMethod = retrievalResult.method
+      retrievalRewrites = retrievalResult.rewrites ?? []
+
+      const formatted = formatRetrievalResult(retrievalResult)
+
+      if (formatted.isEmpty) {
+      // Graceful empty — agents will know there's no context
+        context = formatted.message
+      } else {
+        context = formatted.context
+      }
+
+      console.log(`[Orchestrator] Retrieval method: ${retrievalMethod}, chunks: ${chunks.length}`)
     } catch (error) {
-      console.error('RAG retrieval error:', error)
-      context = 'Knowledge base retrieval failed.'
+      console.error('Retrieval pipeline error:', error)
+      context = `Knowledge base retrieval encountered an error: ${error.message}\n\nPlease try rephrasing your question.`
     }
   }
 
@@ -461,5 +496,8 @@ export async function runMultiAgentPipeline({
     scores,
     processingTime: Date.now() - startTime,
     memoryUsed: !!memoryContext,
+    retrievalMethod,        
+    retrievalRewrites,      
+    retrievalEmpty: chunks.length === 0,
   }
 }

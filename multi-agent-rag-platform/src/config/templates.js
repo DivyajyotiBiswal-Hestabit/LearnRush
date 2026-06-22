@@ -68,7 +68,7 @@ Write clearly for an educated non-specialist audience.`,
     difficulty: 'Intermediate',
     useCase: 'Upload business reports, financials, or strategy docs and ask "What are the key risks?" or "What growth opportunities exist?"',
     research_domain: 'Business Strategy',
-    collaboration_mode: 'debate',
+    collaboration_mode: 'parallel',
     tags: ['business', 'strategy', 'market', 'consulting'],
     agents: [
       {
@@ -190,7 +190,7 @@ IMPORTANT: Always remind the user this is AI analysis and not legal advice. Reco
     difficulty: 'Beginner',
     useCase: 'Upload technical docs, API references, or manuals and ask troubleshooting questions.',
     research_domain: 'Technical Documentation',
-    collaboration_mode: 'hierarchical',
+    collaboration_mode: 'parallel',
     tags: ['technical', 'support', 'documentation', 'troubleshooting'],
     agents: [
       {

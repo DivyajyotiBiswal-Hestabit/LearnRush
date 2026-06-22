@@ -27,6 +27,12 @@ export function ChatClient({ teams, knowledgeBases }) {
   const [lastAnswer, setLastAnswer] = useState('')
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
+  const [retrievalMethod, setRetrievalMethod] = useState(null)
+  const [retrievalRewrites, setRetrievalRewrites] = useState([])
+  const [retrievalEmpty, setRetrievalEmpty] = useState(false)
+  const [citations, setCitations] = useState([])
+  const [activeCitationIndex, setActiveCitationIndex] = useState(null)
+
 
   const selectedTeam = teams.find(t => t.id === selectedTeamId)
   const selectedKB = knowledgeBases.find(kb => kb.id === selectedKBId)
@@ -46,6 +52,8 @@ export function ChatClient({ teams, knowledgeBases }) {
     setError('')
     setLastQuestion('')
     setLastAnswer('')
+    setCitations([])
+    setActiveCitationIndex(null)
   }
 
   async function handleSubmit() {
@@ -126,6 +134,10 @@ export function ChatClient({ teams, knowledgeBases }) {
               setProcessingTime(event.processingTime)
               setChunksRetrieved(event.chunksRetrieved)
               setLastAnswer(event.answer)
+              setRetrievalMethod(event.retrievalMethod)          
+              setRetrievalRewrites(event.retrievalRewrites ?? []) 
+              setRetrievalEmpty(event.retrievalEmpty ?? false) 
+              setCitations(event.citations ?? []) 
 
               // Fetch chunks used
               if (selectedKBId) {
@@ -199,9 +211,9 @@ export function ChatClient({ teams, knowledgeBases }) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Main Chat Area */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 ">
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 py-3 bg-white border-b border-gray-200 flex-shrink-0">
+        <div className="flex items-center gap-3 px-5 py-3 bg-[#E9FFDB] border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <Select
               value={selectedTeamId}
@@ -228,6 +240,33 @@ export function ChatClient({ teams, knowledgeBases }) {
                 ))}
               </Select>
             )}
+
+            {/* ── ADD THIS BADGE RIGHT HERE ── */}
+            {selectedTeam && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '4px 10px', borderRadius: 6, flexShrink: 0,
+                fontSize: 11,
+                fontFamily: "'IBM Plex Mono', monospace",
+                ...(selectedTeam.collaboration_mode === 'parallel' ? {
+                  background: 'rgba(16,185,129,0.1)',
+                  border: '1px solid rgba(16,185,129,0.2)',
+                  color: '#10B981',
+                } : selectedTeam.collaboration_mode === 'debate' ? {
+                  background: 'rgba(245,158,11,0.1)',
+                  border: '1px solid rgba(245,158,11,0.2)',
+                  color: '#F59E0B',
+                } : {
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid #1a2234',
+                  color: '#475569',
+                })
+      }        }>
+                {selectedTeam.collaboration_mode === 'parallel' && '⚡ '}
+                {selectedTeam.collaboration_mode === 'debate' && '⚠ '}
+                {selectedTeam.collaboration_mode}
+              </div>
+            )}
           </div>
 
           <Button
@@ -242,7 +281,7 @@ export function ChatClient({ teams, knowledgeBases }) {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-4 bg-[#E9FFDB]">
           {messages.length === 0 && !isProcessing && (
             <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
               <div className="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center mb-4">
@@ -269,7 +308,55 @@ export function ChatClient({ teams, knowledgeBases }) {
           )}
 
           {messages.map((msg, i) => (
-            <ChatMessage key={i} message={msg} />
+            <div key={i}>
+              <ChatMessage
+                message={msg}
+                citations={msg.role === 'assistant' && i === messages.length - 1
+                  ? citations
+                  : []
+                }
+                onCitationClick={(idx) => {
+                  setActiveCitationIndex(idx)
+                }}   
+              />
+
+              {/* Show retrieval fallback notice after assistant messages */}
+              {msg.role === 'assistant' && i === messages.length - 1 && retrievalMethod && retrievalMethod !== 'hybrid' && (
+                <div style={{
+                  marginTop: 6, marginLeft: 44,
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  background: retrievalEmpty
+                    ? 'rgba(239,68,68,0.08)'
+                    : 'rgba(245,158,11,0.08)',
+                  border: `1px solid ${retrievalEmpty
+                    ? 'rgba(239,68,68,0.2)'
+                    : 'rgba(245,158,11,0.2)'}`,
+                  maxWidth: '80%',
+                }}>
+                  <p style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 10,
+                    color: retrievalEmpty ? '#ef4444' : '#F59E0B',
+                    marginBottom: retrievalRewrites?.length > 0 ? 4 : 0,
+                  }}>
+                    {retrievalEmpty
+                      ? '⚠ No relevant documents found after all fallback attempts'
+                      : `ℹ Retrieved via ${retrievalMethod.replace(/_/g, ' ')}`
+                    }
+                  </p>
+                  {retrievalRewrites?.length > 0 && !retrievalEmpty && (
+                    <p style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 9,
+                      color: '#64748b',
+                    }}>
+                      Query rewritten as: "{retrievalRewrites[0]}"
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           ))}
 
           {isProcessing && messages[messages.length - 1]?.role === 'user' && (
@@ -299,7 +386,7 @@ export function ChatClient({ teams, knowledgeBases }) {
         )}
 
         {/* Input */}
-        <div className="px-5 py-4 bg-white border-t border-gray-200 flex-shrink-0">
+        <div className="px-5 py-4 bg-[#E9FFDB] border-t border-gray-200 flex-shrink-0">
           <div className="flex gap-3 items-end">
             <div className="flex-1 relative">
               <textarea
@@ -325,7 +412,7 @@ export function ChatClient({ teams, knowledgeBases }) {
               size="lg"
               className="flex-shrink-0 h-[52px]"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-4" />
             </Button>
           </div>
         </div>
@@ -336,6 +423,7 @@ export function ChatClient({ teams, knowledgeBases }) {
         team={selectedTeam}
         traces={traces}
         chunks={chunks}
+        citations={citations}
         scores={currentScores}
         processingTime={processingTime}
         chunksRetrieved={chunksRetrieved}

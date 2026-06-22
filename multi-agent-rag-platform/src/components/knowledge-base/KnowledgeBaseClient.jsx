@@ -214,7 +214,7 @@ export function KnowledgeBaseClient({ initialKBs, teams }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Knowledge Base</h1>
+          <h1 className="text-2xl font-bold text-[#1B4D3E]">Knowledge Base</h1>
           <p className="text-gray-500 text-sm mt-1">
             Upload documents for your agents to research
           </p>

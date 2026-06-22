@@ -40,16 +40,12 @@ export function TemplateCard({ template, onUse }) {
 
   return (
     <div className={cn(
-      'bg-[#E5AA70] rounded-xl border border-gray-200 overflow-hidden',
+      'bg-[#1B4D3E] rounded-xl border border-gray-200 overflow-hidden h-70 w-100',
       'hover:border-indigo-200 hover:shadow-sm transition-all'
     )}>
       {/* Header */}
-      <div className="p-5">
+      <div className="p-8">
         <div className="flex items-start gap-5">
-          {/* Icon */}
-          <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center text-2xl flex-shrink-0">
-            {template.icon}
-          </div>
 
           {/* Title + badges */}
           <div className="flex-1 min-w-0">
@@ -71,7 +67,7 @@ export function TemplateCard({ template, onUse }) {
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-500 mt-3 leading-relaxed">
+        <p className="text-sm text-white mt-3 leading-relaxed">
           {template.description}
         </p>
 

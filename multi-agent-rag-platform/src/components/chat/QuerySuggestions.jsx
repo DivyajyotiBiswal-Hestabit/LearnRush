@@ -114,14 +114,14 @@ export function QuerySuggestions({ domain, onSelect, lastAnswer, className }) {
     <div className={cn('flex flex-col gap-2', className)}>
       <div className="flex items-center gap-2">
         <Sparkles className="w-3.5 h-3.5 text-gray-400" />
-        <p className="text-xs font-medium text-gray-500">Suggested questions</p>
+        <p className="text-sm font-medium text-[#013220]">Suggested questions</p>
       </div>
       <div className="flex flex-wrap gap-2">
         {suggestions.map((suggestion, i) => (
           <button
             key={i}
             onClick={() => onSelect(suggestion)}
-            className="text-xs px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-full hover:border-indigo-300 hover:text-indigo-600 transition-colors text-left"
+            className="text-xs px-3 py-1.5 bg-[#013220] border border-gray-200 text-white rounded-full hover:border-indigo-300 hover:text-indigo-600 transition-colors text-left"
           >
             {suggestion}
           </button>

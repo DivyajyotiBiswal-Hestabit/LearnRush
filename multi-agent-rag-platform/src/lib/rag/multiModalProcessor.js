@@ -1,5 +1,5 @@
 import { parseDocument } from '@/lib/parser'
-import { chunkByParagraph } from '@/lib/chunker'
+import { smartChunk, chunkByParagraph } from '@/lib/chunker'
 import { extractTablesFromText, tableToSearchableText } from '@/lib/rag/imageUnderstanding'
 import { describeImageWithVision, classifyImageContent, isVisionAvailable } from '@/lib/rag/vision'
 import { extractTextWithOCR, preprocessImageForOCR, shouldUseOCR } from '@/lib/rag/ocr'
@@ -91,11 +91,16 @@ async function processPDFMultiModal(buffer, fileName, visionAvailable) {
 
   // Step 1: Extract text normally
   const parsed = await parseDocument(buffer, 'application/pdf')
-  const textChunks = chunkByParagraph(parsed.text, 1200)
+  const textChunks = await smartChunk(parsed.text, 1200, {
+    strategy: 'auto',              
+    semanticThresholdWords: 3000,  
+    breakpointThreshold: 0.72,
+    bufferSize: 1,
+  })
 
   // Add text chunks
   textChunks.forEach((text, i) => {
-    chunks.push({
+    chunks.push({  
       content: text,
       type: 'text',
       pageNumber: null,
@@ -232,7 +237,11 @@ export async function processDocumentMultiModal(buffer, fileType, fileName) {
       type.includes('csv') || type.includes('json')) {
 
     const text = buffer.toString('utf-8')
-    const textChunks = chunkByParagraph(text, 1200)
+    const textChunks = await smartChunk(text, 1200, {
+      strategy: 'auto',
+      semanticThresholdWords: 3000,
+    })
+    
     const tables = extractTablesFromText(text)
 
     result.chunks = [

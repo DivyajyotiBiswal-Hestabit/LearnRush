@@ -49,15 +49,15 @@ export function AgentForm({ agent, index, onChange, onRemove, canRemove }) {
     <div className="border border-gray-200 rounded-xl overflow-hidden">
       {/* Agent Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 bg-gray-50 cursor-pointer"
+        className="flex items-center justify-between px-4 py-3 bg-[#1B4D3E] cursor-pointer"
         onClick={() => setExpanded(e => !e)}
       >
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">
+          <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-[#1B4D3E] text-xs font-bold">
             {index + 1}
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-white">
               {agent.name || `Agent ${index + 1}`}
             </p>
             {roleInfo && (
@@ -71,14 +71,14 @@ export function AgentForm({ agent, index, onChange, onRemove, canRemove }) {
           {canRemove && (
             <button
               onClick={(e) => { e.stopPropagation(); onRemove(index) }}
-              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-1.5 text-m text-red hover:text-white hover:bg-red rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
           )}
           {expanded
-            ? <ChevronUp className="w-4 h-4 text-gray-400" />
-            : <ChevronDown className="w-4 h-4 text-gray-400" />
+            ? <ChevronUp className="w-4 h-4 text-white" />
+            : <ChevronDown className="w-4 h-4 text-white" />
           }
         </div>
       </div>
@@ -141,7 +141,7 @@ export function AgentForm({ agent, index, onChange, onRemove, canRemove }) {
               value={agent.system_prompt}
               onChange={e => handleField('system_prompt', e.target.value)}
               placeholder="Instructions for this agent..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B4D3E] resize-none"
             />
           </div>
         </div>

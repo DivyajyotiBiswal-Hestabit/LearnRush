@@ -83,7 +83,6 @@ export function TemplatesClient() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search templates..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -98,7 +97,7 @@ export function TemplatesClient() {
               onClick={() => setCategory(cat.id)}
               className={`px-3 py-1.5 text-m font-medium rounded-s transition-colors whitespace-nowrap ${
                 category === cat.id
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-[#00A693] text-white'
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >

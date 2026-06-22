@@ -55,7 +55,7 @@ export function QueryCard({ query, onExportJSON, onExportPDF }) {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-[#ACE1AF] border border-gray-200 rounded-xl overflow-hidden">
       {/* Header */}
       <div
         className="flex items-start gap-4 p-5 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -73,7 +73,7 @@ export function QueryCard({ query, onExportJSON, onExportPDF }) {
               <Badge variant="default">{query.teams.collaboration_mode}</Badge>
             )}
           </div>
-          <p className="text-sm font-medium text-gray-900 line-clamp-2">
+          <p className="text-sm font-medium text-[#1B4D3E] line-clamp-2">
             {query.question}
           </p>
           <p className="text-xs text-gray-400 mt-1">
@@ -112,10 +112,10 @@ export function QueryCard({ query, onExportJSON, onExportPDF }) {
           {/* Final Answer */}
           {query.final_answer && (
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              <p className="text-xs font-semibold text-[#1B4D3E] uppercase tracking-wide mb-2">
                 Final Answer
               </p>
-              <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <div className="bg-[#D0F0C0] rounded-lg p-4 text-sm text-black leading-relaxed whitespace-pre-wrap">
                 {query.final_answer}
               </div>
             </div>
@@ -123,7 +123,7 @@ export function QueryCard({ query, onExportJSON, onExportPDF }) {
 
           {/* Agent Traces */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            <p className="text-xs font-semibold text-[#1B4D3E] uppercase tracking-wide mb-2">
               Agent Traces {loadingTraces && '(loading...)'}
             </p>
             {traces?.length > 0 ? (
@@ -172,7 +172,7 @@ function TraceRow({ trace }) {
         onClick={() => setExpanded(e => !e)}
       >
         <Bot className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-        <span className="text-sm font-medium text-gray-800 flex-1">
+        <span className="text-sm font-medium text-[#1B4D3E] flex-1">
           {trace.agent_name}
         </span>
         <Badge variant={ROLE_COLORS[trace.agent_role] ?? 'default'}>
@@ -185,14 +185,14 @@ function TraceRow({ trace }) {
           {trace.status}
         </Badge>
         {expanded
-          ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" />
-          : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+          ? <ChevronUp className="w-3.5 h-3.5 text-[#1B4D3E]" />
+          : <ChevronDown className="w-3.5 h-3.5 text-[#1B4D3E]" />
         }
       </div>
 
       {expanded && trace.output && (
         <div className="px-3 pb-3 border-t border-gray-100">
-          <p className="text-xs text-gray-600 mt-2 leading-relaxed whitespace-pre-wrap">
+          <p className="text-xs text-[#1B4D3E] mt-2 leading-relaxed whitespace-pre-wrap">
             {trace.output}
           </p>
           {trace.processing_time_ms && (

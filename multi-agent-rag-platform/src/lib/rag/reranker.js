@@ -49,7 +49,7 @@ export function lexicalRerank(query, chunks) {
       positionScore * 0.1 +
       headingBonus +
       (chunk.vector_score ?? 0) * 0.3 +
-      (chunk.bm25Score ?? 0) * 0.1
+      (chunk.keyword_score ?? 0) * 0.1
 
     return { ...chunk, rerankScore }
   })

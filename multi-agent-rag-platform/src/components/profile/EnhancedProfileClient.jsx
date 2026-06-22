@@ -56,8 +56,8 @@ export function EnhancedProfileClient({ profile }) {
     <div className="p-8 max-w-2xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-[#1B4D3E]">Profile</h1>
+        <p className="text-gray-500 text-sm mt-10">
           Manage your account and preferences
         </p>
       </div>
@@ -68,10 +68,10 @@ export function EnhancedProfileClient({ profile }) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
+            className={`px-8 py-5 text-sm font-medium border-b-2 transition-colors -mb-px ${
               activeTab === tab.id
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-indigo-600 text-[#6F4E37]'
+                : 'border-transparent text-[#1B4D3E] hover:text-[#6F4E37]'
             }`}
           >
             {tab.label}
@@ -121,7 +121,7 @@ export function EnhancedProfileClient({ profile }) {
           {/* Edit Form */}
           <Card>
             <CardHeader>
-              <p className="text-sm font-semibold text-gray-700">
+              <p className="text-sm font-semibold text-[#1B4D3E]">
                 Personal Information
               </p>
             </CardHeader>
@@ -132,31 +132,32 @@ export function EnhancedProfileClient({ profile }) {
                   value={formData.full_name}
                   onChange={e => setFormData(p => ({ ...p, full_name: e.target.value }))}
                   placeholder="Your full name"
+                  className="w-140"
                 />
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">Bio</label>
+                  <label className="text-sm font-medium text-[#1B4D3E]">Bio</label>
                   <textarea
                     rows={3}
                     value={formData.bio}
                     onChange={e => setFormData(p => ({ ...p, bio: e.target.value }))}
                     placeholder="Tell us about yourself..."
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                    className="w-140 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">Email</label>
+                  <label className="text-sm font-medium text-[#1B4D3E]">Email</label>
                   <input
                     type="email"
                     value={profile.email}
                     disabled
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
+                    className="w-140 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
                   />
-                  <p className="text-xs text-gray-400">Email cannot be changed</p>
+                  <p className="text-xs text-gray-500">Email cannot be changed</p>
                 </div>
 
-                <Button type="submit" loading={loading} className="w-fit">
+                <Button type="submit" loading={loading} className="w-fit bg-[#1B4D3E]">
                   Save Changes
                 </Button>
               </form>
@@ -171,11 +172,11 @@ export function EnhancedProfileClient({ profile }) {
           <UsageTracker profile={profile} />
 
           {/* Usage Tips */}
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+          <div className="bg-[#D0F0C0] border border-indigo-200 rounded-xl p-4">
             <p className="text-sm font-medium text-indigo-800 mb-1">
               💡 Usage Tips
             </p>
-            <ul className="text-sm text-indigo-700 space-y-1">
+            <ul className="text-sm text-[#1B4D3E] space-y-1">
               <li>• Delete unused teams to free up team slots</li>
               <li>• Remove old documents to stay within document limits</li>
               <li>• Each question you ask counts as one query</li>

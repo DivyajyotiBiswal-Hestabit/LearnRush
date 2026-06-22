@@ -6,10 +6,10 @@ export async function GET() {
   // If Groq is configured, return Groq models
   if (groqAvailable) {
     const groqModels = [
-      { id: 'llama3:latest',  name: 'Llama 3.1 8B',     groq: 'llama-3.1-8b-instant', provider: 'groq' },
-      { id: 'mistral:latest', name: 'Mistral Saba 24B',  groq: 'mistral-saba-24b',     provider: 'groq' },
-      { id: 'phi3:latest',    name: 'Llama 3.1 8B Fast', groq: 'llama-3.1-8b-instant', provider: 'groq' },
-      { id: 'gemma2',         name: 'Gemma 2 9B',        groq: 'gemma2-9b-it',          provider: 'groq' },
+      { id: 'llama3:latest',  name: 'Llama 3.1 8B',      groq: 'llama-3.1-8b-instant',    provider: 'groq' },
+      { id: 'mistral:latest', name: 'Llama 3.3 70B',     groq: 'llama-3.3-70b-versatile', provider: 'groq' },
+      { id: 'phi3:latest',    name: 'Llama 3.1 8B Fast', groq: 'llama-3.1-8b-instant',    provider: 'groq' },
+      { id: 'gemma2',         name: 'Gemma 2 9B',        groq: 'gemma2-9b-it',            provider: 'groq' },
     ]
 
     return Response.json({

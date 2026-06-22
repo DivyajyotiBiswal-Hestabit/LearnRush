@@ -50,7 +50,7 @@ export function AppLayout({ children, user }) {
           <div>
             <p style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: 13, fontWeight: 700, color: '#F1F5F9', lineHeight: 1.2,
+              fontSize: 13, fontWeight: 700, color: '#013220', lineHeight: 1.2,
             }}>MultiAgent RAG</p>
             <p style={{
               fontFamily: "'IBM Plex Mono', monospace",

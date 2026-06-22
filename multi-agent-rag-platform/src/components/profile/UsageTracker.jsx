@@ -62,11 +62,11 @@ export function UsageTracker({ profile }) {
   ]
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="bg-[#ACE1AF] h-60 rounded-xl border border-gray-200 p-5">
       <div className="flex items-center gap-2 mb-5">
-        <TrendingUp className="w-4 h-4 text-indigo-600" />
-        <h3 className="text-sm font-semibold text-gray-900">Usage Limits</h3>
-        <span className="ml-auto text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full font-medium">
+        <TrendingUp className="w-4 h-4 text-[#004225]" />
+        <h3 className="text-sm font-semibold text-[#004225]">Usage Limits</h3>
+        <span className="ml-auto text-xs px-2 py-0.5 bg-indigo-50 text-[#004225] rounded-full font-medium">
           {profile.role === 'admin' ? 'Admin' : 'Free Plan'}
         </span>
       </div>
@@ -75,8 +75,8 @@ export function UsageTracker({ profile }) {
         {usageItems.map(item => (
           <div key={item.label}>
             <div className="flex items-center gap-2 mb-2">
-              <item.icon className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-sm font-medium text-gray-700">{item.label}</span>
+              <item.icon className="w-3.5 h-3.5 text-[#004225]" />
+              <span className="text-sm font-medium text-[#004225]">{item.label}</span>
             </div>
             <UsageBar
               used={item.used}

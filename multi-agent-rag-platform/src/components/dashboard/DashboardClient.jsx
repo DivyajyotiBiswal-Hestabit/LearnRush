@@ -26,7 +26,7 @@ function StatCard({ icon: Icon, label, value, sub, color, href }) {
           padding: '20px',
           borderRadius: 12,
           border: `1px solid ${c.border}`,
-          background: '#7ac7a7ff',
+          background: '#9AB973',
           transition: 'all 0.2s',
           cursor: 'pointer',
           transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
@@ -95,7 +95,7 @@ function QuickAction({ icon: Icon, label, desc, href, accent }) {
         <Icon size={17} style={{ color: c.icon }} />
       </div>
       <div style={{ flex: 1 }}>
-        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 2 }}>
+        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 600, color: '#355E3B', marginBottom: 2 }}>
           {label}
         </p>
         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: '#3D4F68' }}>
@@ -231,7 +231,7 @@ export function DashboardClient({ data }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
           {/* Quick actions */}
-          <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#c0a88bff', padding: '20px' }}>
+          <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#D0F0C0', padding: '20px' }}>
             <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: '#1B4D3E', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>
               Quick Actions
             </p>
@@ -245,7 +245,7 @@ export function DashboardClient({ data }) {
 
           {/* Recent queries */}
           {recentQueries.length > 0 ? (
-            <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#9c856aff', padding: '20px' }}>
+            <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#D0F0C0', padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: '#1B4D3E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                   Recent Queries
@@ -312,7 +312,7 @@ export function DashboardClient({ data }) {
           )}
 
           {/* Platform overview */}
-          <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#c0a88bff', padding: '20px' }}>
+          <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#D0F0C0', padding: '20px' }}>
             <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: '#1B4D3E', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16 }}>
               Platform Overview
             </p>
@@ -346,7 +346,7 @@ export function DashboardClient({ data }) {
           </div>
 
           {/* Model status */}
-          <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#c0a88bff', padding: '20px' }}>
+          <div style={{ borderRadius: 14, border: '1px solid #1C2230', background: '#D0F0C0', padding: '20px' }}>
             <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: '#2A3A52', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>
               Ollama Models
             </p>
