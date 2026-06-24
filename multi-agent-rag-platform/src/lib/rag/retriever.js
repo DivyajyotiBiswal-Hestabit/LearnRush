@@ -72,8 +72,8 @@ export async function retrieveRelevantChunks(
   options = {}
 ) {
   const {
-    useLLMRerank = false,
-    rerankModel = 'phi3:latest',
+    useLLMRerank = true,
+    rerankModel = 'llama-3.1-8b-instant',
     vectorWeight = 0.7,
     keywordWeight = 0.3,
   } = options

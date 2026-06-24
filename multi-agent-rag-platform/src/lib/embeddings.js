@@ -41,12 +41,20 @@ export async function generateEmbedding(text) {
  * (Ollama doesn't support batch embedding natively)
  */
 export async function generateEmbeddings(texts) {
-  const embeddings = []
-  for (const text of texts) {
-    const embedding = await generateEmbedding(text)
-    embeddings.push(embedding)
+  const BATCH_SIZE = 5
+  const results = []
+
+  for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+    const batch = texts.slice(i, i + BATCH_SIZE)
+
+    const embeddings = await Promise.all(
+      batch.map(text => generateEmbedding(text))
+    )
+
+    results.push(...embeddings)
   }
-  return embeddings
+
+  return results
 }
 
 

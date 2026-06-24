@@ -40,7 +40,7 @@ export function TemplateCard({ template, onUse }) {
 
   return (
     <div className={cn(
-      'bg-[#1B4D3E] rounded-xl border border-gray-200 overflow-hidden h-70 w-100',
+      'bg-[#ACE1AF] rounded-xl border border-gray-200 overflow-hidden h-70 w-100',
       'hover:border-indigo-200 hover:shadow-sm transition-all'
     )}>
       {/* Header */}
@@ -50,7 +50,7 @@ export function TemplateCard({ template, onUse }) {
           {/* Title + badges */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              <h3 className="text-base font-semibold text-gray-900">
+              <h3 className="text-base font-semibold text-[#013220]">
                 {template.name}
               </h3>
             </div>
@@ -67,7 +67,7 @@ export function TemplateCard({ template, onUse }) {
         </div>
 
         {/* Description */}
-        <p className="text-sm text-white mt-3 leading-relaxed">
+        <p className="text-sm text-[#013220] mt-3 leading-relaxed">
           {template.description}
         </p>
 
@@ -100,7 +100,7 @@ export function TemplateCard({ template, onUse }) {
           <Button
             onClick={handleUse}
             loading={loading}
-            className="flex-1"
+            className="flex-1 bg-[#013220] mt-9"
           >
             <Zap className="w-3.5 h-3.5 mr-1.5" />
             Use Template

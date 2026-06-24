@@ -32,6 +32,7 @@ export function ChatClient({ teams, knowledgeBases }) {
   const [retrievalEmpty, setRetrievalEmpty] = useState(false)
   const [citations, setCitations] = useState([])
   const [activeCitationIndex, setActiveCitationIndex] = useState(null)
+  const [currentQueryId, setCurrentQueryId] = useState(null)
 
 
   const selectedTeam = teams.find(t => t.id === selectedTeamId)
@@ -54,6 +55,7 @@ export function ChatClient({ teams, knowledgeBases }) {
     setLastAnswer('')
     setCitations([])
     setActiveCitationIndex(null)
+    setCurrentQueryId(null)
   }
 
   async function handleSubmit() {
@@ -61,6 +63,11 @@ export function ChatClient({ teams, knowledgeBases }) {
     if (!selectedTeamId) { setError('Please select a team first'); return }
 
     const question = input.trim()
+    const clientBlock = clientSideCheck(question)
+    if (clientBlock) {
+      setError(clientBlock)
+      return
+    }
     setInput('')
     setError('')
     setIsProcessing(true)
@@ -85,7 +92,11 @@ export function ChatClient({ teams, knowledgeBases }) {
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error ?? 'Request failed')
+        const err = new Error(data.error ?? 'Request failed')
+        err.blocked = data.blocked
+        err.reason = data.reason
+        err.helpMessage = data.helpMessage
+        throw err
       }
 
       const reader = res.body.getReader()
@@ -137,7 +148,8 @@ export function ChatClient({ teams, knowledgeBases }) {
               setRetrievalMethod(event.retrievalMethod)          
               setRetrievalRewrites(event.retrievalRewrites ?? []) 
               setRetrievalEmpty(event.retrievalEmpty ?? false) 
-              setCitations(event.citations ?? []) 
+              setCitations(event.citations ?? [])
+              setCurrentQueryId(event.queryId)  
 
               // Fetch chunks used
               if (selectedKBId) {
@@ -169,10 +181,16 @@ export function ChatClient({ teams, knowledgeBases }) {
         }
       }
     } catch (err) {
-      setError(err.message)
+      if (err.blocked) {
+        setError(`${err.reason}${err.helpMessage ? `\n\n${err.helpMessage}` : ''}`)
+      } else {
+        setError(err.message)
+      }
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `Sorry, something went wrong: ${err.message}`,
+        content: err.blocked
+          ? `I can't process that query: ${err.reason}`
+          : `Sorry, something went wrong: ${err.message}`, 
       }])
     } finally {
       setIsProcessing(false)
@@ -185,6 +203,28 @@ export function ChatClient({ teams, knowledgeBases }) {
       handleSubmit()
     }
   }
+
+  function clientSideCheck(query) {
+    if (!query || query.trim().length < 3) return null
+
+    const dangerPatterns = [
+      /ignore (previous|all|above) instructions?/i,
+      /you are now|pretend (you are|to be)/i,
+      /\[system\]|\[assistant\]/i,
+      /how to (make|build|create).*(bomb|explosive|weapon)/i,
+      /how to (kill|murder|harm|hurt)/i,
+      /how to (hack|crack|bypass).*(password|account)/i,
+      /forget (everything|all|your training)/i,
+    ]
+
+    for (const pattern of dangerPatterns) {
+      if (pattern.test(query)) {
+        return 'This type of query cannot be processed by the research platform.'
+      }
+    }
+
+    return null
+  }  
 
   function handleSuggestion(suggestion) {
     setInput(suggestion)
@@ -429,6 +469,7 @@ export function ChatClient({ teams, knowledgeBases }) {
         chunksRetrieved={chunksRetrieved}
         isProcessing={isProcessing}
         lastQuestion={lastQuestion}
+        queryId={currentQueryId}
       />
     </div>
   )

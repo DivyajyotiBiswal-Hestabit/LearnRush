@@ -9,6 +9,7 @@ import { SourcePreview } from '@/components/chat/SourcePreview'
 import { ScoreCard } from '@/components/chat/ScoreCard'
 import { cn } from '@/lib/utils/cn'
 import { CitationsPanel } from '@/components/chat/CitationsPanel'
+import { EvaluationPanel } from '@/components/evaluation/EvaluationPanel'
 
 const TABS = [
   { id: 'graph', label: 'Graph', icon: GitBranch },
@@ -27,6 +28,7 @@ export function EnhancedRightPanel({
   chunksRetrieved,
   isProcessing,
   lastQuestion,
+  queryId,
 }) {
   const [activeTab, setActiveTab] = useState('graph')
 
@@ -107,17 +109,26 @@ export function EnhancedRightPanel({
         )}
 
         {activeTab === 'score' && (
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {scores ? (
-              <ScoreCard
-                scores={scores}
-                processingTime={processingTime}
-                chunksRetrieved={chunksRetrieved}
-              />
+              <>
+                <ScoreCard
+                  scores={scores}
+                  processingTime={processingTime}
+                  chunksRetrieved={chunksRetrieved}
+                />
+                {/* Evaluation panel — only shown on demand */}
+                {queryId && (
+                  <EvaluationPanel queryId={queryId} />
+                )}
+              </>
             ) : (
-              <div className="text-center py-8">
-                <Star className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                <p className="text-xs text-gray-400">
+              <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+                <Star size={28} style={{ color: '#1C2230', margin: '0 auto 10px' }} />
+                <p style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 11, color: '#2A3A52',
+                }}>
                   Scorecard will appear after the first query
                 </p>
               </div>

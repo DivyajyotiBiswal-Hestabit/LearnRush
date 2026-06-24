@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { runMultiAgentPipeline } from '@/lib/agents/orchestrator'
 import { extractAndSaveMemories } from '@/lib/agents/memory'
 import { logRoutingDecision } from '@/lib/agents/router'
+import { sanitizeQuery } from '@/lib/security/promptSanitizer'
 
 
 export const maxDuration = 300
@@ -13,10 +14,32 @@ export async function POST(request) {
   if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
-  const { question, teamId, knowledgeBaseId, sessionId } = body
+  const { question: rawQuestion, teamId, knowledgeBaseId, sessionId } = body
 
-  if (!question?.trim()) {
+  if (!rawQuestion?.trim()) {
     return Response.json({ error: 'Question is required' }, { status: 400 })
+  }
+
+  const sanitization = await sanitizeQuery(rawQuestion)
+
+  if (!sanitization.safe) {
+    console.warn(`[Chat API] Query blocked: ${sanitization.blockReason}`)
+
+    return Response.json({
+      error: 'Query blocked',
+      reason: sanitization.blockReason,
+      severity: sanitization.severity,
+      helpMessage: sanitization.helpMessage,
+      blocked: true,
+    }, { status: 400 })
+  }
+
+// Use sanitized query (PII redacted, injection stripped)
+  const question = sanitization.sanitizedQuery
+
+// Log PII redaction if it happened
+  if (sanitization.piiRedacted) {
+    console.log(`[Chat API] PII redacted from query: ${sanitization.redactions.map(r => r.type).join(', ')}`)
   }
   if (!teamId) {
     return Response.json({ error: 'Team is required' }, { status: 400 })
@@ -94,7 +117,7 @@ export async function POST(request) {
             useLLMRerank: true,
             vectorWeight: 0.7,
             keywordWeight: 0.3,
-            topK: 6,
+            topK: 5,
             threshold: 0.3,
 
           },
